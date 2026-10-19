@@ -162,3 +162,9 @@ Scripts em `packaging/linux/` (testes: `packaging/linux/tests/test_packaging.sh`
 
 O núcleo do launcher não depende do COSMIC, mas: o modo escuro do sistema só lê/grava o arquivo de tema do COSMIC; as páginas de configurações da busca chamam `cosmic-settings`; o volume usa `wpctl` (PipeWire). Em GNOME/PulseAudio esses itens ficam indisponíveis ou dão erro. Caminho futuro: `gsettings` para o modo escuro, `gnome-control-center` por ambiente e `pactl` como alternativa ao `wpctl`.
 
+## Decisões de comportamento (a implementar na Fase 6, com a UI pronta)
+
+- **Pesquisa por teclado físico é o caminho principal.** O campo recebe o foco ao abrir (barra ou Y no controle). Teclado na tela para quem usa só o controle **não está previsto**; reavaliar só se o uso no sofá mostrar que faz falta.
+- **Ao abrir outro programa, o launcher se esconde** para o programa aparecer (comportamento de console). **O Guide passa a alternar** esconder/mostrar (a leitura do controle independe do foco da janela) e **Ctrl+Q continua fechando**. Isso muda o mapeamento da Fase 4, em que o Guide fecha o app.
+- **Riscos a testar no COSMIC antes de implementar:** (1) um cliente Wayland consegue se minimizar, mas trazer a própria janela de volta à frente depende de o compositor permitir (ativação de janela); (2) um programa aberto pelo launcher pode não ganhar o foco sozinho. Plano B se (1) falhar: atalho de teclado do COSMIC que chama o launcher, ou reabrir uma janela nova. Alternativa descartada: fechar o launcher ao abrir (perde o estado).
+
