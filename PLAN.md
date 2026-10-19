@@ -94,8 +94,7 @@ gamer-launcher/
 ## Notas de ambiente (descobertas na Fase 1)
 
 - **Linux:** o build do Flutter exige `clang`, `cmake`, `libgtk-3-dev` e `libstdc++-14-dev` (apt).
-- **Dois Rust no PC:** o `~/.rustup` global é antigo (1.67) e não lê `Cargo.lock` v4 nem edition 2024; o do asdf (1.98) funciona. Para compilar o app:
-  `R=$HOME/.asdf/installs/rust/stable; CARGO_HOME=$R RUSTUP_HOME=$R PATH="$R/bin:$PATH" flutter build linux --release`
+- **Rust:** 1.99.1 (stable) no asdf e no rustup global; Flutter 3.47.7 (stable, fixado em `.tool-versions`). Se o `~/.rustup` global voltar a ficar antigo, o build quebra com `Cargo.lock` v4/edition 2024: rodar `rustup update stable`.
 - Se o CMake reclamar de `build/native_assets/linux`, criar o diretório vazio (`mkdir -p build/native_assets/linux`).
 - Geração da ponte: `flutter_rust_bridge_codegen generate` dentro de `app/` (precisa de `cargo-expand`).
 - Contra o asdf, usar sempre o shim (`asdf reshim rust` após `cargo install`).
