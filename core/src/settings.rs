@@ -1,9 +1,8 @@
+use crate::fs_util::write_atomic;
 use crate::time_of_day::TimeOfDay;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::{fs, io};
 use thiserror::Error;
 
@@ -197,37 +196,10 @@ impl Settings {
         Ok(settings)
     }
 
-    /// Grava em arquivo temporário vizinho, força o disco e renomeia, para
-    /// nunca deixar um arquivo pela metade. O temporário some em caso de erro.
+    /// Gravação atômica (ver [`write_atomic`]).
     pub fn save(&self, path: &Path) -> Result<(), SettingsError> {
         self.validate()?;
-        if let Some(dir) = path.parent() {
-            fs::create_dir_all(dir)?;
-        }
         let json = serde_json::to_string_pretty(self)?;
-        let temp = temp_path_beside(path);
-        let written = write_synced(&temp, json.as_bytes()).and_then(|()| fs::rename(&temp, path));
-        if written.is_err() {
-            let _ = fs::remove_file(&temp);
-        }
-        Ok(written?)
+        Ok(write_atomic(path, json.as_bytes())?)
     }
-}
-
-/// Nome único por processo e por chamada, para saves concorrentes não colidirem.
-fn temp_path_beside(path: &Path) -> PathBuf {
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-    let mut name = path.as_os_str().to_owned();
-    name.push(format!(
-        ".{}-{}.tmp",
-        std::process::id(),
-        COUNTER.fetch_add(1, Ordering::Relaxed)
-    ));
-    PathBuf::from(name)
-}
-
-fn write_synced(path: &Path, bytes: &[u8]) -> io::Result<()> {
-    let mut file = fs::File::create(path)?;
-    file.write_all(bytes)?;
-    file.sync_all()
 }

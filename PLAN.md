@@ -54,7 +54,7 @@ gamer-launcher/
 
 - O Rust expõe uma **trait por capacidade** (rede, áudio, brilho, energia). Cada SO implementa a sua. Os testes usam implementações falsas.
 - A UI nunca fala com o SO diretamente, só com o `core` pela ponte.
-- Linux: `zbus` (NetworkManager, BlueZ, energia), PipeWire/PulseAudio para volume. Windows: crate `windows`.
+- Linux (decidido na Fase 3): programas de linha de comando por trás de um `CommandRunner` (trocável por um falso nos testes): `nmcli` (Wi-Fi), `bluetoothctl` + `rfkill` (Bluetooth), `wpctl` (volume), brilho lido de `/sys/class/backlight` e escrito pelo `logind` via `busctl`, e modo escuro do sistema no arquivo `is_dark` do COSMIC. Sem `zbus`. Windows: crate `windows`.
 
 ### Entrada e navegação
 
@@ -107,6 +107,12 @@ gamer-launcher/
 | 2 (só núcleo Rust, sem mudança na UI) | igual à Fase 1 | igual |
 
 Dentro da faixa esperada do Flutter (150-250 MB). Meta definitiva: ver "Em aberto".
+
+## Fase 3: o que ficou de fora
+
+- **Luz noturna:** não encontrei API estável no COSMIC; fica fora da v1 (o painel mostra o botão desativado ou o oculta).
+- **Escrita de Wi-Fi/Bluetooth/modo escuro** foi testada com executor falso; só o brilho foi validado de verdade na máquina (leituras dos demais conferem com o sistema). Alternar o Wi-Fi e o Bluetooth de verdade fica para teste manual na Fase 5, para não derrubar a conexão sem você ver.
+- Modo escuro do sistema só atua em apps que seguem o tema do COSMIC.
 
 ## Fase 2: limitações conhecidas (da revisão de código)
 

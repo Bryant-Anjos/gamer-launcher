@@ -8,6 +8,7 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 const APP_DIR: &str = "gamer-launcher";
+const COSMIC_DARK_MODE_FILE: &str = "cosmic/com.system76.CosmicTheme.Mode/v1/is_dark";
 const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
 
 fn absolute_env_dir(lookup: &impl Fn(&str) -> Option<OsString>, name: &str) -> Option<PathBuf> {
@@ -58,6 +59,15 @@ pub fn recents_path_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<P
 
 fn process_env(name: &str) -> Option<OsString> {
     env::var_os(name)
+}
+
+/// Arquivo em que o COSMIC guarda se o tema do sistema é escuro.
+pub fn cosmic_dark_mode_path_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    config_home_with(lookup).map(|dir| dir.join(COSMIC_DARK_MODE_FILE))
+}
+
+pub fn cosmic_dark_mode_path() -> Option<PathBuf> {
+    cosmic_dark_mode_path_with(&process_env)
 }
 
 pub fn data_home() -> Option<PathBuf> {
