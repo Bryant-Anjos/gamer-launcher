@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Gamer Launcher
+Comment=Launcher em tela cheia, estilo console, controlado por gamepad
+Exec=gamer-launcher
+Icon=gamer-launcher
+Terminal=false
+Categories=Utility;
+StartupNotify=false

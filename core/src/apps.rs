@@ -202,16 +202,20 @@ pub fn find_app<'a>(apps: &'a [AppEntry], id: &str) -> Option<&'a AppEntry> {
     apps.iter().find(|app| app.id == id)
 }
 
-/// Inicia o programa sem esperar por ele; o processo filho é recolhido em
-/// segundo plano para não virar zumbi.
-fn spawn_detached(program: &str, args: &[String], dir: Option<&Path>) -> io::Result<()> {
+/// Inicia um programa sem esperar por ele, sem shell e sem terminal; o
+/// processo filho é recolhido em segundo plano para não virar zumbi.
+pub(crate) fn spawn_detached(
+    program: &str,
+    args: &[String],
+    working_dir: Option<&Path>,
+) -> io::Result<()> {
     let mut command = Command::new(program);
     command
         .args(args)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
-    if let Some(dir) = dir {
+    if let Some(dir) = working_dir {
         command.current_dir(dir);
     }
     #[cfg(unix)]
@@ -223,6 +227,7 @@ fn spawn_detached(program: &str, args: &[String], dir: Option<&Path>) -> io::Res
     Ok(())
 }
 
+/// Abre o app sem esperar por ele.
 pub fn launch(app: &AppEntry) -> io::Result<()> {
     if app.terminal {
         return Err(io::Error::new(

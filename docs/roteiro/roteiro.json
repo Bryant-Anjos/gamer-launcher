@@ -1,0 +1,588 @@
+{
+  "versao": 1,
+  "watch": [
+    "core/src/**/*.rs",
+    "app/lib/**/*.dart",
+    "app/rust/src/**/*.rs",
+    "app/linux/runner/*",
+    "app/linux/CMakeLists.txt",
+    "packaging/linux/*.sh",
+    "packaging/linux/*.desktop",
+    "packaging/linux/*.svg",
+    ".github/workflows/release.yml"
+  ],
+  "ignore": [
+    "core/src/lib.rs",
+    "app/lib/src/rust/**",
+    "app/rust/src/frb_generated.rs",
+    "app/rust/src/lib.rs",
+    "app/rust/src/api/mod.rs",
+    "app/rust/src/api/meta.rs",
+    "app/rust/src/api_tests.rs",
+    "app/rust/src/convert/**",
+    "app/lib/backend/**",
+    "app/lib/state/latest_writer.dart",
+    "app/lib/state/launcher_state.dart",
+    "app/lib/state/messages.dart",
+    "app/lib/util/formatting.dart",
+    "app/lib/ui/launcher_scope.dart",
+    "app/lib/theme/dimens.dart",
+    "app/lib/ui/pages/page_header.dart"
+  ],
+  "sections": [
+    {
+      "id": "instalar",
+      "title": "Instalar e abrir",
+      "sub": "Pacote, menu, tela cheia e fechar",
+      "items": [
+        "Instale o pacote .deb (sudo apt install ./gamer-launcher_0.1.0_amd64.deb) ou deixe o AppImage executável e abra. Confira se instala sem erro.",
+        "Procure \"Gamer Launcher\" no menu de aplicativos. Confira se o ícone aparece e se o programa abre.",
+        "Abra também pelo terminal com o comando gamer-launcher.",
+        "Confira se ocupa a tela inteira, sem barra de título nem bordas, e se abre em poucos segundos.",
+        "Confira se a primeira tela aparece sem mensagem de erro.",
+        "Feche com o botão Guide do controle. Abra de novo e feche com Ctrl+Q. Confira se fecha por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
+        "Abra o launcher duas vezes seguidas. Anote o que acontece (duas janelas? a segunda fecha? dá erro?).",
+        "Desinstale (sudo apt remove gamer-launcher). Confira se o atalho do menu some."
+      ],
+      "covers": [
+        "packaging/linux/*.sh",
+        "packaging/linux/*.desktop",
+        "packaging/linux/*.svg",
+        ".github/workflows/release.yml",
+        "app/linux/runner/*",
+        "app/linux/CMakeLists.txt",
+        "app/lib/main.dart"
+      ],
+      "reviewed": {
+        ".github/workflows/release.yml": "7d01b146f691",
+        "app/lib/main.dart": "2528dc338540",
+        "app/linux/CMakeLists.txt": "41cb78aea946",
+        "app/linux/runner/CMakeLists.txt": "8cdcfd911e77",
+        "app/linux/runner/main.cc": "ea23f7cdf740",
+        "app/linux/runner/my_application.cc": "ae76d6783d10",
+        "app/linux/runner/my_application.h": "a4218d7ac0db",
+        "packaging/linux/build-appdir.sh": "63d9b4ef2a89",
+        "packaging/linux/build-appimage.sh": "674468b78320",
+        "packaging/linux/build-deb.sh": "dc501dbecd11",
+        "packaging/linux/common.sh": "9529cfc4e597",
+        "packaging/linux/gamer-launcher.desktop": "88a91850f503",
+        "packaging/linux/gamer-launcher.svg": "332eb1294f07"
+      },
+      "itemsHash": "23da77b8d185",
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O main.dart só passou a criar o RustBackend da UI; nada muda na instalação, no atalho nem na abertura."
+        }
+      ]
+    },
+    {
+      "id": "controle",
+      "title": "Controle de videogame",
+      "sub": "Navegar, confirmar, voltar e fechar",
+      "priority": "Precisa de controle físico",
+      "desc": "A lógica foi testada com um controle virtual. Falta confirmar em controle de verdade, de preferência em mais de um modelo.",
+      "items": [
+        "Conecte um controle (cabo ou Bluetooth) com o launcher já aberto. Confira se ele passa a responder sem precisar reiniciar o programa.",
+        "Com o direcional (D-pad), vá para cima, baixo, esquerda e direita. Confira se o destaque do foco vai para o item certo.",
+        "Repita com o analógico esquerdo. Com o analógico solto, confira se o foco NÃO anda sozinho.",
+        "Segure uma direção. Confira se repete devagar no começo, depois em ritmo constante, e para assim que você solta.",
+        "Aperte A para abrir o item em foco e B para voltar. Na tela inicial, o B não deve fechar o launcher.",
+        "Aperte LB e RB. Confira se trocam de seção.",
+        "Aperte Y (pesquisa) e Start (controle rápido).",
+        "Aperte o botão Guide (o botão central). Confira se o launcher fecha.",
+        "Segure uma direção e, com ela apertada, desconecte o controle (tire o cabo ou desligue). Confira se o foco para de correr sozinho.",
+        "Reconecte o controle. Confira se volta a responder.",
+        "Repita os testes com outro modelo de controle (Xbox, PlayStation, 8BitDo...). Anote em qual algo não funcionou ou veio com botões trocados.",
+        "Conecte dois controles ao mesmo tempo. Confira se os dois funcionam e se um não atrapalha o outro.",
+        "Com o controle rápido aberto (Start), mova com o direcional. Confira se o foco fica dentro do painel e não vai para itens escondidos atrás dele."
+      ],
+      "covers": [
+        "core/src/input.rs",
+        "core/src/gamepad.rs",
+        "app/rust/src/api/input.rs",
+        "app/lib/input/gamepad_stream.dart",
+        "app/lib/input/input_router.dart",
+        "app/lib/input/adjust_intent.dart",
+        "app/lib/state/gamepad_status.dart"
+      ],
+      "reviewed": {
+        "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
+        "app/lib/input/gamepad_stream.dart": "cc39ff1ab220",
+        "app/lib/input/input_router.dart": "1d679b5caca1",
+        "app/lib/state/gamepad_status.dart": "45985707455b",
+        "app/rust/src/api/input.rs": "556cef9a6cea",
+        "core/src/gamepad.rs": "ae7c94cdcb79",
+        "core/src/input.rs": "3514299523ae"
+      },
+      "itemsHash": "edfe55269f51",
+      "reviews": []
+    },
+    {
+      "id": "teclado",
+      "title": "Teclado e mouse",
+      "sub": "Tudo também sem controle",
+      "items": [
+        "Use as setas. Confira se movem o foco em todas as direções.",
+        "Aperte Enter ou Espaço no item em foco. Confira se ele abre.",
+        "Aperte Esc em uma tela interna. Confira se volta.",
+        "Aperte Tab e Shift+Tab. Confira se o foco percorre os itens em ordem lógica.",
+        "Clique com o mouse nos itens e use a rodinha em listas longas.",
+        "Alterne entre controle, teclado e mouse na mesma sessão. Confira se um não atrapalha o outro.",
+        "Com o controle rápido aberto, aperte Ctrl+Q. Confira se o launcher fecha mesmo assim."
+      ],
+      "covers": [
+        "app/lib/input/input_router.dart",
+        "app/lib/input/adjust_intent.dart"
+      ],
+      "reviewed": {
+        "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
+        "app/lib/input/input_router.dart": "1d679b5caca1"
+      },
+      "itemsHash": "4d9bba16a13f",
+      "reviews": []
+    },
+    {
+      "id": "visual",
+      "title": "Tema e papel de parede",
+      "sub": "Claro, escuro, automático e imagem de fundo",
+      "items": [
+        "Escolha o tema claro e depois o escuro. Confira se tudo muda junto e se os textos continuam legíveis.",
+        "Em Configurações > Tema, escolha Automático e ajuste \"Escuro a partir de\" e \"Claro a partir de\" com os botões Mais cedo e Mais tarde, para virar daqui a poucos minutos. Confira se o tema troca sozinho na hora certa, inclusive cruzando a meia-noite.",
+        "Em Configurações > Wallpaper, escolha uma imagem (uma grande, de preferência). Confira se aparece sem travar e sem esticar de forma estranha, e se a lista de imagens abre rápido.",
+        "Tente uma imagem muito clara e uma muito escura. Confira se os textos continuam legíveis nas duas.",
+        "Escolha \"Nenhum\" no Wallpaper. Confira se volta a um fundo liso do tema.",
+        "Apague do disco a imagem escolhida e reabra o launcher. Confira se abre normalmente, sem erro.",
+        "Confira se o destaque do foco é bem visível nos dois temas, com e sem papel de parede.",
+        "Feche e abra o launcher. Confira se tema e papel de parede continuam como você deixou.",
+        "Se a lista de imagens falhar, confira se aparece \"Não foi possível listar as imagens\" com o motivo."
+      ],
+      "covers": [
+        "core/src/theme.rs",
+        "core/src/time_of_day.rs",
+        "core/src/wallpapers.rs",
+        "app/lib/theme/launcher_theme.dart",
+        "app/lib/ui/settings/settings_page.dart",
+        "app/lib/ui/settings/wallpaper_picker.dart",
+        "app/lib/ui/settings/settings_controls.dart",
+        "app/lib/ui/shell/launcher_background.dart",
+        "app/lib/ui/widgets/focus_tile.dart",
+        "app/lib/ui/widgets/panel_card.dart",
+        "app/lib/state/settings_edit.dart"
+      ],
+      "reviewed": {
+        "app/lib/state/settings_edit.dart": "ff89a65bca98",
+        "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
+        "app/lib/ui/settings/settings_controls.dart": "2bd55da8b33d",
+        "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
+        "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
+        "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
+        "app/lib/ui/widgets/focus_tile.dart": "2422fe86f6b5",
+        "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
+        "core/src/theme.rs": "2dba34e92256",
+        "core/src/time_of_day.rs": "3648a3ad3dd3",
+        "core/src/wallpapers.rs": "0ea70ce54eac"
+      },
+      "itemsHash": "60a94224d711",
+      "reviews": []
+    },
+    {
+      "id": "paineis",
+      "title": "Mostrar e ocultar painéis",
+      "sub": "Deixar só o essencial",
+      "items": [
+        "Em Configurações > \"Painéis da tela inicial\", oculte um painel por vez: pesquisa, controle rápido, sistema, recentes, favoritos e cartões. Confira se o layout se reorganiza sem buracos nem sobreposição.",
+        "Oculte todos. Confira se ainda dá para navegar pelo menu principal e para trazer os painéis de volta.",
+        "Mostre todos de novo. Confira se voltam no lugar certo.",
+        "Feche e abra o launcher. Confira se a escolha de painéis foi lembrada."
+      ],
+      "covers": [
+        "core/src/settings.rs",
+        "app/lib/ui/settings/settings_page.dart",
+        "app/lib/ui/home/home_page.dart",
+        "app/rust/src/api/settings.rs"
+      ],
+      "reviewed": {
+        "app/lib/ui/home/home_page.dart": "6ed5c801706e",
+        "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
+        "app/rust/src/api/settings.rs": "8cbff3ceb194",
+        "core/src/settings.rs": "121ab8ceb617"
+      },
+      "itemsHash": "dc74ddc2780b",
+      "reviews": []
+    },
+    {
+      "id": "inicio",
+      "title": "Início e cartões",
+      "sub": "Continuar, Projetos, Jogos e Músicas",
+      "items": [
+        "Abra a tela inicial. Confira se aparecem a saudação com o seu primeiro nome, a navegação lateral, a barra superior (Wi-Fi, volume, controle conectado, hora e data) e os quatro cartões: Continuar, Projetos, Jogos e Músicas.",
+        "No cartão Continuar, confira se diz \"Nenhum app aberto ainda\" antes de abrir algo e se passa a mostrar o último aplicativo aberto pelo launcher depois.",
+        "Abra o cartão Projetos. Hoje ele mostra quantos itens recentes existem e leva a Arquivos. Anote se é isso que você esperava dele.",
+        "Confira o cartão Músicas: sem player instalado ele aparece apagado com \"Nenhum player encontrado\"; com um player instalado, \"Abrir player\" deve abri-lo. Anote qual player abriu se houver vários.",
+        "Troque entre Início, Aplicativos, Jogos, Arquivos e Configurações. Confira se cada uma abre a tela certa.",
+        "Confira se a hora e a data da barra superior estão certas e se a hora atualiza sozinha.",
+        "Confira se a saudação muda conforme a hora do dia (bom dia, boa tarde, boa noite)."
+      ],
+      "covers": [
+        "app/lib/launcher_app.dart",
+        "app/lib/ui/home/home_page.dart",
+        "app/lib/ui/home/greeting_header.dart",
+        "app/lib/ui/home/featured_cards.dart",
+        "app/lib/ui/shell/launcher_shell.dart",
+        "app/lib/ui/shell/side_nav.dart",
+        "app/lib/ui/shell/top_bar.dart",
+        "app/lib/state/launcher_controller.dart",
+        "app/lib/state/clock.dart",
+        "core/src/history.rs",
+        "core/src/user.rs"
+      ],
+      "reviewed": {
+        "app/lib/launcher_app.dart": "2c0887dd03db",
+        "app/lib/state/clock.dart": "9f13cfa32f2a",
+        "app/lib/state/launcher_controller.dart": "7751c85c8a24",
+        "app/lib/ui/home/featured_cards.dart": "a185f648562e",
+        "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
+        "app/lib/ui/home/home_page.dart": "6ed5c801706e",
+        "app/lib/ui/shell/launcher_shell.dart": "67ae141dffbf",
+        "app/lib/ui/shell/side_nav.dart": "ffd313f39dbc",
+        "app/lib/ui/shell/top_bar.dart": "5ff7f662f98b",
+        "core/src/history.rs": "d02f2fd3e17f",
+        "core/src/user.rs": "891e6dec580a"
+      },
+      "itemsHash": "fc585849b599",
+      "reviews": []
+    },
+    {
+      "id": "apps",
+      "title": "Aplicativos e favoritos",
+      "sub": "Lista, abrir e fixar",
+      "items": [
+        "Abra Aplicativos. Confira se o número \"N instalados\" e a lista batem com o menu de aplicativos do sistema, em ordem alfabética, e se os apps sem ícone aparecem com a inicial.",
+        "Abra um aplicativo simples (calculadora, por exemplo). Anote o que acontece com o launcher: some, fica atrás ou continua por cima? A ideia em estudo é ele sair da frente para você ver o programa.",
+        "Abra um aplicativo de terminal, como o htop, se tiver atalho. Confira se aparece uma mensagem clara, e não um erro técnico nem silêncio.",
+        "Instale ou desinstale um aplicativo e reabra o launcher. Confira se a lista acompanha.",
+        "Na tela inicial, em \"Aplicativos favoritos\", abra o botão \"Adicionar\". Confira se abre \"Escolha os favoritos\" (A marca ou desmarca, B fecha) e se o app escolhido aparece na grade.",
+        "Desmarque um favorito no mesmo seletor. Confira se ele some da grade.",
+        "Feche e abra o launcher. Confira se os favoritos continuam.",
+        "Sem nenhum favorito, confira se a grade mostra só o botão \"Adicionar\" (hoje não há favoritos padrão)."
+      ],
+      "covers": [
+        "core/src/apps.rs",
+        "core/src/icons.rs",
+        "app/lib/ui/pages/apps_page.dart",
+        "app/lib/ui/home/favorites_panel.dart",
+        "app/lib/ui/home/favorites_picker.dart",
+        "app/lib/ui/widgets/app_icon.dart"
+      ],
+      "reviewed": {
+        "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
+        "app/lib/ui/home/favorites_picker.dart": "26a87f7b65d1",
+        "app/lib/ui/pages/apps_page.dart": "20850355065c",
+        "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
+        "core/src/apps.rs": "e1c1bc2ec028",
+        "core/src/icons.rs": "fe7303cd015c"
+      },
+      "itemsHash": "64eeb3c7ab84",
+      "reviews": []
+    },
+    {
+      "id": "recentes",
+      "title": "Arquivos recentes",
+      "sub": "Lista e abrir com o programa padrão",
+      "items": [
+        "Na tela inicial, confira se o painel \"Recentes\" bate com os arquivos recentes do gerenciador de arquivos. Abra também a seção Arquivos (\"Arquivos e pastas abertos recentemente\") e confira a mesma lista.",
+        "Abra um arquivo da lista. Confira se abre no programa certo.",
+        "Apague um arquivo que estava na lista e reabra o launcher. Confira se ele sumiu da lista.",
+        "Se a lista ficar vazia, confira se aparece \"Nada recente por aqui.\""
+      ],
+      "covers": [
+        "core/src/recents.rs",
+        "app/lib/ui/home/recents_panel.dart",
+        "app/lib/ui/widgets/recent_tile.dart",
+        "app/lib/ui/pages/files_page.dart",
+        "app/rust/src/api/files.rs"
+      ],
+      "reviewed": {
+        "app/lib/ui/home/recents_panel.dart": "e3cb008390bc",
+        "app/lib/ui/pages/files_page.dart": "5a80974480eb",
+        "app/lib/ui/widgets/recent_tile.dart": "78d2af4994e8",
+        "app/rust/src/api/files.rs": "85313b83b7a4",
+        "core/src/recents.rs": "45843026b6a8"
+      },
+      "itemsHash": "e8af3ffc1a70",
+      "reviews": []
+    },
+    {
+      "id": "controle-rapido",
+      "title": "Controle rápido",
+      "sub": "Wi-Fi, Bluetooth, volume, brilho e modo escuro",
+      "priority": "Wi-Fi e Bluetooth derrubam a conexão",
+      "desc": "Abre com Start no controle. Só desligue o Wi-Fi se puder ficar sem internet por um instante.",
+      "items": [
+        "Abra o controle rápido pelo Start (ou pelo ícone, com o mouse). Confira se abre por cima da tela e se o foco fica dentro do painel, sem ir para itens escondidos atrás.",
+        "Feche com B e abra de novo.",
+        "Mude o volume. Confira se o som do sistema acompanha e se o valor mostrado bate com o do sistema.",
+        "Silencie e reative o som, se houver o controle.",
+        "Mude o brilho. Confira se a tela acompanha. O brilho nunca deve apagar a tela por completo, nem em 0%.",
+        "Ligue e desligue o modo escuro do sistema. Confira se os aplicativos do COSMIC acompanham.",
+        "Desligue o Wi-Fi e ligue de novo. Confira se o nome da rede volta a aparecer e se a conexão retorna.",
+        "Ligue e desligue o Bluetooth. Confira se o estado mostrado bate com o do sistema.",
+        "Em um computador sem controle de brilho (de mesa), confira se o item aparece indisponível em vez de travar o painel.",
+        "Confira se não há botão de luz noturna quebrado: ela ainda não existe nesta versão.",
+        "Confira se cada controle mostra o estado (\"Ativado\", \"Desativado\", \"Indisponível\" ou \"Lendo...\") e se Volume e Brilho se ajustam com esquerda e direita.",
+        "Ajuste o volume segurando a direção. Confira se o valor final mostrado bate com o do sistema.",
+        "Em Configurações, oculte o painel de controle rápido e aperte Start. Anote o que acontece (dúvida em aberto: deveria abrir mesmo oculto?)."
+      ],
+      "covers": [
+        "core/src/system/*.rs",
+        "app/rust/src/api/system.rs",
+        "app/lib/ui/quick/*.dart",
+        "app/lib/ui/widgets/level_slider.dart",
+        "app/lib/state/quick_controls_controller.dart",
+        "app/lib/state/quick_controls_edit.dart"
+      ],
+      "reviewed": {
+        "app/lib/state/quick_controls_controller.dart": "c6673ecd3ff6",
+        "app/lib/state/quick_controls_edit.dart": "9f752b41b06a",
+        "app/lib/ui/quick/overlays.dart": "b3d4b72c68ba",
+        "app/lib/ui/quick/quick_controls_panel.dart": "9941ae119a34",
+        "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
+        "app/rust/src/api/system.rs": "1fc2f28ce668",
+        "core/src/system/error.rs": "a214856a4ee9",
+        "core/src/system/linux.rs": "3cb114277a1c",
+        "core/src/system/mod.rs": "c5a23a75be6d",
+        "core/src/system/parse.rs": "015052330404",
+        "core/src/system/runner.rs": "007097823ffc"
+      },
+      "itemsHash": "d259f819115a",
+      "reviews": []
+    },
+    {
+      "id": "sistema",
+      "title": "Painel do sistema",
+      "sub": "CPU, memória e disco",
+      "items": [
+        "Compare a memória usada com o comando free -h. Confira se os valores batem.",
+        "Compare o espaço do disco com o comando df -h /.",
+        "Compare a CPU com o btop ou o monitor do sistema.",
+        "Abra um programa pesado. Confira se o gráfico da CPU sobe e depois desce.",
+        "Confira se os números atualizam sozinhos, mais ou menos uma vez por segundo.",
+        "Confira se o painel Sistema mostra CPU, RAM e Disco com gráficos e se, quando uma leitura falha, aparece um aviso (uma vez) em vez de gráficos vazios."
+      ],
+      "covers": [
+        "core/src/stats.rs",
+        "app/lib/ui/home/system_panel.dart",
+        "app/lib/ui/widgets/charts.dart",
+        "app/lib/state/system_monitor.dart"
+      ],
+      "reviewed": {
+        "app/lib/state/system_monitor.dart": "bbaeb102ecda",
+        "app/lib/ui/home/system_panel.dart": "ac005873d478",
+        "app/lib/ui/widgets/charts.dart": "2598986b0179",
+        "core/src/stats.rs": "7589918568f6"
+      },
+      "itemsHash": "de41a718f457",
+      "reviews": []
+    },
+    {
+      "id": "pesquisa",
+      "title": "Pesquisa global",
+      "sub": "Apps, arquivos e configurações",
+      "priority": "Ainda em desenvolvimento",
+      "desc": "O núcleo da busca já existe. A tela de pesquisa ainda será ligada, então estes testes valem quando ela estiver pronta.",
+      "items": [
+        "Aperte Y (ou vá até a barra \"Pesquisar aplicativos, arquivos, configurações...\"). Confira se o campo recebe o foco. Hoje a busca em si ainda não funciona: confira se aparece \"A pesquisa chega na próxima versão.\"",
+        "Digite no teclado físico. Confira se os resultados atualizam a cada letra e se as setas e o Enter escolhem e abrem um resultado.",
+        "Pesquise o nome de um aplicativo. Confira se aparece e se abre.",
+        "Pesquise por sigla, como vsc para o Visual Studio Code.",
+        "Pesquise o nome de um arquivo recente. Confira se aparece e se abre.",
+        "Pesquise wifi, bluetooth e papel de parede. Confira se abrem as páginas certas de configurações.",
+        "Pesquise com maiúsculas e sem acentos. Confira se acha do mesmo jeito.",
+        "Pesquise algo que não existe. Confira se aparece uma mensagem de nada encontrado.",
+        "Se você costuma usar só o controle (no sofá), anote se faz falta um teclado na tela. Hoje ele não está previsto; a digitação é pelo teclado físico."
+      ],
+      "covers": [
+        "core/src/search.rs",
+        "core/src/catalog.rs",
+        "core/src/open.rs",
+        "app/rust/src/api/catalog.rs"
+      ],
+      "reviewed": {
+        "app/rust/src/api/catalog.rs": "c96f9f610fec",
+        "core/src/catalog.rs": "969c1987ddcc",
+        "core/src/open.rs": "4863c3edfde7",
+        "core/src/search.rs": "57d64d75b23d"
+      },
+      "itemsHash": "e42b4a2b3250",
+      "reviews": []
+    },
+    {
+      "id": "jogos",
+      "title": "Jogos",
+      "sub": "Atalho para Steam, Heroic e Lutris",
+      "items": [
+        "Abra Jogos. Com Steam, Heroic ou Lutris instalados, confira se aparece \"Abra a biblioteca no seu lançador\" com eles; sem nenhum, confira a mensagem pedindo para instalar um (nesta máquina nenhum está instalado).",
+        "Abra o Steam (ou outra loja) por aqui. Confira se abre e se dá para voltar ao launcher depois.",
+        "Em um computador sem nenhuma loja instalada, confira se aparece um aviso claro.",
+        "No cartão Jogos da tela inicial, confira se aparece apagado com \"Steam, Heroic ou Lutris não encontrados\" quando não há lançador, e \"Iniciar biblioteca\" quando há."
+      ],
+      "covers": [
+        "core/src/featured.rs",
+        "app/lib/ui/pages/games_page.dart"
+      ],
+      "reviewed": {
+        "app/lib/ui/pages/games_page.dart": "6df9bdf0cef1",
+        "core/src/featured.rs": "2cb6c5933f13"
+      },
+      "itemsHash": "b7aa3f50dcf9",
+      "reviews": []
+    },
+    {
+      "id": "desktop",
+      "title": "Convivência com o desktop",
+      "sub": "Por cima do COSMIC, janelas e monitores",
+      "items": [
+        "Com o launcher aberto, troque de janela (Super ou Alt+Tab). Anote como o launcher se comporta.",
+        "Abra um aplicativo pelo launcher e volte para ele. Confira se a volta é natural.",
+        "Confira se o painel e o dock do COSMIC ficam visíveis ou cobertos, e se isso é o que você esperaria.",
+        "Com dois monitores, anote em qual deles o launcher abre e se cobre os dois.",
+        "Suspenda o computador e acorde. Confira se o launcher continua funcionando, inclusive o controle.",
+        "Conecte ou desconecte um monitor com o launcher aberto. Confira se ele se ajusta sem travar.",
+        "Se puder, teste numa sessão X11 além do Wayland e anote as diferenças."
+      ],
+      "covers": [
+        "app/linux/runner/*"
+      ],
+      "reviewed": {
+        "app/linux/runner/CMakeLists.txt": "8cdcfd911e77",
+        "app/linux/runner/main.cc": "ea23f7cdf740",
+        "app/linux/runner/my_application.cc": "ae76d6783d10",
+        "app/linux/runner/my_application.h": "a4218d7ac0db"
+      },
+      "itemsHash": "da7481d650c5",
+      "reviews": []
+    },
+    {
+      "id": "config",
+      "title": "Configurações salvas",
+      "sub": "Arquivo em ~/.config/gamer-launcher",
+      "items": [
+        "Mude o tema e os painéis, feche e abra o launcher. Confira se tudo foi lembrado.",
+        "Apague o arquivo ~/.config/gamer-launcher/settings.json e abra o launcher. Confira se abre com os padrões, sem erro.",
+        "Estrague o arquivo de propósito (escreva um texto qualquer dentro). Confira se o launcher abre e avisa em vez de travar. Anote o que aparece.",
+        "Depois de estragar, mude uma opção. Confira se o arquivo volta a ficar válido.",
+        "O último app aberto fica em ~/.local/state/gamer-launcher/history.json. Apague o arquivo e confira se o cartão Continuar volta a \"Nenhum app aberto ainda\", sem erro."
+      ],
+      "covers": [
+        "core/src/settings.rs",
+        "core/src/paths.rs",
+        "core/src/fs_util.rs",
+        "app/rust/src/api/settings.rs"
+      ],
+      "reviewed": {
+        "app/rust/src/api/settings.rs": "8cbff3ceb194",
+        "core/src/fs_util.rs": "9e6d1889c09f",
+        "core/src/paths.rs": "c4d915aed584",
+        "core/src/settings.rs": "121ab8ceb617"
+      },
+      "itemsHash": "eb6eb25a0554",
+      "reviews": []
+    },
+    {
+      "id": "desempenho",
+      "title": "Desempenho",
+      "sub": "Memória, CPU e fluidez",
+      "items": [
+        "Com o launcher parado na tela inicial, meça a memória: ps -o rss= -p $(pgrep -x gamer_launcher). O número é em KB. Anote. (Com a tela vazia deu cerca de 209 MB.)",
+        "Meça a CPU parado, com top -p $(pgrep -x gamer_launcher). Deve ficar perto de 0%.",
+        "Navegue com o controle por todas as telas. Confira se o movimento é fluido, sem engasgos.",
+        "Abra e feche o launcher umas 20 vezes. Confira se a memória não vai só subindo.",
+        "Deixe aberto por uma hora e meça de novo. Confira se a memória não cresceu muito.",
+        "No notebook, deixe aberto na tomada e na bateria. Anote se esquenta, se a ventoinha acelera ou se a bateria cai mais rápido.",
+        "Minimize ou esconda o launcher e meça a CPU: deve ficar perto de 0%, pois as leituras do sistema só rodam com a tela visível."
+      ],
+      "covers": [
+        "app/lib/state/poller.dart",
+        "app/lib/ui/widgets/poller_attachment.dart"
+      ],
+      "reviewed": {
+        "app/lib/state/poller.dart": "bc036fb9bd2f",
+        "app/lib/ui/widgets/poller_attachment.dart": "148131cb9a20"
+      },
+      "itemsHash": "0494949db9da",
+      "reviews": []
+    },
+    {
+      "id": "pacotes",
+      "title": "Pacotes e instalação",
+      "sub": ".deb e AppImage",
+      "items": [
+        "Instale o .deb por cima de uma versão anterior. Confira se as configurações continuam.",
+        "Remova o pacote. Confira se as configurações em ~/.config/gamer-launcher continuam (é o esperado).",
+        "Abra o AppImage direto, sem instalar. Se não abrir, anote a mensagem (ele precisa do FUSE).",
+        "Confira se o ícone aparece no menu e na lista de janelas.",
+        "Confira se o comando gamer-launcher funciona de qualquer pasta."
+      ],
+      "covers": [
+        "packaging/linux/*.sh",
+        "packaging/linux/*.desktop",
+        "packaging/linux/*.svg",
+        ".github/workflows/release.yml"
+      ],
+      "reviewed": {
+        ".github/workflows/release.yml": "7d01b146f691",
+        "packaging/linux/build-appdir.sh": "63d9b4ef2a89",
+        "packaging/linux/build-appimage.sh": "674468b78320",
+        "packaging/linux/build-deb.sh": "dc501dbecd11",
+        "packaging/linux/common.sh": "9529cfc4e597",
+        "packaging/linux/gamer-launcher.desktop": "88a91850f503",
+        "packaging/linux/gamer-launcher.svg": "332eb1294f07"
+      },
+      "itemsHash": "09be864b0810",
+      "reviews": []
+    },
+    {
+      "id": "outros",
+      "title": "Outros computadores",
+      "sub": "Versões e ambientes diferentes",
+      "priority": "Opcional",
+      "desc": "O projeto foi feito para o Pop!_OS 24.04 com COSMIC. Em outros ambientes, alguns itens podem ficar indisponíveis, mas o launcher não pode travar.",
+      "items": [
+        "Em um Pop!_OS 22.04 ou Ubuntu com GNOME, confira se o launcher abre. Anote a mensagem se não abrir.",
+        "Nesse ambiente, confira se modo escuro, páginas de configurações e volume aparecem como indisponíveis, sem travar.",
+        "Confira se o controle e a lista de aplicativos funcionam normalmente."
+      ],
+      "covers": [
+        "core/src/system/linux.rs",
+        "core/src/paths.rs"
+      ],
+      "reviewed": {
+        "core/src/paths.rs": "c4d915aed584",
+        "core/src/system/linux.rs": "3cb114277a1c"
+      },
+      "itemsHash": "8c05993e0ad7",
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O paths.rs só ganhou o diretório de estado (XDG_STATE_HOME) para o histórico; a compatibilidade com outros ambientes não muda."
+        }
+      ]
+    },
+    {
+      "id": "longe",
+      "title": "Ler à distância",
+      "sub": "Como na TV ou no sofá",
+      "items": [
+        "Sente a 2 ou 3 metros da tela e leia os textos principais. Anote o que ficou pequeno demais.",
+        "Confira se o foco continua fácil de achar à distância.",
+        "Confira o contraste dos textos sobre o papel de parede.",
+        "Confira se os itens são grandes o bastante para acertar com o analógico."
+      ],
+      "covers": [],
+      "reviewed": {},
+      "itemsHash": "3aaa24917ad0",
+      "reviews": []
+    }
+  ]
+}

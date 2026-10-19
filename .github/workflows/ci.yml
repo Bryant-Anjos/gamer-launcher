@@ -48,3 +48,22 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+
+  packaging:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y desktop-file-utils
+      - run: packaging/linux/tests/test_packaging.sh
+
+  roteiro:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testes do verificador
+        run: python3 -m unittest discover -s tools/roteiro
+      - name: O roteiro de testes manuais acompanha o código
+        run: python3 tools/roteiro/roteiro.py check
+      - name: A página é gerada
+        run: python3 tools/roteiro/roteiro.py build
+

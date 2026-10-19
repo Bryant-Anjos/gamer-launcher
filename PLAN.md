@@ -186,3 +186,23 @@ Ficam para quando a UI for ligada (Fase 5), pois dependem do locale e do ambient
 - Meta de RAM/CPU em repouso (referência atual: ~209 MB / 0%).
 - Atalho global para abrir/fechar o launcher.
 - Quais apps entram como favoritos padrão (hoje nenhum).
+
+## Fase 7 (empacotamento Linux): preparado, falta validar o AppImage na CI
+
+Scripts em `packaging/linux/` (testes: `packaging/linux/tests/test_packaging.sh`, 31 verificações, rodam em segundos com um bundle de mentira):
+
+- `build-deb.sh <bundle> <saída> [versão]` → `gamer-launcher_<versão>_amd64.deb` (bundle em `/opt/gamer-launcher`, comando `gamer-launcher` em `/usr/bin`, atalho de menu e ícone SVG). Validado com o app real: instalado em pasta temporária, abre e fecha com o Guide do controle virtual. Tamanho: 7,6 MB (23 MB instalado).
+- `build-appdir.sh` / `build-appimage.sh`: montam o AppDir (estrutura conferida nos testes) e chamam o `appimagetool`. **A geração do AppImage em si não foi executada localmente** (exigiria baixar o `appimagetool`); ela roda na CI de release (`.github/workflows/release.yml`, em tags `v*`), com a versão do `appimagetool` fixada. Confirmar na primeira execução da CI.
+- A versão do pacote vem de `app/pubspec.yaml` (hoje 0.1.0).
+- A release compila no Ubuntu 22.04 de propósito (glibc mais antiga roda nas mais novas). O binário atual exige no máximo glibc 2.34, então em teoria roda no Pop!_OS/Ubuntu 22.04+; **não foi testado em outra versão**.
+- Campo `Maintainer` do .deb usa um endereço genérico; defina `MAINTAINER="Nome <email>"` na CI/ambiente antes de publicar.
+
+### Compatibilidade fora do COSMIC (não implementado)
+
+O núcleo do launcher não depende do COSMIC, mas: o modo escuro do sistema só lê/grava o arquivo de tema do COSMIC; as páginas de configurações da busca chamam `cosmic-settings`; o volume usa `wpctl` (PipeWire). Em GNOME/PulseAudio esses itens ficam indisponíveis ou dão erro. Caminho futuro: `gsettings` para o modo escuro, `gnome-control-center` por ambiente e `pactl` como alternativa ao `wpctl`.
+
+## Decisões de comportamento (a implementar na Fase 6, com a UI pronta)
+
+- **Pesquisa por teclado físico é o caminho principal.** O campo recebe o foco ao abrir (barra ou Y no controle). Teclado na tela para quem usa só o controle **não está previsto**; reavaliar só se o uso no sofá mostrar que faz falta.
+- **Ao abrir outro programa, o launcher se esconde** para o programa aparecer (comportamento de console). **O Guide passa a alternar** esconder/mostrar (a leitura do controle independe do foco da janela) e **Ctrl+Q continua fechando**. Isso muda o mapeamento da Fase 4, em que o Guide fecha o app.
+- **Riscos a testar no COSMIC antes de implementar:** (1) um cliente Wayland consegue se minimizar, mas trazer a própria janela de volta à frente depende de o compositor permitir (ativação de janela); (2) um programa aberto pelo launcher pode não ganhar o foco sozinho. Plano B se (1) falhar: atalho de teclado do COSMIC que chama o launcher, ou reabrir uma janela nova. Alternativa descartada: fechar o launcher ao abrir (perde o estado).
