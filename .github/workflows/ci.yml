@@ -34,3 +34,10 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+
+  packaging:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y desktop-file-utils
+      - run: packaging/linux/tests/test_packaging.sh

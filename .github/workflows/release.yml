@@ -1,0 +1,69 @@
+name: release
+
+# Gera .deb e AppImage ao publicar uma tag (ex.: git tag v0.1.0 && git push --tags).
+# Compila no Ubuntu 22.04 de propósito: binários feitos numa glibc mais antiga
+# rodam nas mais novas, mas não o contrário.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # Versão fixa do appimagetool; confirme em https://github.com/AppImage/appimagetool/releases
+  APPIMAGETOOL_VERSION: "1.9.0"
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dependências de sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev libudev-dev libstdc++-12-dev desktop-file-utils
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+
+      - name: Testes dos scripts de empacotamento
+        run: packaging/linux/tests/test_packaging.sh
+
+      - name: Compilar o bundle
+        working-directory: app
+        run: |
+          flutter pub get
+          mkdir -p build/native_assets/linux
+          flutter build linux --release
+
+      - name: Gerar .deb
+        run: packaging/linux/build-deb.sh app/build/linux/x64/release/bundle dist
+
+      - name: Gerar AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1" # o runner não tem FUSE
+        run: |
+          curl -fsSL -o appimagetool \
+            "https://github.com/AppImage/appimagetool/releases/download/${APPIMAGETOOL_VERSION}/appimagetool-x86_64.AppImage"
+          chmod +x appimagetool
+          APPIMAGETOOL="$PWD/appimagetool" \
+            packaging/linux/build-appimage.sh app/build/linux/x64/release/bundle dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: dist/*
+
+      - name: Publicar na release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

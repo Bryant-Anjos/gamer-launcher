@@ -147,3 +147,18 @@ Ficam para quando a UI for ligada (Fase 5), pois dependem do locale e do ambient
 - A janela em tela cheia ainda não tem como fechar; atalho (Esc/botão Guide) entra na Fase 4.
 - Atalho global para abrir/fechar o launcher.
 - Quais apps entram como favoritos padrão.
+
+## Fase 7 (empacotamento Linux): preparado, falta validar o AppImage na CI
+
+Scripts em `packaging/linux/` (testes: `packaging/linux/tests/test_packaging.sh`, 31 verificações, rodam em segundos com um bundle de mentira):
+
+- `build-deb.sh <bundle> <saída> [versão]` → `gamer-launcher_<versão>_amd64.deb` (bundle em `/opt/gamer-launcher`, comando `gamer-launcher` em `/usr/bin`, atalho de menu e ícone SVG). Validado com o app real: instalado em pasta temporária, abre e fecha com o Guide do controle virtual. Tamanho: 7,6 MB (23 MB instalado).
+- `build-appdir.sh` / `build-appimage.sh`: montam o AppDir (estrutura conferida nos testes) e chamam o `appimagetool`. **A geração do AppImage em si não foi executada localmente** (exigiria baixar o `appimagetool`); ela roda na CI de release (`.github/workflows/release.yml`, em tags `v*`), com a versão do `appimagetool` fixada. Confirmar na primeira execução da CI.
+- A versão do pacote vem de `app/pubspec.yaml` (hoje 0.1.0).
+- A release compila no Ubuntu 22.04 de propósito (glibc mais antiga roda nas mais novas). O binário atual exige no máximo glibc 2.34, então em teoria roda no Pop!_OS/Ubuntu 22.04+; **não foi testado em outra versão**.
+- Campo `Maintainer` do .deb usa um endereço genérico; defina `MAINTAINER="Nome <email>"` na CI/ambiente antes de publicar.
+
+### Compatibilidade fora do COSMIC (não implementado)
+
+O núcleo do launcher não depende do COSMIC, mas: o modo escuro do sistema só lê/grava o arquivo de tema do COSMIC; as páginas de configurações da busca chamam `cosmic-settings`; o volume usa `wpctl` (PipeWire). Em GNOME/PulseAudio esses itens ficam indisponíveis ou dão erro. Caminho futuro: `gsettings` para o modo escuro, `gnome-control-center` por ambiente e `pactl` como alternativa ao `wpctl`.
+
