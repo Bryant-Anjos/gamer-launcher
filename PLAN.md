@@ -206,3 +206,18 @@ O núcleo do launcher não depende do COSMIC, mas: o modo escuro do sistema só 
 - **Pesquisa por teclado físico é o caminho principal.** O campo recebe o foco ao abrir (barra ou Y no controle). Teclado na tela para quem usa só o controle **não está previsto**; reavaliar só se o uso no sofá mostrar que faz falta.
 - **Ao abrir outro programa, o launcher se esconde** para o programa aparecer (comportamento de console). **O Guide passa a alternar** esconder/mostrar (a leitura do controle independe do foco da janela) e **Ctrl+Q continua fechando**. Isso muda o mapeamento da Fase 4, em que o Guide fecha o app.
 - **Riscos a testar no COSMIC antes de implementar:** (1) um cliente Wayland consegue se minimizar, mas trazer a própria janela de volta à frente depende de o compositor permitir (ativação de janela); (2) um programa aberto pelo launcher pode não ganhar o foco sozinho. Plano B se (1) falhar: atalho de teclado do COSMIC que chama o launcher, ou reabrir uma janela nova. Alternativa descartada: fechar o launcher ao abrir (perde o estado).
+
+## Feedback do primeiro teste real (2026-10-19)
+
+Testado pelo Bryant com um **Pro Controller da Nintendo** (vendor `057e`, produto `2009`) por Bluetooth, no Pop!_OS 24.04 com COSMIC.
+
+1. **Botões "invertidos" em controle Nintendo.** O launcher segue a **posição** dos botões do Xbox (confirmar = botão de baixo, voltar = o da direita, Y = o de cima). Num controle Nintendo os nomes são outros (o de baixo é o B, o da direita é o A), então a tela ("A marca, B fecha") e o roteiro confundem. Proposta (Fase 6, no núcleo e na UI): um `ButtonLayout` (Xbox, Nintendo, Automático) aplicado no `InputMapper`, trocando confirmar/voltar e os botões de cima/esquerda; o automático detecta Nintendo pelo vendor `0x057e` (`gilrs` expõe `vendor_id`); ajuste manual em Configurações; as dicas na tela mostram os nomes do layout ativo. O controle virtual (`tools/virtual_pad.py`) precisa de uma opção para imitar esse vendor nos testes.
+2. **Pesquisa no seletor de favoritos ("Escolha os favoritos").** Pedido: filtrar os apps por nome ao adicionar favoritos. Reaproveita o `search` do núcleo; campo no topo do seletor, com a digitação pelo teclado físico (decisão já tomada). Fase 6, UI.
+3. **Bluetooth e Wi-Fi no controle rápido só ligam e desligam.** Não há lista de dispositivos nem de redes, então para conectar foi preciso ir às configurações do sistema (o Wi-Fi não foi testado, mas deve ser igual). Opções, da mais barata à mais completa:
+   - atalho "Configurações de Bluetooth/Rede" no painel, abrindo `cosmic-settings bluetooth` e `wireless` (o `open.rs` já abre essas páginas);
+   - lista de dispositivos **pareados** com conectar/desconectar (`bluetoothctl devices Paired`, `connect`, `disconnect`);
+   - varredura e pareamento de dispositivos novos (`scan on`, `pair`; pode pedir confirmação de PIN);
+   - Wi-Fi: lista de redes (`nmcli dev wifi list`) e conectar; redes com senha exigem digitar (teclado físico ou na tela).
+   Escolha de escopo pendente do usuário; a primeira opção cabe junto da Fase 6.
+4. **Abrir outro programa funcionou sem tratamento próprio.** O launcher foi para trás quando o outro programa abriu e voltou quando esse foi fechado ("aparentemente está funcionando"). Pode ser o próprio COSMIC; **entender o que de fato aconteceu antes de implementar o "esconder ao abrir" e o "Guide alterna"** decididos antes (talvez não sejam necessários).
+

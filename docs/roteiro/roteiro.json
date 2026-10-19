@@ -95,7 +95,8 @@
         "Reconecte o controle. Confira se volta a responder.",
         "Repita os testes com outro modelo de controle (Xbox, PlayStation, 8BitDo...). Anote em qual algo não funcionou ou veio com botões trocados.",
         "Conecte dois controles ao mesmo tempo. Confira se os dois funcionam e se um não atrapalha o outro.",
-        "Com o controle rápido aberto (Start), mova com o direcional. Confira se o foco fica dentro do painel e não vai para itens escondidos atrás dele."
+        "Com o controle rápido aberto (Start), mova com o direcional. Confira se o foco fica dentro do painel e não vai para itens escondidos atrás dele.",
+        "Se o seu controle é estilo Nintendo (Pro Controller), anote se confirmar e voltar parecem trocados. Hoje o launcher segue a posição do Xbox: confirmar é o botão de baixo, voltar o da direita."
       ],
       "covers": [
         "core/src/input.rs",
@@ -115,7 +116,7 @@
         "core/src/gamepad.rs": "ae7c94cdcb79",
         "core/src/input.rs": "3514299523ae"
       },
-      "itemsHash": "edfe55269f51",
+      "itemsHash": "0a0b33d3b67c",
       "reviews": []
     },
     {
@@ -265,7 +266,8 @@
         "Na tela inicial, em \"Aplicativos favoritos\", abra o botão \"Adicionar\". Confira se abre \"Escolha os favoritos\" (A marca ou desmarca, B fecha) e se o app escolhido aparece na grade.",
         "Desmarque um favorito no mesmo seletor. Confira se ele some da grade.",
         "Feche e abra o launcher. Confira se os favoritos continuam.",
-        "Sem nenhum favorito, confira se a grade mostra só o botão \"Adicionar\" (hoje não há favoritos padrão)."
+        "Sem nenhum favorito, confira se a grade mostra só o botão \"Adicionar\" (hoje não há favoritos padrão).",
+        "No seletor \"Escolha os favoritos\", anote se faz falta pesquisar por nome (hoje não há pesquisa ali)."
       ],
       "covers": [
         "core/src/apps.rs",
@@ -283,7 +285,7 @@
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
-      "itemsHash": "64eeb3c7ab84",
+      "itemsHash": "3db780b400c1",
       "reviews": []
     },
     {
@@ -332,7 +334,8 @@
         "Confira se não há botão de luz noturna quebrado: ela ainda não existe nesta versão.",
         "Confira se cada controle mostra o estado (\"Ativado\", \"Desativado\", \"Indisponível\" ou \"Lendo...\") e se Volume e Brilho se ajustam com esquerda e direita.",
         "Ajuste o volume segurando a direção. Confira se o valor final mostrado bate com o do sistema.",
-        "Em Configurações, oculte o painel de controle rápido e aperte Start. Anote o que acontece (dúvida em aberto: deveria abrir mesmo oculto?)."
+        "Em Configurações, oculte o painel de controle rápido e aperte Start. Anote o que acontece (dúvida em aberto: deveria abrir mesmo oculto?).",
+        "No Bluetooth e no Wi-Fi, anote o que falta para conectar sem sair do launcher. Hoje o painel só liga e desliga; a lista de dispositivos e de redes não existe."
       ],
       "covers": [
         "core/src/system/*.rs",
@@ -355,7 +358,7 @@
         "core/src/system/parse.rs": "015052330404",
         "core/src/system/runner.rs": "007097823ffc"
       },
-      "itemsHash": "d259f819115a",
+      "itemsHash": "dee24fbea0d2",
       "reviews": []
     },
     {
