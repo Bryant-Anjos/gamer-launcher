@@ -60,7 +60,8 @@ gamer-launcher/
 
 - Gamepad via `gilrs` no Rust, enviado à UI como eventos.
 - Navegação por **foco direcional** (D-pad/analógico), com `Focus`/`FocusTraversalGroup` do Flutter.
-- Mapeamento: A confirma, B volta, Y pesquisa, Start abre o controle rápido.
+- Mapeamento (implementado): A confirma, B volta, Y pesquisa, Start abre o controle rápido, LB/RB trocam de aba, **Guide fecha o app** (Ctrl+Q no teclado). D-pad e analógico esquerdo movem o foco; segurar uma direção repete (400 ms de espera, depois a cada 120 ms).
+- A lógica é pura (`core/src/input.rs`, tempo como parâmetro) e só a casca fina (`gamepad.rs`) lê o `gilrs`. No Flutter, o `InputRouter` traduz as ações em foco/ativação, como se fossem teclas.
 
 ## Fases (cada uma termina com testes verdes e commit antes da próxima)
 
@@ -107,6 +108,21 @@ gamer-launcher/
 | 2 (só núcleo Rust, sem mudança na UI) | igual à Fase 1 | igual |
 
 Dentro da faixa esperada do Flutter (150-250 MB). Meta definitiva: ver "Em aberto".
+
+## Fase 4: como testar sem controle físico
+
+`tools/virtual_pad.py` cria um controle virtual (imita um Xbox 360) via `/dev/uinput` e aperta botões em sequência:
+
+```
+python3 tools/virtual_pad.py 1.5 DPAD_DOWN SOUTH EAST MODE   # MODE = Guide: o app fecha
+```
+
+- Precisa de acesso de escrita a `/dev/uinput` (no Pop!_OS o usuário da sessão já tem por ACL). O `gilrs` só aceita dispositivos com **pelo menos 1 botão e 2 eixos**, e só aplica o mapeamento SDL (D-pad como botão, Guide reconhecido) se o dispositivo for um modelo conhecido; por isso o script imita um Xbox 360 de verdade.
+- Dependência de sistema para compilar o núcleo: `libudev-dev`.
+
+### Fase 4: pendência para a Fase 5 (da revisão de código)
+
+- **Diálogos e rotas empilhadas:** o `InputRouter` resolve a travessia de foco a partir do contexto da tela de baixo, e o Ctrl+Q fica dentro dessa tela. Com um diálogo ou o painel de controle rápido aberto, a direção pode focar um item escondido atrás dele, e o Ctrl+Q não age ali (o Guide continua funcionando). Ao criar o primeiro painel sobreposto: usar o contexto do foco primário para a travessia e subir o `Shortcuts` para acima do `Navigator`. Não há diálogos hoje, por isso não foi tratado.
 
 ## Fase 3: o que ficou de fora
 

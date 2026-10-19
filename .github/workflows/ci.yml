@@ -12,6 +12,7 @@ jobs:
         working-directory: core
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt

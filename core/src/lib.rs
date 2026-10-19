@@ -2,6 +2,8 @@
 
 pub mod apps;
 mod fs_util;
+pub mod gamepad;
+pub mod input;
 pub mod paths;
 pub mod recents;
 pub mod search;
