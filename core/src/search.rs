@@ -1,5 +1,6 @@
 //! Busca global tolerante: ignora maiúsculas e acentos e aceita letras
-//! em sequência (ex.: "trm" encontra "Terminal").
+//! em sequência desde que próximas ("trm" encontra "Terminal") e siglas
+//! ("vsc" encontra "Visual Studio Code").
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ItemKind {
@@ -22,6 +23,7 @@ enum Rank {
     Exact,
     Prefix,
     WordPrefix,
+    Acronym,
     Substring,
     Subsequence,
 }
@@ -41,15 +43,48 @@ fn fold(text: &str) -> String {
         .collect()
 }
 
-fn is_subsequence(query: &str, text: &str) -> bool {
-    let mut wanted = query.chars();
-    let mut next = wanted.next();
-    for c in text.chars() {
-        if Some(c) == next {
-            next = wanted.next();
-        }
+/// Quantas vezes o tamanho da busca o trecho com as letras pode ocupar.
+/// Mais que isso é coincidência (ex.: "code" em "Aplicativos de inicialização").
+const MAX_SUBSEQUENCE_SPREAD: usize = 2;
+const MIN_ACRONYM_LEN: usize = 2;
+
+/// Menor trecho do texto que contém as letras da busca, em ordem.
+fn tightest_subsequence_span(query: &[char], text: &[char]) -> Option<usize> {
+    let first = *query.first()?;
+    (0..text.len())
+        .filter(|&start| text[start] == first)
+        .filter_map(|start| {
+            let mut wanted = query.iter().skip(1).peekable();
+            let mut end = start;
+            for (offset, c) in text[start + 1..].iter().enumerate() {
+                if wanted.peek().is_none() {
+                    break;
+                }
+                if wanted.peek() == Some(&c) {
+                    wanted.next();
+                    end = start + 1 + offset;
+                }
+            }
+            wanted.peek().is_none().then_some(end - start + 1)
+        })
+        .min()
+}
+
+fn is_close_subsequence(query: &str, text: &str) -> bool {
+    let (query, text): (Vec<char>, Vec<char>) = (query.chars().collect(), text.chars().collect());
+    tightest_subsequence_span(&query, &text)
+        .is_some_and(|span| span <= query.len() * MAX_SUBSEQUENCE_SPREAD)
+}
+
+fn is_acronym(query: &str, title: &str) -> bool {
+    if query.chars().count() < MIN_ACRONYM_LEN {
+        return false;
     }
-    next.is_none()
+    let initials: String = title
+        .split(|c: char| !c.is_alphanumeric())
+        .filter_map(|word| word.chars().next())
+        .collect();
+    initials.starts_with(query)
 }
 
 fn rank(query: &str, title: &str) -> Option<Rank> {
@@ -62,9 +97,11 @@ fn rank(query: &str, title: &str) -> Option<Rank> {
         .any(|word| word.starts_with(query))
     {
         Some(Rank::WordPrefix)
+    } else if is_acronym(query, title) {
+        Some(Rank::Acronym)
     } else if title.contains(query) {
         Some(Rank::Substring)
-    } else if is_subsequence(query, title) {
+    } else if is_close_subsequence(query, title) {
         Some(Rank::Subsequence)
     } else {
         None

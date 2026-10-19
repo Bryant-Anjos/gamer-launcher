@@ -105,3 +105,55 @@ fn keeps_kind_and_id_of_the_original_item() {
     assert_eq!(results[0].kind, ItemKind::Setting);
     assert_eq!(results[0].id, "wifi");
 }
+
+#[test]
+fn letters_scattered_across_a_long_title_do_not_match() {
+    let items = vec![
+        item(ItemKind::App, "a", "Advanced Network Configuration"),
+        item(ItemKind::Setting, "b", "Aplicativos de inicialização"),
+    ];
+
+    assert!(search(&items, "anki", 10).is_empty());
+    assert!(search(&items, "code", 10).is_empty());
+}
+
+#[test]
+fn close_letters_still_match_as_a_subsequence() {
+    let items = vec![item(ItemKind::App, "t", "Terminal")];
+
+    assert_eq!(titles(&search(&items, "trml", 10)), vec!["Terminal"]);
+}
+
+#[test]
+fn initials_match_as_an_acronym() {
+    let items = vec![
+        item(ItemKind::App, "a", "Visual Studio Code"),
+        item(ItemKind::App, "b", "Calculadora"),
+    ];
+
+    assert_eq!(
+        titles(&search(&items, "vsc", 10)),
+        vec!["Visual Studio Code"]
+    );
+}
+
+#[test]
+fn an_acronym_ranks_below_a_word_prefix_and_above_loose_letters() {
+    let items = vec![
+        item(ItemKind::App, "a", "Visual Studio Code"),
+        item(ItemKind::App, "b", "Vsc Tools"),
+    ];
+
+    assert_eq!(
+        titles(&search(&items, "vsc", 10)),
+        vec!["Vsc Tools", "Visual Studio Code"]
+    );
+}
+
+#[test]
+fn a_single_letter_is_never_an_acronym_or_a_scatter() {
+    let items = vec![item(ItemKind::App, "a", "Visual Studio Code")];
+
+    assert!(search(&items, "z", 10).is_empty());
+    assert_eq!(titles(&search(&items, "v", 10)), vec!["Visual Studio Code"]);
+}

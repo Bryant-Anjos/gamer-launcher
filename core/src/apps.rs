@@ -2,7 +2,7 @@
 
 use crate::paths;
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::{fs, io, thread};
 
@@ -196,8 +196,32 @@ pub fn default_app_dirs() -> Vec<PathBuf> {
     app_dirs_from(paths::data_home(), paths::home_dir(), &paths::data_dirs())
 }
 
-/// Abre o app sem esperar por ele; o processo filho é recolhido em segundo
-/// plano para não virar zumbi.
+/// Inicia um programa sem esperar por ele, sem shell e sem terminal; o
+/// processo filho é recolhido em segundo plano para não virar zumbi.
+pub(crate) fn spawn_detached(
+    program: &str,
+    args: &[String],
+    working_dir: Option<&Path>,
+) -> io::Result<()> {
+    let mut command = Command::new(program);
+    command
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    if let Some(dir) = working_dir {
+        command.current_dir(dir);
+    }
+    #[cfg(unix)]
+    std::os::unix::process::CommandExt::process_group(&mut command, 0);
+    let mut child = command.spawn()?;
+    thread::spawn(move || {
+        let _ = child.wait();
+    });
+    Ok(())
+}
+
+/// Abre o app sem esperar por ele.
 pub fn launch(app: &AppEntry) -> io::Result<()> {
     if app.terminal {
         return Err(io::Error::new(
@@ -209,20 +233,5 @@ pub fn launch(app: &AppEntry) -> io::Result<()> {
     let (program, rest) = args
         .split_first()
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "comando de execução vazio"))?;
-    let mut command = Command::new(program);
-    command
-        .args(rest)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
-    if let Some(dir) = &app.working_dir {
-        command.current_dir(dir);
-    }
-    #[cfg(unix)]
-    std::os::unix::process::CommandExt::process_group(&mut command, 0);
-    let mut child = command.spawn()?;
-    thread::spawn(move || {
-        let _ = child.wait();
-    });
-    Ok(())
+    spawn_detached(program, rest, app.working_dir.as_deref())
 }
