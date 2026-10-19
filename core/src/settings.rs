@@ -1,4 +1,5 @@
 use crate::fs_util::write_atomic;
+use crate::input::ButtonLayoutSetting;
 use crate::time_of_day::TimeOfDay;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -102,6 +103,7 @@ pub struct Settings {
     pub light_starts_at: TimeOfDay,
     pub wallpaper: Option<PathBuf>,
     pub favorites: Vec<String>,
+    pub button_layout: ButtonLayoutSetting,
     panels: Panels,
 }
 
@@ -113,6 +115,7 @@ impl Default for Settings {
             light_starts_at: TimeOfDay::from_minutes(6 * 60).expect("06:00 é válido"),
             wallpaper: None,
             favorites: Vec::new(),
+            button_layout: ButtonLayoutSetting::default(),
             panels: Panels::default(),
         }
     }
@@ -133,6 +136,13 @@ impl Settings {
     pub fn with_wallpaper(&self, wallpaper: Option<PathBuf>) -> Self {
         Self {
             wallpaper,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_button_layout(&self, button_layout: ButtonLayoutSetting) -> Self {
+        Self {
+            button_layout,
             ..self.clone()
         }
     }

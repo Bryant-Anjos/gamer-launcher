@@ -188,3 +188,47 @@ fn a_failed_save_leaves_no_temporary_file() {
         .collect();
     assert!(leftovers.is_empty(), "{leftovers:?}");
 }
+
+#[test]
+fn the_button_layout_is_automatic_by_default_and_survives_a_round_trip() {
+    use launcher_core::input::ButtonLayoutSetting;
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    assert_eq!(Settings::default().button_layout, ButtonLayoutSetting::Auto);
+
+    Settings::default()
+        .with_button_layout(ButtonLayoutSetting::Nintendo)
+        .save(&path)
+        .unwrap();
+
+    assert_eq!(
+        Settings::load(&path).unwrap().button_layout,
+        ButtonLayoutSetting::Nintendo
+    );
+    assert!(fs::read_to_string(&path).unwrap().contains("\"nintendo\""));
+}
+
+#[test]
+fn files_without_a_button_layout_fall_back_to_automatic() {
+    use launcher_core::input::ButtonLayoutSetting;
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    fs::write(&path, r#"{"theme_mode":"dark"}"#).unwrap();
+
+    assert_eq!(
+        Settings::load(&path).unwrap().button_layout,
+        ButtonLayoutSetting::Auto
+    );
+}
+
+#[test]
+fn an_unknown_button_layout_in_a_file_is_a_parse_error() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    fs::write(&path, r#"{"button_layout":"playstation"}"#).unwrap();
+
+    assert!(matches!(
+        Settings::load(&path),
+        Err(SettingsError::Parse(_))
+    ));
+}

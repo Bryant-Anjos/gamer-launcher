@@ -1,16 +1,20 @@
 use super::{
-    AudioControl, BluetoothControl, BrightnessControl, CommandRunner, DarkModeControl,
-    QuickControlsSnapshot, SystemError, Volume, WifiControl, WifiState, parse,
+    AudioControl, BluetoothControl, BluetoothDevice, BluetoothDevices, BrightnessControl,
+    CommandRunner, DarkModeControl, QuickControlsSnapshot, SystemError, Volume, WifiControl,
+    WifiState, parse,
 };
 use crate::fs_util::write_atomic;
 use crate::paths;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 use std::{fs, io};
 
 const BACKLIGHT_ROOT: &str = "/sys/class/backlight";
 const DEFAULT_SINK: &str = "@DEFAULT_AUDIO_SINK@";
 const MIN_BRIGHTNESS_PERCENT: u64 = 1;
 const MAX_PERCENT: u8 = 100;
+/// Conectar um dispositivo pode levar vários segundos.
+const BLUETOOTH_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// Controles do sistema no Linux (NetworkManager, BlueZ, PipeWire, logind
 /// e o tema do COSMIC), todos por programas de linha de comando e arquivos.
@@ -111,6 +115,63 @@ impl<R: CommandRunner> BluetoothControl for LinuxSystem<R> {
         }
         let state = if enabled { "on" } else { "off" };
         self.runner.run("bluetoothctl", &["power", state]).map(drop)
+    }
+}
+
+impl<R: CommandRunner> BluetoothDevices for LinuxSystem<R> {
+    fn paired_devices(&self) -> Result<Vec<BluetoothDevice>, SystemError> {
+        let paired = parse::bluetooth_device_lines(
+            &self.runner.run("bluetoothctl", &["devices", "Paired"])?,
+        )?;
+        // versões antigas do BlueZ não têm "devices Connected"; sem ele,
+        // os dispositivos aparecem como desconectados em vez de a lista falhar
+        let connected = self
+            .runner
+            .run("bluetoothctl", &["devices", "Connected"])
+            .ok()
+            .and_then(|output| parse::bluetooth_device_lines(&output).ok())
+            .unwrap_or_default();
+
+        let mut devices: Vec<BluetoothDevice> = paired
+            .into_iter()
+            .map(|(address, name)| BluetoothDevice {
+                connected: connected.iter().any(|(other, _)| *other == address),
+                address,
+                name,
+            })
+            .collect();
+        devices.sort_by(|a, b| {
+            b.connected
+                .cmp(&a.connected)
+                .then_with(|| a.name.to_lowercase().cmp(&b.name.to_lowercase()))
+        });
+        Ok(devices)
+    }
+
+    fn connect_device(&self, address: &str) -> Result<(), SystemError> {
+        let address = parse::bluetooth_address(address)?;
+        let output = self.runner.run_with_timeout(
+            "bluetoothctl",
+            &["connect", &address],
+            BLUETOOTH_CONNECT_TIMEOUT,
+        )?;
+        bluetooth_outcome(&output)
+    }
+
+    fn disconnect_device(&self, address: &str) -> Result<(), SystemError> {
+        let address = parse::bluetooth_address(address)?;
+        let output = self.runner.run("bluetoothctl", &["disconnect", &address])?;
+        bluetooth_outcome(&output)
+    }
+}
+
+fn bluetooth_outcome(output: &str) -> Result<(), SystemError> {
+    match parse::bluetooth_failure(output) {
+        Some(message) => Err(SystemError::CommandFailed {
+            program: "bluetoothctl".into(),
+            message,
+        }),
+        None => Ok(()),
     }
 }
 

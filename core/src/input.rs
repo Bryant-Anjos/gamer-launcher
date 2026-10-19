@@ -3,12 +3,16 @@
 //! Tudo aqui é puro (o tempo entra como parâmetro), então dá para testar
 //! sem controle conectado. Quem lê o hardware só alimenta o [`InputMapper`].
 
+use serde::{Deserialize, Serialize};
+
 const REPEAT_DELAY_MS: u64 = 400;
 const REPEAT_INTERVAL_MS: u64 = 120;
 /// O analógico "aperta" ao passar de PRESS e só "solta" ao voltar a RELEASE;
 /// a folga entre os dois evita disparos por tremida perto do limite.
 const STICK_PRESS: f32 = 0.6;
 const STICK_RELEASE: f32 = 0.3;
+/// Fabricante da Nintendo (Pro Controller, Joy-Con).
+const NINTENDO_VENDOR_ID: u16 = 0x057e;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GamepadAction {
@@ -66,6 +70,57 @@ pub enum PadEvent {
     Disconnected,
 }
 
+/// Como os botões de ação são nomeados no controle. O launcher pensa em
+/// posição (South é o de baixo); no layout Nintendo o A fica à direita e o
+/// B embaixo, o contrário do Xbox, então confirmar e voltar trocam de lugar.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ButtonLayout {
+    Xbox,
+    Nintendo,
+}
+
+/// Escolha do usuário: seguir o controle conectado ou forçar um layout.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ButtonLayoutSetting {
+    #[default]
+    Auto,
+    Xbox,
+    Nintendo,
+}
+
+impl ButtonLayoutSetting {
+    /// Layout efetivo para um controle de fabricante `vendor` (se conhecido).
+    pub fn resolve(self, vendor: Option<u16>) -> ButtonLayout {
+        match self {
+            Self::Auto => layout_for_vendor(vendor),
+            Self::Xbox => ButtonLayout::Xbox,
+            Self::Nintendo => ButtonLayout::Nintendo,
+        }
+    }
+}
+
+pub fn layout_for_vendor(vendor: Option<u16>) -> ButtonLayout {
+    if vendor == Some(NINTENDO_VENDOR_ID) {
+        ButtonLayout::Nintendo
+    } else {
+        ButtonLayout::Xbox
+    }
+}
+
+/// Ação de um botão no layout dado. O direcional, os gatilhos e os botões de
+/// sistema são iguais em todos os layouts.
+pub fn action_for_button_with(layout: ButtonLayout, button: PadButton) -> Option<GamepadAction> {
+    let position = match (layout, button) {
+        (ButtonLayout::Nintendo, PadButton::South) => PadButton::East,
+        (ButtonLayout::Nintendo, PadButton::East) => PadButton::South,
+        (ButtonLayout::Nintendo, PadButton::West) => PadButton::North,
+        (ButtonLayout::Nintendo, PadButton::North) => PadButton::West,
+        (_, other) => other,
+    };
+    action_for_button(position)
+}
+
 pub fn action_for_button(button: PadButton) -> Option<GamepadAction> {
     use GamepadAction as A;
     match button {
@@ -114,16 +169,28 @@ impl InputMapper {
     /// Ação gerada por um evento, se houver. Direções passam a repetir
     /// enquanto seguradas (veja [`InputMapper::tick`]).
     pub fn handle(&mut self, event: PadEvent, now_ms: u64) -> Option<GamepadAction> {
+        self.handle_with(ButtonLayout::Xbox, event, now_ms)
+    }
+
+    /// Como [`InputMapper::handle`], com o layout de botões do controle de origem.
+    pub fn handle_with(
+        &mut self,
+        layout: ButtonLayout,
+        event: PadEvent,
+        now_ms: u64,
+    ) -> Option<GamepadAction> {
         match event {
             PadEvent::ButtonPressed(button) => {
-                let action = action_for_button(button)?;
+                let action = action_for_button_with(layout, button)?;
                 if action.is_direction() {
                     self.start_repeat(action, now_ms);
                 }
                 Some(action)
             }
             PadEvent::ButtonReleased(button) => {
-                if let Some(action) = action_for_button(button).filter(|a| a.is_direction()) {
+                if let Some(action) =
+                    action_for_button_with(layout, button).filter(|a| a.is_direction())
+                {
                     self.stop_repeat(action, now_ms);
                 }
                 None

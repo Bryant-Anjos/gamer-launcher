@@ -62,3 +62,52 @@ fn the_listener_reports_how_many_gamepads_are_connected() {
 
     assert!(connected < 64, "contagem absurda: {connected}");
 }
+
+mod layout {
+    use super::*;
+    use launcher_core::gamepad::{SharedLayout, spawn_listener_with};
+    use launcher_core::input::ButtonLayoutSetting;
+
+    const ALL: [ButtonLayoutSetting; 3] = [
+        ButtonLayoutSetting::Auto,
+        ButtonLayoutSetting::Xbox,
+        ButtonLayoutSetting::Nintendo,
+    ];
+
+    #[test]
+    fn the_shared_setting_keeps_whatever_was_stored() {
+        for stored in ALL {
+            let shared = SharedLayout::new(ButtonLayoutSetting::Auto);
+
+            shared.set(stored);
+
+            assert_eq!(shared.get(), stored);
+        }
+    }
+
+    #[test]
+    fn a_new_shared_setting_starts_with_the_given_value() {
+        for initial in ALL {
+            assert_eq!(SharedLayout::new(initial).get(), initial);
+        }
+    }
+
+    #[test]
+    fn the_running_listener_takes_layout_changes() {
+        let handle =
+            spawn_listener_with(ButtonLayoutSetting::Nintendo, |_| ControlFlow::Continue(()))
+                .expect("udev disponível");
+        assert_eq!(handle.layout_setting(), ButtonLayoutSetting::Nintendo);
+
+        handle.set_layout_setting(ButtonLayoutSetting::Xbox);
+
+        assert_eq!(handle.layout_setting(), ButtonLayoutSetting::Xbox);
+    }
+
+    #[test]
+    fn the_default_listener_follows_the_connected_controller() {
+        let handle = spawn_listener(|_| ControlFlow::Continue(())).expect("udev disponível");
+
+        assert_eq!(handle.layout_setting(), ButtonLayoutSetting::Auto);
+    }
+}

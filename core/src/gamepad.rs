@@ -1,10 +1,12 @@
 //! Leitura de controles de verdade (via `gilrs`) numa thread própria.
 //! A interpretação dos eventos fica em [`crate::input`].
 
-use crate::input::{GamepadAction, InputMapper, PadButton, PadEvent, StickAxis};
+use crate::input::{
+    ButtonLayoutSetting, GamepadAction, InputMapper, PadButton, PadEvent, StickAxis,
+};
 use gilrs::{Axis, Button, EventType, Gilrs};
 use std::ops::ControlFlow;
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 use std::sync::{Arc, mpsc};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
@@ -63,10 +65,45 @@ fn pad_event_from(event: EventType) -> Option<PadEvent> {
     }
 }
 
+/// Layout de botões escolhido pelo usuário, compartilhado entre a UI (que
+/// muda) e a thread de leitura (que consulta a cada evento).
+#[derive(Debug, Clone)]
+pub struct SharedLayout(Arc<AtomicU8>);
+
+impl SharedLayout {
+    const AUTO: u8 = 0;
+    const XBOX: u8 = 1;
+    const NINTENDO: u8 = 2;
+
+    pub fn new(setting: ButtonLayoutSetting) -> Self {
+        let shared = Self(Arc::new(AtomicU8::new(Self::AUTO)));
+        shared.set(setting);
+        shared
+    }
+
+    pub fn set(&self, setting: ButtonLayoutSetting) {
+        let code = match setting {
+            ButtonLayoutSetting::Auto => Self::AUTO,
+            ButtonLayoutSetting::Xbox => Self::XBOX,
+            ButtonLayoutSetting::Nintendo => Self::NINTENDO,
+        };
+        self.0.store(code, Ordering::Relaxed);
+    }
+
+    pub fn get(&self) -> ButtonLayoutSetting {
+        match self.0.load(Ordering::Relaxed) {
+            Self::XBOX => ButtonLayoutSetting::Xbox,
+            Self::NINTENDO => ButtonLayoutSetting::Nintendo,
+            _ => ButtonLayoutSetting::Auto,
+        }
+    }
+}
+
 /// Mantém a leitura ativa; ao ser descartado, para a thread e espera ela acabar.
 pub struct ListenerHandle {
     stop: Arc<AtomicBool>,
     connected: Arc<AtomicUsize>,
+    layout: SharedLayout,
     thread: Option<JoinHandle<()>>,
 }
 
@@ -74,6 +111,15 @@ impl ListenerHandle {
     /// Controles conectados agora (atualizado pela thread de leitura).
     pub fn connected_gamepads(&self) -> usize {
         self.connected.load(Ordering::Relaxed)
+    }
+
+    /// Muda o layout de botões sem reiniciar a leitura.
+    pub fn set_layout_setting(&self, setting: ButtonLayoutSetting) {
+        self.layout.set(setting);
+    }
+
+    pub fn layout_setting(&self) -> ButtonLayoutSetting {
+        self.layout.get()
     }
 }
 
@@ -93,8 +139,13 @@ impl Drop for ListenerHandle {
     }
 }
 
-fn run_loop<F>(mut gilrs: Gilrs, stop: &AtomicBool, connected: &AtomicUsize, mut on_action: F)
-where
+fn run_loop<F>(
+    mut gilrs: Gilrs,
+    stop: &AtomicBool,
+    connected: &AtomicUsize,
+    layout: &SharedLayout,
+    mut on_action: F,
+) where
     F: FnMut(GamepadAction) -> ControlFlow<()>,
 {
     let started = Instant::now();
@@ -112,9 +163,16 @@ where
             connected.store(count_connected(&gilrs), Ordering::Relaxed);
         }
 
-        let from_event = event
-            .and_then(|event| pad_event_from(event.event))
-            .and_then(|event| mapper.handle(event, now_ms()));
+        let from_event = event.and_then(|event| {
+            // o layout vale para o controle que mandou o evento: no modo
+            // automático, um Nintendo e um Xbox conectados juntos não se misturam
+            let vendor = gilrs
+                .connected_gamepad(event.id)
+                .and_then(|pad| pad.vendor_id());
+            let layout = layout.get().resolve(vendor);
+            let pad_event = pad_event_from(event.event)?;
+            mapper.handle_with(layout, pad_event, now_ms())
+        });
         let from_repeat = mapper.tick(now_ms());
         for action in from_event.into_iter().chain(from_repeat) {
             if on_action(action).is_break() {
@@ -130,6 +188,19 @@ pub fn spawn_listener<F>(on_action: F) -> Result<ListenerHandle, GamepadError>
 where
     F: FnMut(GamepadAction) -> ControlFlow<()> + Send + 'static,
 {
+    spawn_listener_with(ButtonLayoutSetting::Auto, on_action)
+}
+
+/// Como [`spawn_listener`], com o layout de botões inicial escolhido.
+pub fn spawn_listener_with<F>(
+    layout: ButtonLayoutSetting,
+    on_action: F,
+) -> Result<ListenerHandle, GamepadError>
+where
+    F: FnMut(GamepadAction) -> ControlFlow<()> + Send + 'static,
+{
+    let shared_layout = SharedLayout::new(layout);
+    let thread_layout = shared_layout.clone();
     let stop = Arc::new(AtomicBool::new(false));
     let connected = Arc::new(AtomicUsize::new(0));
     let (ready_tx, ready_rx) = mpsc::channel();
@@ -142,7 +213,13 @@ where
             Ok(gilrs) => {
                 thread_connected.store(count_connected(&gilrs), Ordering::Relaxed);
                 let _ = ready_tx.send(Ok(()));
-                run_loop(gilrs, &thread_stop, &thread_connected, on_action);
+                run_loop(
+                    gilrs,
+                    &thread_stop,
+                    &thread_connected,
+                    &thread_layout,
+                    on_action,
+                );
             }
             Err(error) => {
                 let _ = ready_tx.send(Err(error.to_string()));
@@ -154,6 +231,7 @@ where
         Ok(Ok(())) => Ok(ListenerHandle {
             stop,
             connected,
+            layout: shared_layout,
             thread: Some(thread),
         }),
         Ok(Err(message)) => Err(GamepadError::Init(message)),

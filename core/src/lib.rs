@@ -1,6 +1,7 @@
 //! Núcleo do gamer-launcher: lógica de sistema sem UI.
 
 pub mod apps;
+pub mod autostart;
 pub mod catalog;
 pub mod featured;
 mod fs_util;

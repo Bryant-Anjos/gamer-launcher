@@ -96,7 +96,7 @@
         "Repita os testes com outro modelo de controle (Xbox, PlayStation, 8BitDo...). Anote em qual algo não funcionou ou veio com botões trocados.",
         "Conecte dois controles ao mesmo tempo. Confira se os dois funcionam e se um não atrapalha o outro.",
         "Com o controle rápido aberto (Start), mova com o direcional. Confira se o foco fica dentro do painel e não vai para itens escondidos atrás dele.",
-        "Se o seu controle é estilo Nintendo (Pro Controller), anote se confirmar e voltar parecem trocados. Hoje o launcher segue a posição do Xbox: confirmar é o botão de baixo, voltar o da direita."
+        "Com um controle Nintendo (Pro Controller), confira se o A (à direita) confirma, o B (embaixo) volta e o Y (à esquerda) abre a pesquisa: o launcher reconhece controle Nintendo sozinho. Num controle Xbox, o A fica embaixo e o B à direita. Anote se algum botão parecer trocado."
       ],
       "covers": [
         "core/src/input.rs",
@@ -113,10 +113,10 @@
         "app/lib/input/input_router.dart": "1d679b5caca1",
         "app/lib/state/gamepad_status.dart": "45985707455b",
         "app/rust/src/api/input.rs": "556cef9a6cea",
-        "core/src/gamepad.rs": "ae7c94cdcb79",
-        "core/src/input.rs": "3514299523ae"
+        "core/src/gamepad.rs": "453db342dddc",
+        "core/src/input.rs": "5c4ce90df3f5"
       },
-      "itemsHash": "0a0b33d3b67c",
+      "itemsHash": "3e6a8b2510d1",
       "reviews": []
     },
     {
@@ -207,10 +207,15 @@
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
         "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
         "app/rust/src/api/settings.rs": "8cbff3ceb194",
-        "core/src/settings.rs": "121ab8ceb617"
+        "core/src/settings.rs": "efa4799b8a5f"
       },
       "itemsHash": "dc74ddc2780b",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O settings.rs ganhou o campo button_layout, sem relação com a visibilidade dos painéis."
+        }
+      ]
     },
     {
       "id": "inicio",
@@ -353,13 +358,18 @@
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
         "app/rust/src/api/system.rs": "1fc2f28ce668",
         "core/src/system/error.rs": "a214856a4ee9",
-        "core/src/system/linux.rs": "3cb114277a1c",
-        "core/src/system/mod.rs": "c5a23a75be6d",
-        "core/src/system/parse.rs": "015052330404",
-        "core/src/system/runner.rs": "007097823ffc"
+        "core/src/system/linux.rs": "9674f6220a33",
+        "core/src/system/mod.rs": "24c94b9f0875",
+        "core/src/system/parse.rs": "895585b2f9cc",
+        "core/src/system/runner.rs": "10ffd75acefb"
       },
       "itemsHash": "dee24fbea0d2",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "A lista de dispositivos Bluetooth (listar, conectar, desconectar) existe só no núcleo; os itens entram quando o painel da UI for feito."
+        }
+      ]
     },
     {
       "id": "sistema",
@@ -487,9 +497,38 @@
         "app/rust/src/api/settings.rs": "8cbff3ceb194",
         "core/src/fs_util.rs": "9e6d1889c09f",
         "core/src/paths.rs": "c4d915aed584",
-        "core/src/settings.rs": "121ab8ceb617"
+        "core/src/settings.rs": "efa4799b8a5f"
       },
       "itemsHash": "eb6eb25a0554",
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O settings.rs ganhou o campo button_layout, que ainda não tem tela; arquivos antigos sem o campo continuam abrindo (teste automático). Os itens entram quando o ajuste estiver na interface."
+        }
+      ]
+    },
+    {
+      "id": "iniciar-sistema",
+      "title": "Iniciar com o sistema",
+      "sub": "Abrir o launcher ao entrar na sessão",
+      "priority": "Ainda em desenvolvimento",
+      "desc": "O núcleo já grava e apaga o arquivo de inicialização. A chave em Configurações ainda será ligada, então estes testes valem quando ela estiver pronta.",
+      "items": [
+        "Em Configurações, ligue \"Iniciar com o sistema\". Confira se o ajuste continua ligado depois de fechar e abrir o launcher.",
+        "Confira se o arquivo ~/.config/autostart/gamer-launcher.desktop foi criado e tem o comando certo.",
+        "Saia da sessão e entre de novo (ou reinicie). Confira se o launcher abre sozinho, em tela cheia.",
+        "Desligue o ajuste. Confira se o arquivo some e se o launcher não abre no próximo login.",
+        "Desligue o launcher em Configurações do sistema > Aplicativos de inicialização e reabra o launcher. Confira se o ajuste aparece desligado.",
+        "Instalado pelo .deb e pelo AppImage, confira se o comando gravado abre o launcher certo.",
+        "Anote se abrir com o sistema atrapalha o login (demora, janela por cima da tela de boas-vindas ou do desbloqueio)."
+      ],
+      "covers": [
+        "core/src/autostart.rs"
+      ],
+      "reviewed": {
+        "core/src/autostart.rs": "cc491ddf08bc"
+      },
+      "itemsHash": "c7fd95321716",
       "reviews": []
     },
     {
@@ -562,13 +601,17 @@
       ],
       "reviewed": {
         "core/src/paths.rs": "c4d915aed584",
-        "core/src/system/linux.rs": "3cb114277a1c"
+        "core/src/system/linux.rs": "9674f6220a33"
       },
       "itemsHash": "8c05993e0ad7",
       "reviews": [
         {
           "date": "2026-10-19",
           "reason": "O paths.rs só ganhou o diretório de estado (XDG_STATE_HOME) para o histórico; a compatibilidade com outros ambientes não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O system/linux.rs ganhou a lista de dispositivos Bluetooth (bluetoothctl); não muda a compatibilidade com outros ambientes além do que já está descrito."
         }
       ]
     },

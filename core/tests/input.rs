@@ -280,3 +280,157 @@ fn flipping_the_stick_inside_the_hysteresis_band_lets_go_of_the_old_direction() 
         Some(Action::Right)
     );
 }
+
+// ---------- layout dos botões (Xbox x Nintendo) ----------
+
+mod layout {
+    use super::*;
+    use launcher_core::input::{
+        ButtonLayout, ButtonLayoutSetting, action_for_button_with, layout_for_vendor,
+    };
+
+    const NINTENDO_VENDOR: u16 = 0x057e;
+    const MICROSOFT_VENDOR: u16 = 0x045e;
+
+    #[test]
+    fn the_xbox_layout_is_the_default_one() {
+        for button in [
+            PadButton::South,
+            PadButton::East,
+            PadButton::North,
+            PadButton::West,
+        ] {
+            assert_eq!(
+                action_for_button_with(ButtonLayout::Xbox, button),
+                action_for_button(button),
+                "{button:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn nintendo_swaps_confirm_and_back_to_match_the_printed_labels() {
+        // no Nintendo o A fica à direita (East) e o B embaixo (South)
+        assert_eq!(
+            action_for_button_with(ButtonLayout::Nintendo, PadButton::East),
+            Some(Action::Confirm)
+        );
+        assert_eq!(
+            action_for_button_with(ButtonLayout::Nintendo, PadButton::South),
+            Some(Action::Back)
+        );
+    }
+
+    #[test]
+    fn nintendo_search_is_the_button_labeled_y_on_the_left() {
+        assert_eq!(
+            action_for_button_with(ButtonLayout::Nintendo, PadButton::West),
+            Some(Action::Search)
+        );
+        assert_eq!(
+            action_for_button_with(ButtonLayout::Nintendo, PadButton::North),
+            None
+        );
+    }
+
+    #[test]
+    fn dpad_bumpers_and_system_buttons_do_not_depend_on_the_layout() {
+        for button in [
+            PadButton::DPadUp,
+            PadButton::DPadDown,
+            PadButton::DPadLeft,
+            PadButton::DPadRight,
+            PadButton::Start,
+            PadButton::Select,
+            PadButton::Mode,
+            PadButton::LeftBumper,
+            PadButton::RightBumper,
+            PadButton::Other,
+        ] {
+            assert_eq!(
+                action_for_button_with(ButtonLayout::Nintendo, button),
+                action_for_button_with(ButtonLayout::Xbox, button),
+                "{button:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn nintendo_controllers_are_recognized_by_vendor() {
+        assert_eq!(
+            layout_for_vendor(Some(NINTENDO_VENDOR)),
+            ButtonLayout::Nintendo
+        );
+        assert_eq!(
+            layout_for_vendor(Some(MICROSOFT_VENDOR)),
+            ButtonLayout::Xbox
+        );
+        assert_eq!(layout_for_vendor(None), ButtonLayout::Xbox);
+    }
+
+    #[test]
+    fn automatic_follows_the_device_and_manual_choices_win() {
+        let nintendo_pad = Some(NINTENDO_VENDOR);
+        let xbox_pad = Some(MICROSOFT_VENDOR);
+
+        assert_eq!(
+            ButtonLayoutSetting::Auto.resolve(nintendo_pad),
+            ButtonLayout::Nintendo
+        );
+        assert_eq!(
+            ButtonLayoutSetting::Auto.resolve(xbox_pad),
+            ButtonLayout::Xbox
+        );
+        assert_eq!(
+            ButtonLayoutSetting::Xbox.resolve(nintendo_pad),
+            ButtonLayout::Xbox
+        );
+        assert_eq!(
+            ButtonLayoutSetting::Nintendo.resolve(xbox_pad),
+            ButtonLayout::Nintendo
+        );
+    }
+
+    #[test]
+    fn the_mapper_applies_the_layout_it_is_given() {
+        let mut mapper = InputMapper::new();
+
+        let confirm = mapper.handle_with(
+            ButtonLayout::Nintendo,
+            PadEvent::ButtonPressed(PadButton::East),
+            0,
+        );
+        let back = mapper.handle_with(
+            ButtonLayout::Nintendo,
+            PadEvent::ButtonPressed(PadButton::South),
+            10,
+        );
+
+        assert_eq!(confirm, Some(Action::Confirm));
+        assert_eq!(back, Some(Action::Back));
+    }
+
+    #[test]
+    fn handle_without_a_layout_keeps_the_xbox_behavior() {
+        let mut mapper = InputMapper::new();
+
+        assert_eq!(
+            press(&mut mapper, PadButton::South, 0),
+            Some(Action::Confirm)
+        );
+    }
+
+    #[test]
+    fn directions_still_repeat_under_the_nintendo_layout() {
+        let mut mapper = InputMapper::new();
+
+        let first = mapper.handle_with(
+            ButtonLayout::Nintendo,
+            PadEvent::ButtonPressed(PadButton::DPadDown),
+            0,
+        );
+
+        assert_eq!(first, Some(Action::Down));
+        assert_eq!(mapper.tick(400), Some(Action::Down));
+    }
+}

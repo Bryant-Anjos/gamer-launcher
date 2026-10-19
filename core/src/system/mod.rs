@@ -45,6 +45,23 @@ pub trait BluetoothControl {
     fn set_bluetooth_enabled(&self, enabled: bool) -> Result<(), SystemError>;
 }
 
+/// Dispositivo Bluetooth já pareado.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BluetoothDevice {
+    pub address: String,
+    pub name: String,
+    pub connected: bool,
+}
+
+/// Dispositivos pareados: listar, conectar e desconectar. Parear dispositivos
+/// novos fica para depois (pode exigir confirmação de PIN).
+pub trait BluetoothDevices {
+    /// Conectados primeiro; dentro de cada grupo, por nome.
+    fn paired_devices(&self) -> Result<Vec<BluetoothDevice>, SystemError>;
+    fn connect_device(&self, address: &str) -> Result<(), SystemError>;
+    fn disconnect_device(&self, address: &str) -> Result<(), SystemError>;
+}
+
 pub trait AudioControl {
     fn volume(&self) -> Result<Volume, SystemError>;
     /// Acima de 100 vale 100.

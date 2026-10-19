@@ -12,11 +12,32 @@ const POLL_INTERVAL: Duration = Duration::from_millis(10);
 /// Existe como trait para os testes trocarem o sistema real por um falso.
 pub trait CommandRunner: Send + Sync {
     fn run(&self, program: &str, args: &[&str]) -> Result<String, SystemError>;
+
+    /// Como [`CommandRunner::run`], com um limite de tempo próprio, para
+    /// comandos que demoram mais que o normal (conectar um dispositivo).
+    /// Executores que não medem tempo, como os falsos dos testes, ignoram o limite.
+    fn run_with_timeout(
+        &self,
+        program: &str,
+        args: &[&str],
+        _timeout: Duration,
+    ) -> Result<String, SystemError> {
+        self.run(program, args)
+    }
 }
 
 impl<T: CommandRunner + ?Sized> CommandRunner for Arc<T> {
     fn run(&self, program: &str, args: &[&str]) -> Result<String, SystemError> {
         (**self).run(program, args)
+    }
+
+    fn run_with_timeout(
+        &self,
+        program: &str,
+        args: &[&str],
+        timeout: Duration,
+    ) -> Result<String, SystemError> {
+        (**self).run_with_timeout(program, args, timeout)
     }
 }
 
@@ -49,6 +70,26 @@ fn read_in_background<R: Read + Send + 'static>(mut source: R) -> thread::JoinHa
 
 impl CommandRunner for ProcessRunner {
     fn run(&self, program: &str, args: &[&str]) -> Result<String, SystemError> {
+        self.run_limited(program, args, self.timeout)
+    }
+
+    fn run_with_timeout(
+        &self,
+        program: &str,
+        args: &[&str],
+        timeout: Duration,
+    ) -> Result<String, SystemError> {
+        self.run_limited(program, args, timeout)
+    }
+}
+
+impl ProcessRunner {
+    fn run_limited(
+        &self,
+        program: &str,
+        args: &[&str],
+        timeout: Duration,
+    ) -> Result<String, SystemError> {
         let failed = |message: String| SystemError::CommandFailed {
             program: program.to_string(),
             message,
@@ -65,7 +106,7 @@ impl CommandRunner for ProcessRunner {
         let stdout = child.stdout.take().map(read_in_background);
         let stderr = child.stderr.take().map(read_in_background);
 
-        let deadline = Instant::now() + self.timeout;
+        let deadline = Instant::now() + timeout;
         let status = loop {
             match child
                 .try_wait()
@@ -77,7 +118,7 @@ impl CommandRunner for ProcessRunner {
                     let _ = child.wait();
                     return Err(SystemError::Timeout {
                         program: program.to_string(),
-                        seconds: self.timeout.as_secs().max(1),
+                        seconds: timeout.as_secs().max(1),
                     });
                 }
                 None => thread::sleep(POLL_INTERVAL),

@@ -77,3 +77,47 @@ pub fn flag(text: &str) -> Result<bool, SystemError> {
         _ => Err(unexpected("valor lógico", text)),
     }
 }
+
+const NO_ADAPTER_MESSAGE: &str = "No default controller available";
+const ADDRESS_GROUPS: usize = 6;
+
+fn is_bluetooth_address(text: &str) -> bool {
+    let groups: Vec<&str> = text.split(':').collect();
+    groups.len() == ADDRESS_GROUPS
+        && groups
+            .iter()
+            .all(|group| group.len() == 2 && group.bytes().all(|b| b.is_ascii_hexdigit()))
+}
+
+/// Endereço no formato `AA:BB:CC:DD:EE:FF`, em maiúsculas. Qualquer outra
+/// coisa é recusada: o valor vira argumento do `bluetoothctl`.
+pub fn bluetooth_address(text: &str) -> Result<String, SystemError> {
+    if is_bluetooth_address(text) {
+        Ok(text.to_ascii_uppercase())
+    } else {
+        Err(unexpected("endereço bluetooth", text))
+    }
+}
+
+/// Linhas "Device ENDEREÇO Nome" de `bluetoothctl devices ...`; o resto é ignorado.
+pub fn bluetooth_device_lines(output: &str) -> Result<Vec<(String, String)>, SystemError> {
+    if output.contains(NO_ADAPTER_MESSAGE) {
+        return Err(SystemError::Unavailable("sem adaptador bluetooth".into()));
+    }
+    Ok(output
+        .lines()
+        .filter_map(|line| line.trim().strip_prefix("Device "))
+        .filter_map(|rest| rest.split_once(' '))
+        .filter(|(address, _)| is_bluetooth_address(address))
+        .map(|(address, name)| (address.to_ascii_uppercase(), name.trim().to_string()))
+        .collect())
+}
+
+/// O `bluetoothctl` às vezes escreve a falha na saída e sai com sucesso.
+pub fn bluetooth_failure(output: &str) -> Option<String> {
+    output
+        .lines()
+        .map(str::trim)
+        .find(|line| line.starts_with("Failed to"))
+        .map(str::to_string)
+}
