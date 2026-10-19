@@ -104,8 +104,19 @@ gamer-launcher/
 | Fase | RAM em repouso | CPU em repouso |
 |---|---|---|
 | 1 (tela cheia vazia, release, Linux) | ~209 MB | 0% |
+| 2 (só núcleo Rust, sem mudança na UI) | igual à Fase 1 | igual |
 
 Dentro da faixa esperada do Flutter (150-250 MB). Meta definitiva: ver "Em aberto".
+
+## Fase 2: limitações conhecidas (da revisão de código)
+
+Ficam para quando a UI for ligada (Fase 5), pois dependem do locale e do ambiente do usuário:
+
+- **Nomes localizados:** só `Name=` é lido; `Name[pt_BR]=` ainda não (precisa receber o locale).
+- **Filtros do `.desktop`:** `TryExec`, `OnlyShowIn` e `NotShowIn` são ignorados.
+- **Códigos de campo `%i` e `%c`** são removidos em vez de expandidos; o unescape de string do `.desktop` (`\s`, `\n`) ainda não é aplicado.
+- **Apps de terminal** (`Terminal=true`): `launch` recusa com erro `Unsupported` até existir uma forma de abri-los num terminal.
+- Flatpak do usuário usa `$HOME/.local/share/flatpak`; a spec do Flatpak usa `$XDG_DATA_HOME/flatpak`.
 
 ## Em aberto
 

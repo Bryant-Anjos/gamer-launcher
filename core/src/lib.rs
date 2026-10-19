@@ -1,5 +1,14 @@
 //! Núcleo do gamer-launcher: lógica de sistema sem UI.
 
+pub mod apps;
+pub mod paths;
+pub mod recents;
+pub mod search;
+pub mod settings;
+pub mod stats;
+pub mod theme;
+pub mod time_of_day;
+
 /// Versão do núcleo, usada para confirmar que a ponte Flutter↔Rust está viva.
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
