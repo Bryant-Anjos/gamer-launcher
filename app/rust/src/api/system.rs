@@ -1,8 +1,11 @@
-use crate::convert::{quick_controls, stats_sample};
+use crate::convert::{battery_reading, paired_devices, quick_controls, stats_sample};
+use flutter_rust_bridge::frb;
+use launcher_core::autostart;
 use launcher_core::stats::StatsSampler;
+pub use launcher_core::system::PowerAction;
 use launcher_core::system::{
-    AudioControl, BluetoothControl, BrightnessControl, DarkModeControl, LinuxSystem, ProcessRunner,
-    WifiControl,
+    AudioControl, BatteryControl, BluetoothControl, BluetoothDevices, BrightnessControl,
+    DarkModeControl, LinuxSystem, PowerControl, ProcessRunner, WifiControl,
 };
 use std::sync::{LazyLock, Mutex, PoisonError};
 
@@ -41,6 +44,29 @@ pub struct StatsSample {
     pub ram_total_bytes: f64,
     pub disk_used_bytes: f64,
     pub disk_total_bytes: f64,
+}
+
+#[frb(mirror(PowerAction))]
+pub enum _PowerAction {
+    Shutdown,
+    Reboot,
+    Suspend,
+    LogOut,
+}
+
+/// Bateria do computador.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BatteryReading {
+    pub percent: u8,
+    pub charging: bool,
+}
+
+/// Dispositivo Bluetooth já pareado.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PairedDevice {
+    pub address: String,
+    pub name: String,
+    pub connected: bool,
 }
 
 static SYSTEM: LazyLock<LinuxSystem<ProcessRunner>> =
@@ -91,4 +117,53 @@ pub fn sample_stats() -> StatsSample {
         .unwrap_or_else(PoisonError::into_inner)
         .sample();
     stats_sample(&stats)
+}
+
+/// `None` quando o computador não tem bateria (um desktop, por exemplo).
+pub fn read_battery() -> Result<Option<BatteryReading>, String> {
+    SYSTEM
+        .battery()
+        .map(|battery| battery.map(battery_reading))
+        .map_err(|error| error.to_string())
+}
+
+/// Desligar, reiniciar, suspender ou encerrar a sessão.
+pub fn perform_power_action(action: PowerAction) -> Result<(), String> {
+    SYSTEM.perform(action).map_err(|error| error.to_string())
+}
+
+pub fn list_paired_devices() -> Result<Vec<PairedDevice>, String> {
+    SYSTEM
+        .paired_devices()
+        .map(|devices| paired_devices(&devices))
+        .map_err(|error| error.to_string())
+}
+
+pub fn connect_bluetooth_device(address: String) -> Result<(), String> {
+    SYSTEM
+        .connect_device(&address)
+        .map_err(|error| error.to_string())
+}
+
+pub fn disconnect_bluetooth_device(address: String) -> Result<(), String> {
+    SYSTEM
+        .disconnect_device(&address)
+        .map_err(|error| error.to_string())
+}
+
+const NO_AUTOSTART_DIR: &str = "sem pasta de configuração (HOME ausente)";
+
+/// A existência do arquivo em `~/.config/autostart` é a verdade.
+pub fn autostart_enabled() -> bool {
+    autostart::autostart_file().is_some_and(|file| autostart::is_enabled(&file))
+}
+
+pub fn set_autostart(enabled: bool) -> Result<(), String> {
+    let file = autostart::autostart_file().ok_or_else(|| NO_AUTOSTART_DIR.to_string())?;
+    let exec = if enabled {
+        autostart::current_exec_line().map_err(|error| error.to_string())?
+    } else {
+        String::new()
+    };
+    autostart::set_enabled(&file, enabled, &exec).map_err(|error| error.to_string())
 }

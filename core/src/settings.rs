@@ -104,6 +104,10 @@ pub struct Settings {
     pub wallpaper: Option<PathBuf>,
     pub favorites: Vec<String>,
     pub button_layout: ButtonLayoutSetting,
+    /// Sons de navegação, confirmar e voltar (desligados por padrão).
+    pub sounds: bool,
+    /// Tira as transições, além do que o sistema já pedir.
+    pub reduce_animations: bool,
     panels: Panels,
 }
 
@@ -116,6 +120,8 @@ impl Default for Settings {
             wallpaper: None,
             favorites: Vec::new(),
             button_layout: ButtonLayoutSetting::default(),
+            sounds: false,
+            reduce_animations: false,
             panels: Panels::default(),
         }
     }
@@ -143,6 +149,20 @@ impl Settings {
     pub fn with_button_layout(&self, button_layout: ButtonLayoutSetting) -> Self {
         Self {
             button_layout,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_sounds(&self, sounds: bool) -> Self {
+        Self {
+            sounds,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_reduce_animations(&self, reduce_animations: bool) -> Self {
+        Self {
+            reduce_animations,
             ..self.clone()
         }
     }

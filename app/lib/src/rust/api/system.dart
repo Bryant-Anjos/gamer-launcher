@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Roda vários programas do sistema; nunca chamar da thread da UI.
 Future<QuickControls> readQuickControls() =>
@@ -32,6 +32,51 @@ Future<void> setBrightnessPercent({required int percent}) =>
 Future<StatsSample> sampleStats() =>
     RustLib.instance.api.crateApiSystemSampleStats();
 
+/// `None` quando o computador não tem bateria (um desktop, por exemplo).
+Future<BatteryReading?> readBattery() =>
+    RustLib.instance.api.crateApiSystemReadBattery();
+
+/// Desligar, reiniciar, suspender ou encerrar a sessão.
+Future<void> performPowerAction({required PowerAction action}) =>
+    RustLib.instance.api.crateApiSystemPerformPowerAction(action: action);
+
+Future<List<PairedDevice>> listPairedDevices() =>
+    RustLib.instance.api.crateApiSystemListPairedDevices();
+
+Future<void> connectBluetoothDevice({required String address}) =>
+    RustLib.instance.api.crateApiSystemConnectBluetoothDevice(address: address);
+
+Future<void> disconnectBluetoothDevice({required String address}) => RustLib
+    .instance
+    .api
+    .crateApiSystemDisconnectBluetoothDevice(address: address);
+
+/// A existência do arquivo em `~/.config/autostart` é a verdade.
+Future<bool> autostartEnabled() =>
+    RustLib.instance.api.crateApiSystemAutostartEnabled();
+
+Future<void> setAutostart({required bool enabled}) =>
+    RustLib.instance.api.crateApiSystemSetAutostart(enabled: enabled);
+
+/// Bateria do computador.
+class BatteryReading {
+  final int percent;
+  final bool charging;
+
+  const BatteryReading({required this.percent, required this.charging});
+
+  @override
+  int get hashCode => percent.hashCode ^ charging.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BatteryReading &&
+          runtimeType == other.runtimeType &&
+          percent == other.percent &&
+          charging == other.charging;
+}
+
 /// Um nível de 0 a 100 (volume, brilho); `percent` vazio quando falhou.
 class LevelReading {
   final int? percent;
@@ -52,6 +97,33 @@ class LevelReading {
           muted == other.muted &&
           error == other.error;
 }
+
+/// Dispositivo Bluetooth já pareado.
+class PairedDevice {
+  final String address;
+  final String name;
+  final bool connected;
+
+  const PairedDevice({
+    required this.address,
+    required this.name,
+    required this.connected,
+  });
+
+  @override
+  int get hashCode => address.hashCode ^ name.hashCode ^ connected.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PairedDevice &&
+          runtimeType == other.runtimeType &&
+          address == other.address &&
+          name == other.name &&
+          connected == other.connected;
+}
+
+enum PowerAction { shutdown, reboot, suspend, logOut }
 
 /// Leitura do painel de controle rápido. Cada item falha sozinho.
 class QuickControls {

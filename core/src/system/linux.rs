@@ -10,6 +10,7 @@ use std::time::Duration;
 use std::{fs, io};
 
 const BACKLIGHT_ROOT: &str = "/sys/class/backlight";
+const POWER_SUPPLY_ROOT: &str = "/sys/class/power_supply";
 const DEFAULT_SINK: &str = "@DEFAULT_AUDIO_SINK@";
 const MIN_BRIGHTNESS_PERCENT: u64 = 1;
 const MAX_PERCENT: u8 = 100;
@@ -22,6 +23,8 @@ pub struct LinuxSystem<R: CommandRunner> {
     runner: R,
     backlight_root: PathBuf,
     dark_mode_file: Option<PathBuf>,
+    power_supply_root: PathBuf,
+    session_id: Option<String>,
 }
 
 impl<R: CommandRunner> LinuxSystem<R> {
@@ -30,6 +33,8 @@ impl<R: CommandRunner> LinuxSystem<R> {
             runner,
             backlight_root: PathBuf::from(BACKLIGHT_ROOT),
             dark_mode_file: paths::cosmic_dark_mode_path(),
+            power_supply_root: PathBuf::from(POWER_SUPPLY_ROOT),
+            session_id: std::env::var("XDG_SESSION_ID").ok(),
         }
     }
 
@@ -38,7 +43,32 @@ impl<R: CommandRunner> LinuxSystem<R> {
             runner,
             backlight_root,
             dark_mode_file: Some(dark_mode_file),
+            power_supply_root: PathBuf::from(POWER_SUPPLY_ROOT),
+            session_id: None,
         }
+    }
+
+    pub fn with_power_supply_root(self, power_supply_root: PathBuf) -> Self {
+        Self {
+            power_supply_root,
+            ..self
+        }
+    }
+
+    pub fn with_session_id(self, session_id: Option<String>) -> Self {
+        Self { session_id, ..self }
+    }
+
+    pub(super) fn runner(&self) -> &R {
+        &self.runner
+    }
+
+    pub(super) fn power_supply_root(&self) -> &Path {
+        &self.power_supply_root
+    }
+
+    pub(super) fn session_id(&self) -> Option<&str> {
+        self.session_id.as_deref()
     }
 
     /// Lê todos os controles; uma falha não esconde os demais.

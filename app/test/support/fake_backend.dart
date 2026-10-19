@@ -21,6 +21,9 @@ class FakeBackend implements LauncherBackend {
     this.wallpapers = const [],
     this.isGamepadConnected = true,
     this.theme = ResolvedTheme.dark,
+    this.battery = const BatteryReading(percent: 80, charging: false),
+    this.autostart = false,
+    this.pairedDevices = const [],
   }) : settings = settings ?? sampleSettings(),
        catalog = catalog ?? sampleCatalog(),
        recents = recents ?? sampleRecents;
@@ -35,6 +38,9 @@ class FakeBackend implements LauncherBackend {
   bool isGamepadConnected;
   ResolvedTheme theme;
   String? launchWarning;
+  BatteryReading? battery;
+  bool autostart;
+  List<PairedDevice> pairedDevices;
 
   /// Nome do método -> mensagem do erro que ele deve lançar.
   final failures = <String, String>{};
@@ -121,6 +127,34 @@ class FakeBackend implements LauncherBackend {
   @override
   Future<void> setBrightnessPercent(int percent) =>
       _answer('setBrightnessPercent($percent)', () {});
+
+  @override
+  Future<BatteryReading?> readBattery() =>
+      _answer('readBattery', () => battery);
+
+  @override
+  Future<void> performPowerAction(PowerAction action) =>
+      _answer('performPowerAction(${action.name})', () {});
+
+  @override
+  Future<bool> autostartEnabled() =>
+      _answer('autostartEnabled', () => autostart);
+
+  @override
+  Future<void> setAutostart(bool enabled) =>
+      _answer('setAutostart($enabled)', () => autostart = enabled);
+
+  @override
+  Future<List<PairedDevice>> listPairedDevices() =>
+      _answer('listPairedDevices', () => pairedDevices);
+
+  @override
+  Future<void> connectBluetoothDevice(String address) =>
+      _answer('connectBluetoothDevice($address)', () {});
+
+  @override
+  Future<void> disconnectBluetoothDevice(String address) =>
+      _answer('disconnectBluetoothDevice($address)', () {});
 
   @override
   Future<StatsSample> sampleStats() => _answer('sampleStats', () => stats);

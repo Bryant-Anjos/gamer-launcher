@@ -63,4 +63,17 @@ void main() {
     expect(next.darkStartsMinute, 1200);
     expect(next.lightStartsMinute, 420);
   });
+
+  test('layout, sounds and animations change one at a time and survive other edits', () {
+    final edited = base
+        .copyWith(buttonLayout: LauncherButtonLayout.nintendo)
+        .copyWith(sounds: true)
+        .copyWith(reduceAnimations: true);
+
+    expect(edited.buttonLayout, LauncherButtonLayout.nintendo);
+    expect(edited.sounds, isTrue);
+    expect(edited.reduceAnimations, isTrue);
+    expect(edited.withWallpaper('/a.png').sounds, isTrue);
+    expect(base.sounds, isFalse, reason: 'original intacto');
+  });
 }

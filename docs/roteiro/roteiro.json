@@ -109,15 +109,20 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/gamepad_stream.dart": "cc39ff1ab220",
+        "app/lib/input/gamepad_stream.dart": "d305e483091e",
         "app/lib/input/input_router.dart": "1d679b5caca1",
         "app/lib/state/gamepad_status.dart": "45985707455b",
-        "app/rust/src/api/input.rs": "556cef9a6cea",
+        "app/rust/src/api/input.rs": "9ef46fbf7429",
         "core/src/gamepad.rs": "453db342dddc",
         "core/src/input.rs": "5c4ce90df3f5"
       },
       "itemsHash": "3e6a8b2510d1",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        }
+      ]
     },
     {
       "id": "teclado",
@@ -172,7 +177,7 @@
         "app/lib/state/settings_edit.dart"
       ],
       "reviewed": {
-        "app/lib/state/settings_edit.dart": "ff89a65bca98",
+        "app/lib/state/settings_edit.dart": "862a5e4782ea",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
         "app/lib/ui/settings/settings_controls.dart": "2bd55da8b33d",
         "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
@@ -185,7 +190,12 @@
         "core/src/wallpapers.rs": "0ea70ce54eac"
       },
       "itemsHash": "60a94224d711",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        }
+      ]
     },
     {
       "id": "paineis",
@@ -206,14 +216,18 @@
       "reviewed": {
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
         "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
-        "app/rust/src/api/settings.rs": "8cbff3ceb194",
-        "core/src/settings.rs": "efa4799b8a5f"
+        "app/rust/src/api/settings.rs": "2a6a73f25fa8",
+        "core/src/settings.rs": "144b0e0a81e3"
       },
       "itemsHash": "dc74ddc2780b",
       "reviews": [
         {
           "date": "2026-10-19",
           "reason": "O settings.rs ganhou o campo button_layout, sem relação com a visibilidade dos painéis."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
         }
       ]
     },
@@ -356,11 +370,12 @@
         "app/lib/ui/quick/overlays.dart": "b3d4b72c68ba",
         "app/lib/ui/quick/quick_controls_panel.dart": "9941ae119a34",
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
-        "app/rust/src/api/system.rs": "1fc2f28ce668",
+        "app/rust/src/api/system.rs": "198436bcfac8",
         "core/src/system/error.rs": "a214856a4ee9",
-        "core/src/system/linux.rs": "9674f6220a33",
-        "core/src/system/mod.rs": "24c94b9f0875",
-        "core/src/system/parse.rs": "895585b2f9cc",
+        "core/src/system/linux.rs": "31421816a3bd",
+        "core/src/system/mod.rs": "57e31414e30b",
+        "core/src/system/parse.rs": "d15e66a11330",
+        "core/src/system/power.rs": "51e071639273",
         "core/src/system/runner.rs": "10ffd75acefb"
       },
       "itemsHash": "dee24fbea0d2",
@@ -368,6 +383,10 @@
         {
           "date": "2026-10-19",
           "reason": "A lista de dispositivos Bluetooth (listar, conectar, desconectar) existe só no núcleo; os itens entram quando o painel da UI for feito."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
         }
       ]
     },
@@ -419,16 +438,25 @@
         "core/src/search.rs",
         "core/src/catalog.rs",
         "core/src/open.rs",
-        "app/rust/src/api/catalog.rs"
+        "app/rust/src/api/catalog.rs",
+        "app/rust/src/api/search.rs",
+        "app/rust/src/store.rs"
       ],
       "reviewed": {
-        "app/rust/src/api/catalog.rs": "c96f9f610fec",
+        "app/rust/src/api/catalog.rs": "78c387a14c04",
+        "app/rust/src/api/search.rs": "5be36679f0d4",
+        "app/rust/src/store.rs": "630f1072435a",
         "core/src/catalog.rs": "969c1987ddcc",
         "core/src/open.rs": "4863c3edfde7",
         "core/src/search.rs": "57d64d75b23d"
       },
       "itemsHash": "e42b4a2b3250",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        }
+      ]
     },
     {
       "id": "jogos",
@@ -491,19 +519,27 @@
         "core/src/settings.rs",
         "core/src/paths.rs",
         "core/src/fs_util.rs",
-        "app/rust/src/api/settings.rs"
+        "app/rust/src/api/settings.rs",
+        "core/src/sound.rs",
+        "app/rust/src/api/sound.rs"
       ],
       "reviewed": {
-        "app/rust/src/api/settings.rs": "8cbff3ceb194",
+        "app/rust/src/api/settings.rs": "2a6a73f25fa8",
+        "app/rust/src/api/sound.rs": "63bf56a9b28a",
         "core/src/fs_util.rs": "9e6d1889c09f",
         "core/src/paths.rs": "c4d915aed584",
-        "core/src/settings.rs": "efa4799b8a5f"
+        "core/src/settings.rs": "144b0e0a81e3",
+        "core/src/sound.rs": "b3f4fbc249cf"
       },
       "itemsHash": "eb6eb25a0554",
       "reviews": [
         {
           "date": "2026-10-19",
           "reason": "O settings.rs ganhou o campo button_layout, que ainda não tem tela; arquivos antigos sem o campo continuam abrindo (teste automático). Os itens entram quando o ajuste estiver na interface."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
         }
       ]
     },
@@ -601,7 +637,7 @@
       ],
       "reviewed": {
         "core/src/paths.rs": "c4d915aed584",
-        "core/src/system/linux.rs": "9674f6220a33"
+        "core/src/system/linux.rs": "31421816a3bd"
       },
       "itemsHash": "8c05993e0ad7",
       "reviews": [
@@ -612,6 +648,10 @@
         {
           "date": "2026-10-19",
           "reason": "O system/linux.rs ganhou a lista de dispositivos Bluetooth (bluetoothctl); não muda a compatibilidade com outros ambientes além do que já está descrito."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
         }
       ]
     },

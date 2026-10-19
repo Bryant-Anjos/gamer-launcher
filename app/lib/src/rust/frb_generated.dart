@@ -7,7 +7,9 @@ import 'api/catalog.dart';
 import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
+import 'api/search.dart';
 import 'api/settings.dart';
+import 'api/sound.dart';
 import 'api/system.dart';
 
 import 'dart:async';
@@ -74,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1358231040;
+  int get rustContentHash => 1777648095;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -86,19 +88,33 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<bool> crateApiSystemAutostartEnabled();
+
+  Future<void> crateApiSystemConnectBluetoothDevice({required String address});
+
   String crateApiMetaCoreVersion();
 
   LauncherSettings crateApiSettingsDefaultSettings();
 
-  Stream<GamepadAction> crateApiInputGamepadActions();
+  Future<void> crateApiSystemDisconnectBluetoothDevice({
+    required String address,
+  });
+
+  Stream<GamepadAction> crateApiInputGamepadActions({
+    required LauncherButtonLayout layout,
+  });
 
   bool crateApiInputGamepadConnected();
+
+  void crateApiInputGamepadSetLayout({required LauncherButtonLayout layout});
 
   Future<void> crateApiInputGamepadStop();
 
   Future<void> crateApiMetaInitApp();
 
   Future<String?> crateApiCatalogLaunchApp({required String id});
+
+  Future<List<PairedDevice>> crateApiSystemListPairedDevices();
 
   Future<List<RecentFile>> crateApiFilesListRecents({required int limit});
 
@@ -109,6 +125,16 @@ abstract class RustLibApi extends BaseApi {
   Future<LauncherSettings> crateApiSettingsLoadSettings();
 
   Future<void> crateApiFilesOpenPath({required String path});
+
+  Future<void> crateApiSearchOpenSearchResult({required String id});
+
+  Future<void> crateApiSystemPerformPowerAction({required PowerAction action});
+
+  void crateApiSoundPlayUiSound({required LauncherSound sound});
+
+  Future<void> crateApiSearchPrepareSearch();
+
+  Future<BatteryReading?> crateApiSystemReadBattery();
 
   Future<QuickControls> crateApiSystemReadQuickControls();
 
@@ -122,6 +148,13 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiSettingsSaveSettings({
     required LauncherSettings settings,
   });
+
+  Future<List<SearchResult>> crateApiSearchSearchAll({
+    required String query,
+    required int limit,
+  });
+
+  Future<void> crateApiSystemSetAutostart({required bool enabled});
 
   Future<void> crateApiSystemSetBluetoothEnabled({required bool enabled});
 
@@ -145,12 +178,70 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<bool> crateApiSystemAutostartEnabled() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSystemAutostartEnabledConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemAutostartEnabledConstMeta =>
+      const TaskConstMeta(debugName: "autostart_enabled", argNames: []);
+
+  @override
+  Future<void> crateApiSystemConnectBluetoothDevice({required String address}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(address, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemConnectBluetoothDeviceConstMeta,
+        argValues: [address],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemConnectBluetoothDeviceConstMeta =>
+      const TaskConstMeta(
+        debugName: "connect_bluetooth_device",
+        argNames: ["address"],
+      );
+
+  @override
   String crateApiMetaCoreVersion() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -172,7 +263,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_launcher_settings,
@@ -189,7 +280,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "default_settings", argNames: []);
 
   @override
-  Stream<GamepadAction> crateApiInputGamepadActions() {
+  Future<void> crateApiSystemDisconnectBluetoothDevice({
+    required String address,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(address, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemDisconnectBluetoothDeviceConstMeta,
+        argValues: [address],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemDisconnectBluetoothDeviceConstMeta =>
+      const TaskConstMeta(
+        debugName: "disconnect_bluetooth_device",
+        argNames: ["address"],
+      );
+
+  @override
+  Stream<GamepadAction> crateApiInputGamepadActions({
+    required LauncherButtonLayout layout,
+  }) {
     final sink = RustStreamSink<GamepadAction>();
     unawaited(
       handler.executeNormal(
@@ -197,10 +323,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           callFfi: (port_) {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_StreamSink_gamepad_action_Sse(sink, serializer);
+            sse_encode_launcher_button_layout(layout, serializer);
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 3,
+              funcId: 6,
               port: port_,
             );
           },
@@ -209,7 +336,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: sse_decode_String,
           ),
           constMeta: kCrateApiInputGamepadActionsConstMeta,
-          argValues: [sink],
+          argValues: [sink, layout],
           apiImpl: this,
         ),
       ),
@@ -218,7 +345,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiInputGamepadActionsConstMeta =>
-      const TaskConstMeta(debugName: "gamepad_actions", argNames: ["sink"]);
+      const TaskConstMeta(
+        debugName: "gamepad_actions",
+        argNames: ["sink", "layout"],
+      );
 
   @override
   bool crateApiInputGamepadConnected() {
@@ -226,7 +356,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -243,6 +373,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "gamepad_connected", argNames: []);
 
   @override
+  void crateApiInputGamepadSetLayout({required LauncherButtonLayout layout}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_launcher_button_layout(layout, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiInputGamepadSetLayoutConstMeta,
+        argValues: [layout],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiInputGamepadSetLayoutConstMeta =>
+      const TaskConstMeta(
+        debugName: "gamepad_set_layout",
+        argNames: ["layout"],
+      );
+
+  @override
   Future<void> crateApiInputGamepadStop() {
     return handler.executeNormal(
       NormalTask(
@@ -251,7 +407,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 9,
             port: port_,
           );
         },
@@ -278,7 +434,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 10,
             port: port_,
           );
         },
@@ -306,7 +462,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 11,
             port: port_,
           );
         },
@@ -325,6 +481,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "launch_app", argNames: ["id"]);
 
   @override
+  Future<List<PairedDevice>> crateApiSystemListPairedDevices() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_paired_device,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemListPairedDevicesConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemListPairedDevicesConstMeta =>
+      const TaskConstMeta(debugName: "list_paired_devices", argNames: []);
+
+  @override
   Future<List<RecentFile>> crateApiFilesListRecents({required int limit}) {
     return handler.executeNormal(
       NormalTask(
@@ -334,7 +517,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 13,
             port: port_,
           );
         },
@@ -362,7 +545,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 14,
             port: port_,
           );
         },
@@ -389,7 +572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 15,
             port: port_,
           );
         },
@@ -416,7 +599,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 16,
             port: port_,
           );
         },
@@ -444,7 +627,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 17,
             port: port_,
           );
         },
@@ -463,6 +646,142 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "open_path", argNames: ["path"]);
 
   @override
+  Future<void> crateApiSearchOpenSearchResult({required String id}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(id, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSearchOpenSearchResultConstMeta,
+        argValues: [id],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSearchOpenSearchResultConstMeta =>
+      const TaskConstMeta(debugName: "open_search_result", argNames: ["id"]);
+
+  @override
+  Future<void> crateApiSystemPerformPowerAction({required PowerAction action}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_power_action(action, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 19,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemPerformPowerActionConstMeta,
+        argValues: [action],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemPerformPowerActionConstMeta =>
+      const TaskConstMeta(
+        debugName: "perform_power_action",
+        argNames: ["action"],
+      );
+
+  @override
+  void crateApiSoundPlayUiSound({required LauncherSound sound}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_launcher_sound(sound, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSoundPlayUiSoundConstMeta,
+        argValues: [sound],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSoundPlayUiSoundConstMeta =>
+      const TaskConstMeta(debugName: "play_ui_sound", argNames: ["sound"]);
+
+  @override
+  Future<void> crateApiSearchPrepareSearch() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSearchPrepareSearchConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSearchPrepareSearchConstMeta =>
+      const TaskConstMeta(debugName: "prepare_search", argNames: []);
+
+  @override
+  Future<BatteryReading?> crateApiSystemReadBattery() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 22,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_battery_reading,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemReadBatteryConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemReadBatteryConstMeta =>
+      const TaskConstMeta(debugName: "read_battery", argNames: []);
+
+  @override
   Future<QuickControls> crateApiSystemReadQuickControls() {
     return handler.executeNormal(
       NormalTask(
@@ -471,7 +790,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 23,
             port: port_,
           );
         },
@@ -500,7 +819,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_launcher_settings(settings, serializer);
           sse_encode_u_16(minuteOfDay, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_resolved_theme,
@@ -528,7 +847,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 25,
             port: port_,
           );
         },
@@ -558,7 +877,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 26,
             port: port_,
           );
         },
@@ -577,6 +896,68 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "save_settings", argNames: ["settings"]);
 
   @override
+  Future<List<SearchResult>> crateApiSearchSearchAll({
+    required String query,
+    required int limit,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(query, serializer);
+          sse_encode_u_32(limit, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 27,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_search_result,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSearchSearchAllConstMeta,
+        argValues: [query, limit],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSearchSearchAllConstMeta => const TaskConstMeta(
+    debugName: "search_all",
+    argNames: ["query", "limit"],
+  );
+
+  @override
+  Future<void> crateApiSystemSetAutostart({required bool enabled}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_bool(enabled, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 28,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetAutostartConstMeta,
+        argValues: [enabled],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetAutostartConstMeta =>
+      const TaskConstMeta(debugName: "set_autostart", argNames: ["enabled"]);
+
+  @override
   Future<void> crateApiSystemSetBluetoothEnabled({required bool enabled}) {
     return handler.executeNormal(
       NormalTask(
@@ -586,7 +967,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 29,
             port: port_,
           );
         },
@@ -617,7 +998,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 30,
             port: port_,
           );
         },
@@ -648,7 +1029,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 31,
             port: port_,
           );
         },
@@ -679,7 +1060,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 32,
             port: port_,
           );
         },
@@ -710,7 +1091,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 33,
             port: port_,
           );
         },
@@ -737,7 +1118,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 22,
+            funcId: 34,
             port: port_,
           );
         },
@@ -805,9 +1186,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BatteryReading dco_decode_battery_reading(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return BatteryReading(
+      percent: dco_decode_u_8(arr[0]),
+      charging: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
+  }
+
+  @protected
+  BatteryReading dco_decode_box_autoadd_battery_reading(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_battery_reading(raw);
   }
 
   @protected
@@ -853,11 +1252,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LauncherButtonLayout dco_decode_launcher_button_layout(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LauncherButtonLayout.values[raw as int];
+  }
+
+  @protected
   LauncherSettings dco_decode_launcher_settings(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return LauncherSettings(
       themeMode: dco_decode_launcher_theme_mode(arr[0]),
       darkStartsMinute: dco_decode_u_16(arr[1]),
@@ -865,7 +1270,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       wallpaper: dco_decode_opt_String(arr[3]),
       favorites: dco_decode_list_String(arr[4]),
       panels: dco_decode_panel_visibility(arr[5]),
+      buttonLayout: dco_decode_launcher_button_layout(arr[6]),
+      sounds: dco_decode_bool(arr[7]),
+      reduceAnimations: dco_decode_bool(arr[8]),
     );
+  }
+
+  @protected
+  LauncherSound dco_decode_launcher_sound(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LauncherSound.values[raw as int];
   }
 
   @protected
@@ -900,6 +1314,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<PairedDevice> dco_decode_list_paired_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_paired_device).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -912,9 +1332,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<SearchResult> dco_decode_list_search_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_search_result).toList();
+  }
+
+  @protected
   String? dco_decode_opt_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  BatteryReading? dco_decode_opt_box_autoadd_battery_reading(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_battery_reading(raw);
   }
 
   @protected
@@ -927,6 +1359,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int? dco_decode_opt_box_autoadd_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_8(raw);
+  }
+
+  @protected
+  PairedDevice dco_decode_paired_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PairedDevice(
+      address: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      connected: dco_decode_bool(arr[2]),
+    );
   }
 
   @protected
@@ -943,6 +1388,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       favorites: dco_decode_bool(arr[4]),
       featuredCards: dco_decode_bool(arr[5]),
     );
+  }
+
+  @protected
+  PowerAction dco_decode_power_action(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PowerAction.values[raw as int];
   }
 
   @protected
@@ -980,6 +1431,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ResolvedTheme dco_decode_resolved_theme(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ResolvedTheme.values[raw as int];
+  }
+
+  @protected
+  SearchKind dco_decode_search_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SearchKind.values[raw as int];
+  }
+
+  @protected
+  SearchResult dco_decode_search_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return SearchResult(
+      kind: dco_decode_search_kind(arr[0]),
+      id: dco_decode_String(arr[1]),
+      title: dco_decode_String(arr[2]),
+      subtitle: dco_decode_opt_String(arr[3]),
+      appId: dco_decode_opt_String(arr[4]),
+    );
   }
 
   @protected
@@ -1088,9 +1560,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BatteryReading sse_decode_battery_reading(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_percent = sse_decode_u_8(deserializer);
+    var var_charging = sse_decode_bool(deserializer);
+    return BatteryReading(percent: var_percent, charging: var_charging);
+  }
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  BatteryReading sse_decode_box_autoadd_battery_reading(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_battery_reading(deserializer));
   }
 
   @protected
@@ -1139,6 +1627,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LauncherButtonLayout sse_decode_launcher_button_layout(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LauncherButtonLayout.values[inner];
+  }
+
+  @protected
   LauncherSettings sse_decode_launcher_settings(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_themeMode = sse_decode_launcher_theme_mode(deserializer);
@@ -1147,6 +1644,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_wallpaper = sse_decode_opt_String(deserializer);
     var var_favorites = sse_decode_list_String(deserializer);
     var var_panels = sse_decode_panel_visibility(deserializer);
+    var var_buttonLayout = sse_decode_launcher_button_layout(deserializer);
+    var var_sounds = sse_decode_bool(deserializer);
+    var var_reduceAnimations = sse_decode_bool(deserializer);
     return LauncherSettings(
       themeMode: var_themeMode,
       darkStartsMinute: var_darkStartsMinute,
@@ -1154,7 +1654,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       wallpaper: var_wallpaper,
       favorites: var_favorites,
       panels: var_panels,
+      buttonLayout: var_buttonLayout,
+      sounds: var_sounds,
+      reduceAnimations: var_reduceAnimations,
     );
+  }
+
+  @protected
+  LauncherSound sse_decode_launcher_sound(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LauncherSound.values[inner];
   }
 
   @protected
@@ -1204,6 +1714,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<PairedDevice> sse_decode_list_paired_device(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <PairedDevice>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_paired_device(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -1223,11 +1747,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<SearchResult> sse_decode_list_search_result(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SearchResult>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_search_result(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BatteryReading? sse_decode_opt_box_autoadd_battery_reading(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_battery_reading(deserializer));
     } else {
       return null;
     }
@@ -1256,6 +1807,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PairedDevice sse_decode_paired_device(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_address = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_connected = sse_decode_bool(deserializer);
+    return PairedDevice(
+      address: var_address,
+      name: var_name,
+      connected: var_connected,
+    );
+  }
+
+  @protected
   PanelVisibility sse_decode_panel_visibility(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_search = sse_decode_bool(deserializer);
@@ -1272,6 +1836,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       favorites: var_favorites,
       featuredCards: var_featuredCards,
     );
+  }
+
+  @protected
+  PowerAction sse_decode_power_action(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return PowerAction.values[inner];
   }
 
   @protected
@@ -1315,6 +1886,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return ResolvedTheme.values[inner];
+  }
+
+  @protected
+  SearchKind sse_decode_search_kind(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SearchKind.values[inner];
+  }
+
+  @protected
+  SearchResult sse_decode_search_result(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_search_kind(deserializer);
+    var var_id = sse_decode_String(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_subtitle = sse_decode_opt_String(deserializer);
+    var var_appId = sse_decode_opt_String(deserializer);
+    return SearchResult(
+      kind: var_kind,
+      id: var_id,
+      title: var_title,
+      subtitle: var_subtitle,
+      appId: var_appId,
+    );
   }
 
   @protected
@@ -1417,9 +2012,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_battery_reading(
+    BatteryReading self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.percent, serializer);
+    sse_encode_bool(self.charging, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_battery_reading(
+    BatteryReading self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_battery_reading(self, serializer);
   }
 
   @protected
@@ -1468,6 +2082,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_launcher_button_layout(
+    LauncherButtonLayout self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_launcher_settings(
     LauncherSettings self,
     SseSerializer serializer,
@@ -1479,6 +2102,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.wallpaper, serializer);
     sse_encode_list_String(self.favorites, serializer);
     sse_encode_panel_visibility(self.panels, serializer);
+    sse_encode_launcher_button_layout(self.buttonLayout, serializer);
+    sse_encode_bool(self.sounds, serializer);
+    sse_encode_bool(self.reduceAnimations, serializer);
+  }
+
+  @protected
+  void sse_encode_launcher_sound(LauncherSound self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -1517,6 +2149,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_paired_device(
+    List<PairedDevice> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_paired_device(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -1539,12 +2183,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_search_result(
+    List<SearchResult> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_search_result(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_battery_reading(
+    BatteryReading? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_battery_reading(self, serializer);
     }
   }
 
@@ -1569,6 +2238,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_paired_device(PairedDevice self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.address, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_bool(self.connected, serializer);
+  }
+
+  @protected
   void sse_encode_panel_visibility(
     PanelVisibility self,
     SseSerializer serializer,
@@ -1580,6 +2257,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.recents, serializer);
     sse_encode_bool(self.favorites, serializer);
     sse_encode_bool(self.featuredCards, serializer);
+  }
+
+  @protected
+  void sse_encode_power_action(PowerAction self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -1607,6 +2290,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_resolved_theme(ResolvedTheme self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_search_kind(SearchKind self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_search_result(SearchResult self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_search_kind(self.kind, serializer);
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_opt_String(self.subtitle, serializer);
+    sse_encode_opt_String(self.appId, serializer);
   }
 
   @protected

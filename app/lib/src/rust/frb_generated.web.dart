@@ -10,7 +10,9 @@ import 'api/catalog.dart';
 import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
+import 'api/search.dart';
 import 'api/settings.dart';
+import 'api/sound.dart';
 import 'api/system.dart';
 
 import 'dart:async';
@@ -46,7 +48,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AppInfo dco_decode_app_info(dynamic raw);
 
   @protected
+  BatteryReading dco_decode_battery_reading(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
+
+  @protected
+  BatteryReading dco_decode_box_autoadd_battery_reading(dynamic raw);
 
   @protected
   bool dco_decode_box_autoadd_bool(dynamic raw);
@@ -70,7 +78,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_i_32(dynamic raw);
 
   @protected
+  LauncherButtonLayout dco_decode_launcher_button_layout(dynamic raw);
+
+  @protected
   LauncherSettings dco_decode_launcher_settings(dynamic raw);
+
+  @protected
+  LauncherSound dco_decode_launcher_sound(dynamic raw);
 
   @protected
   LauncherThemeMode dco_decode_launcher_theme_mode(dynamic raw);
@@ -85,13 +99,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AppInfo> dco_decode_list_app_info(dynamic raw);
 
   @protected
+  List<PairedDevice> dco_decode_list_paired_device(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<RecentFile> dco_decode_list_recent_file(dynamic raw);
 
   @protected
+  List<SearchResult> dco_decode_list_search_result(dynamic raw);
+
+  @protected
   String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  BatteryReading? dco_decode_opt_box_autoadd_battery_reading(dynamic raw);
 
   @protected
   bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
@@ -100,7 +123,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_u_8(dynamic raw);
 
   @protected
+  PairedDevice dco_decode_paired_device(dynamic raw);
+
+  @protected
   PanelVisibility dco_decode_panel_visibility(dynamic raw);
+
+  @protected
+  PowerAction dco_decode_power_action(dynamic raw);
 
   @protected
   QuickControls dco_decode_quick_controls(dynamic raw);
@@ -110,6 +139,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ResolvedTheme dco_decode_resolved_theme(dynamic raw);
+
+  @protected
+  SearchKind dco_decode_search_kind(dynamic raw);
+
+  @protected
+  SearchResult dco_decode_search_result(dynamic raw);
 
   @protected
   StatsSample dco_decode_stats_sample(dynamic raw);
@@ -147,7 +182,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AppInfo sse_decode_app_info(SseDeserializer deserializer);
 
   @protected
+  BatteryReading sse_decode_battery_reading(SseDeserializer deserializer);
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  BatteryReading sse_decode_box_autoadd_battery_reading(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
@@ -173,7 +216,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
+  LauncherButtonLayout sse_decode_launcher_button_layout(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LauncherSettings sse_decode_launcher_settings(SseDeserializer deserializer);
+
+  @protected
+  LauncherSound sse_decode_launcher_sound(SseDeserializer deserializer);
 
   @protected
   LauncherThemeMode sse_decode_launcher_theme_mode(
@@ -190,13 +241,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AppInfo> sse_decode_list_app_info(SseDeserializer deserializer);
 
   @protected
+  List<PairedDevice> sse_decode_list_paired_device(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   List<RecentFile> sse_decode_list_recent_file(SseDeserializer deserializer);
 
   @protected
+  List<SearchResult> sse_decode_list_search_result(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  BatteryReading? sse_decode_opt_box_autoadd_battery_reading(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
@@ -205,7 +271,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? sse_decode_opt_box_autoadd_u_8(SseDeserializer deserializer);
 
   @protected
+  PairedDevice sse_decode_paired_device(SseDeserializer deserializer);
+
+  @protected
   PanelVisibility sse_decode_panel_visibility(SseDeserializer deserializer);
+
+  @protected
+  PowerAction sse_decode_power_action(SseDeserializer deserializer);
 
   @protected
   QuickControls sse_decode_quick_controls(SseDeserializer deserializer);
@@ -215,6 +287,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ResolvedTheme sse_decode_resolved_theme(SseDeserializer deserializer);
+
+  @protected
+  SearchKind sse_decode_search_kind(SseDeserializer deserializer);
+
+  @protected
+  SearchResult sse_decode_search_result(SseDeserializer deserializer);
 
   @protected
   StatsSample sse_decode_stats_sample(SseDeserializer deserializer);
@@ -256,7 +334,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_app_info(AppInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_battery_reading(
+    BatteryReading self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_battery_reading(
+    BatteryReading self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
@@ -283,10 +373,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_launcher_button_layout(
+    LauncherButtonLayout self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_launcher_settings(
     LauncherSettings self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_launcher_sound(LauncherSound self, SseSerializer serializer);
 
   @protected
   void sse_encode_launcher_theme_mode(
@@ -304,6 +403,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_app_info(List<AppInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_paired_device(
+    List<PairedDevice> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -316,7 +421,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_search_result(
+    List<SearchResult> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_battery_reading(
+    BatteryReading? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
@@ -325,10 +442,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_u_8(int? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_paired_device(PairedDevice self, SseSerializer serializer);
+
+  @protected
   void sse_encode_panel_visibility(
     PanelVisibility self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_power_action(PowerAction self, SseSerializer serializer);
 
   @protected
   void sse_encode_quick_controls(QuickControls self, SseSerializer serializer);
@@ -338,6 +461,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_resolved_theme(ResolvedTheme self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_search_kind(SearchKind self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_search_result(SearchResult self, SseSerializer serializer);
 
   @protected
   void sse_encode_stats_sample(StatsSample self, SseSerializer serializer);

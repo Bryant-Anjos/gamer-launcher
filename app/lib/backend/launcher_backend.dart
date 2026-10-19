@@ -37,6 +37,18 @@ abstract interface class LauncherBackend {
   Future<void> setVolumePercent(int percent);
   Future<void> setBrightnessPercent(int percent);
 
+  /// `null` quando o computador não tem bateria.
+  Future<BatteryReading?> readBattery();
+  Future<void> performPowerAction(PowerAction action);
+
+  /// Iniciar com o sistema: o arquivo em `~/.config/autostart` é a verdade.
+  Future<bool> autostartEnabled();
+  Future<void> setAutostart(bool enabled);
+
+  Future<List<PairedDevice>> listPairedDevices();
+  Future<void> connectBluetoothDevice(String address);
+  Future<void> disconnectBluetoothDevice(String address);
+
   Future<StatsSample> sampleStats();
   Future<String?> userFirstName();
   bool gamepadConnected();

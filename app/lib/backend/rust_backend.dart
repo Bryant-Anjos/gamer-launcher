@@ -92,6 +92,32 @@ class RustBackend implements LauncherBackend {
       _guard(() => system.setBrightnessPercent(percent: percent));
 
   @override
+  Future<system.BatteryReading?> readBattery() => _guard(system.readBattery);
+
+  @override
+  Future<void> performPowerAction(system.PowerAction action) =>
+      _guard(() => system.performPowerAction(action: action));
+
+  @override
+  Future<bool> autostartEnabled() => _guard(system.autostartEnabled);
+
+  @override
+  Future<void> setAutostart(bool enabled) =>
+      _guard(() => system.setAutostart(enabled: enabled));
+
+  @override
+  Future<List<system.PairedDevice>> listPairedDevices() =>
+      _guard(system.listPairedDevices);
+
+  @override
+  Future<void> connectBluetoothDevice(String address) =>
+      _guard(() => system.connectBluetoothDevice(address: address));
+
+  @override
+  Future<void> disconnectBluetoothDevice(String address) =>
+      _guard(() => system.disconnectBluetoothDevice(address: address));
+
+  @override
   Future<system.StatsSample> sampleStats() => _guard(system.sampleStats);
 
   @override

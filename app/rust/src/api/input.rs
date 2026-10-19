@@ -1,6 +1,8 @@
+use crate::api::settings::LauncherButtonLayout;
+use crate::convert::button_layout_from_dto;
 use crate::frb_generated::StreamSink;
 use flutter_rust_bridge::frb;
-use launcher_core::gamepad::{spawn_listener, ListenerHandle};
+use launcher_core::gamepad::{spawn_listener_with, ListenerHandle};
 pub use launcher_core::input::GamepadAction;
 use std::ops::ControlFlow;
 use std::sync::{Mutex, MutexGuard, PoisonError};
@@ -38,11 +40,16 @@ fn stop_listener() {
 /// Ações do controle como stream. Uma nova chamada para a anterior antes de
 /// começar, para nunca haver dois leitores ativos. Falha se o sistema não
 /// permitir ler controles.
-pub fn gamepad_actions(sink: StreamSink<GamepadAction>) -> Result<(), String> {
+pub fn gamepad_actions(
+    sink: StreamSink<GamepadAction>,
+    layout: LauncherButtonLayout,
+) -> Result<(), String> {
     stop_listener();
-    let handle = spawn_listener(move |action| match sink.add(action) {
-        Ok(()) => ControlFlow::Continue(()),
-        Err(_) => ControlFlow::Break(()),
+    let handle = spawn_listener_with(button_layout_from_dto(layout), move |action| {
+        match sink.add(action) {
+            Ok(()) => ControlFlow::Continue(()),
+            Err(_) => ControlFlow::Break(()),
+        }
     })
     .map_err(|error| error.to_string())?;
     *lock_listener() = Some(handle);
@@ -60,4 +67,12 @@ pub fn gamepad_connected() -> bool {
     lock_listener()
         .as_ref()
         .is_some_and(|handle| handle.connected_gamepads() > 0)
+}
+
+/// Troca a disposição dos botões com a leitura rodando.
+#[frb(sync)]
+pub fn gamepad_set_layout(layout: LauncherButtonLayout) {
+    if let Some(handle) = lock_listener().as_ref() {
+        handle.set_layout_setting(button_layout_from_dto(layout));
+    }
 }

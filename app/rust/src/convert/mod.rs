@@ -3,16 +3,23 @@
 
 use crate::api::catalog::{AppCatalog, AppInfo};
 use crate::api::files::RecentFile;
-use crate::api::settings::{LauncherSettings, LauncherThemeMode, PanelVisibility, ResolvedTheme};
-use crate::api::system::{LevelReading, QuickControls, StatsSample, ToggleReading};
+use crate::api::search::{SearchKind, SearchResult};
+use crate::api::settings::{
+    LauncherButtonLayout, LauncherSettings, LauncherThemeMode, PanelVisibility, ResolvedTheme,
+};
+use crate::api::system::{
+    BatteryReading, LevelReading, PairedDevice, QuickControls, StatsSample, ToggleReading,
+};
 use launcher_core::apps::{find_app, AppEntry};
 use launcher_core::featured::{game_launchers, music_player};
 use launcher_core::history::LaunchHistory;
 use launcher_core::icons::resolve_icon;
+use launcher_core::input::ButtonLayoutSetting;
 use launcher_core::recents::RecentItem;
+use launcher_core::search::{ItemKind, SearchItem};
 use launcher_core::settings::{Panel, Settings, ThemeMode};
 use launcher_core::stats::SystemStats;
-use launcher_core::system::{QuickControlsSnapshot, SystemError};
+use launcher_core::system::{Battery, BluetoothDevice, QuickControlsSnapshot, SystemError};
 use launcher_core::theme::Theme;
 use launcher_core::time_of_day::TimeOfDay;
 use std::io;
@@ -36,6 +43,22 @@ fn theme_mode_from_dto(mode: LauncherThemeMode) -> ThemeMode {
         LauncherThemeMode::Light => ThemeMode::Light,
         LauncherThemeMode::Dark => ThemeMode::Dark,
         LauncherThemeMode::Auto => ThemeMode::Auto,
+    }
+}
+
+pub fn button_layout_to_dto(setting: ButtonLayoutSetting) -> LauncherButtonLayout {
+    match setting {
+        ButtonLayoutSetting::Auto => LauncherButtonLayout::Auto,
+        ButtonLayoutSetting::Xbox => LauncherButtonLayout::Xbox,
+        ButtonLayoutSetting::Nintendo => LauncherButtonLayout::Nintendo,
+    }
+}
+
+pub fn button_layout_from_dto(layout: LauncherButtonLayout) -> ButtonLayoutSetting {
+    match layout {
+        LauncherButtonLayout::Auto => ButtonLayoutSetting::Auto,
+        LauncherButtonLayout::Xbox => ButtonLayoutSetting::Xbox,
+        LauncherButtonLayout::Nintendo => ButtonLayoutSetting::Nintendo,
     }
 }
 
@@ -65,6 +88,9 @@ pub fn settings_to_dto(settings: &Settings) -> LauncherSettings {
             favorites: visible(Panel::Favorites),
             featured_cards: visible(Panel::FeaturedCards),
         },
+        button_layout: button_layout_to_dto(settings.button_layout),
+        sounds: settings.sounds,
+        reduce_animations: settings.reduce_animations,
     }
 }
 
@@ -90,6 +116,9 @@ pub fn settings_from_dto(dto: &LauncherSettings) -> Result<Settings, String> {
     let base = Settings::default()
         .with_theme_mode(theme_mode_from_dto(dto.theme_mode))
         .with_wallpaper(dto.wallpaper.as_ref().map(PathBuf::from))
+        .with_button_layout(button_layout_from_dto(dto.button_layout))
+        .with_sounds(dto.sounds)
+        .with_reduce_animations(dto.reduce_animations)
         .with_favorites(dto.favorites.clone())
         .and_then(|settings| settings.with_auto_schedule(dark_starts_at, light_starts_at))
         .map_err(|error| error.to_string())?;
@@ -217,5 +246,55 @@ pub fn friendly_io_error(error: &io::Error) -> String {
         _ => error
             .get_ref()
             .map_or_else(|| error.to_string(), ToString::to_string),
+    }
+}
+
+const APP_ID_PREFIX: &str = "app:";
+
+fn search_kind(kind: ItemKind) -> SearchKind {
+    match kind {
+        ItemKind::App => SearchKind::App,
+        ItemKind::File => SearchKind::File,
+        ItemKind::Setting => SearchKind::Setting,
+    }
+}
+
+/// Resultado de pesquisa para a UI; arquivos mostram a pasta com `~`.
+pub fn search_result_in(item: &SearchItem, home: Option<&Path>) -> SearchResult {
+    let subtitle = match item.kind {
+        ItemKind::File => item
+            .subtitle
+            .as_deref()
+            .map(|folder| display_folder(Path::new(folder), home)),
+        _ => item.subtitle.clone(),
+    };
+    SearchResult {
+        kind: search_kind(item.kind),
+        id: item.id.clone(),
+        title: item.title.clone(),
+        subtitle,
+        app_id: item.id.strip_prefix(APP_ID_PREFIX).map(str::to_string),
+    }
+}
+
+pub fn search_result(item: &SearchItem) -> SearchResult {
+    search_result_in(item, launcher_core::paths::home_dir().as_deref())
+}
+
+pub fn paired_devices(devices: &[BluetoothDevice]) -> Vec<PairedDevice> {
+    devices
+        .iter()
+        .map(|device| PairedDevice {
+            address: device.address.clone(),
+            name: device.name.clone(),
+            connected: device.connected,
+        })
+        .collect()
+}
+
+pub fn battery_reading(battery: Battery) -> BatteryReading {
+    BatteryReading {
+        percent: battery.percent,
+        charging: battery.charging,
     }
 }

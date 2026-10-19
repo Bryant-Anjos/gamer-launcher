@@ -8,7 +8,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `settings_path`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 LauncherSettings defaultSettings() =>
     RustLib.instance.api.crateApiSettingsDefaultSettings();
@@ -31,6 +31,9 @@ ResolvedTheme resolveTheme({
   minuteOfDay: minuteOfDay,
 );
 
+/// Disposição dos botões do controle. `Auto` detecta o fabricante.
+enum LauncherButtonLayout { auto, xbox, nintendo }
+
 /// Configurações como a UI as vê. Horários em minutos desde a meia-noite.
 class LauncherSettings {
   final LauncherThemeMode themeMode;
@@ -39,6 +42,9 @@ class LauncherSettings {
   final String? wallpaper;
   final List<String> favorites;
   final PanelVisibility panels;
+  final LauncherButtonLayout buttonLayout;
+  final bool sounds;
+  final bool reduceAnimations;
 
   const LauncherSettings({
     required this.themeMode,
@@ -47,6 +53,9 @@ class LauncherSettings {
     this.wallpaper,
     required this.favorites,
     required this.panels,
+    required this.buttonLayout,
+    required this.sounds,
+    required this.reduceAnimations,
   });
 
   @override
@@ -56,7 +65,10 @@ class LauncherSettings {
       lightStartsMinute.hashCode ^
       wallpaper.hashCode ^
       favorites.hashCode ^
-      panels.hashCode;
+      panels.hashCode ^
+      buttonLayout.hashCode ^
+      sounds.hashCode ^
+      reduceAnimations.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -68,7 +80,10 @@ class LauncherSettings {
           lightStartsMinute == other.lightStartsMinute &&
           wallpaper == other.wallpaper &&
           favorites == other.favorites &&
-          panels == other.panels;
+          panels == other.panels &&
+          buttonLayout == other.buttonLayout &&
+          sounds == other.sounds &&
+          reduceAnimations == other.reduceAnimations;
 }
 
 /// Escolha de tema do usuário. Nome próprio para não colidir com o

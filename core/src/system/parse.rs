@@ -121,3 +121,13 @@ pub fn bluetooth_failure(output: &str) -> Option<String> {
         .find(|line| line.starts_with("Failed to"))
         .map(str::to_string)
 }
+
+/// Identificador de sessão do logind (letras e números); recusa o que
+/// poderia virar opção do `loginctl`.
+pub fn session_id(id: Option<&str>) -> Result<String, SystemError> {
+    let id = id.ok_or_else(|| SystemError::Unavailable("sem sessão do logind".into()))?;
+    if id.is_empty() || !id.chars().all(|c| c.is_ascii_alphanumeric()) {
+        return Err(SystemError::Parse(format!("sessão inválida: {id:?}")));
+    }
+    Ok(id.to_string())
+}

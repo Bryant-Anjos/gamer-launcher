@@ -14,6 +14,7 @@ pub mod paths;
 pub mod recents;
 pub mod search;
 pub mod settings;
+pub mod sound;
 pub mod stats;
 pub mod system;
 pub mod theme;

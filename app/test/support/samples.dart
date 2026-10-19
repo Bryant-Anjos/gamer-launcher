@@ -19,6 +19,9 @@ LauncherSettings sampleSettings({
   List<String>? favorites,
   PanelVisibility panels = allPanelsVisible,
   String? wallpaper,
+  LauncherButtonLayout buttonLayout = LauncherButtonLayout.auto,
+  bool sounds = false,
+  bool reduceAnimations = false,
 }) => LauncherSettings(
   themeMode: themeMode,
   darkStartsMinute: 19 * 60,
@@ -34,6 +37,9 @@ LauncherSettings sampleSettings({
         'discord.desktop',
       ],
   panels: panels,
+  buttonLayout: buttonLayout,
+  sounds: sounds,
+  reduceAnimations: reduceAnimations,
 );
 
 AppInfo sampleApp(

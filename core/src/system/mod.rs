@@ -6,6 +6,7 @@
 mod error;
 mod linux;
 mod parse;
+mod power;
 mod runner;
 
 pub use error::SystemError;
@@ -79,4 +80,27 @@ pub trait BrightnessControl {
 pub trait DarkModeControl {
     fn dark_mode(&self) -> Result<bool, SystemError>;
     fn set_dark_mode(&self, dark: bool) -> Result<(), SystemError>;
+}
+
+/// Bateria do computador. Computador de mesa não tem: `None`, não erro.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Battery {
+    pub percent: u8,
+    pub charging: bool,
+}
+
+pub trait BatteryControl {
+    fn battery(&self) -> Result<Option<Battery>, SystemError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerAction {
+    Shutdown,
+    Reboot,
+    Suspend,
+    LogOut,
+}
+
+pub trait PowerControl {
+    fn perform(&self, action: PowerAction) -> Result<(), SystemError>;
 }

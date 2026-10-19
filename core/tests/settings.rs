@@ -232,3 +232,33 @@ fn an_unknown_button_layout_in_a_file_is_a_parse_error() {
         Err(SettingsError::Parse(_))
     ));
 }
+
+#[test]
+fn sounds_and_reduced_animations_are_off_by_default_and_survive_a_round_trip() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    let defaults = Settings::default();
+    assert!(!defaults.sounds);
+    assert!(!defaults.reduce_animations);
+
+    defaults
+        .with_sounds(true)
+        .with_reduce_animations(true)
+        .save(&path)
+        .unwrap();
+
+    let loaded = Settings::load(&path).unwrap();
+    assert!(loaded.sounds);
+    assert!(loaded.reduce_animations);
+}
+
+#[test]
+fn files_without_sounds_or_animation_choices_fall_back_to_off() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    fs::write(&path, r#"{"theme_mode":"dark"}"#).unwrap();
+
+    let loaded = Settings::load(&path).unwrap();
+    assert!(!loaded.sounds);
+    assert!(!loaded.reduce_animations);
+}

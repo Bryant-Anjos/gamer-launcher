@@ -20,6 +20,14 @@ pub enum ResolvedTheme {
     Dark,
 }
 
+/// Disposição dos botões do controle. `Auto` detecta o fabricante.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LauncherButtonLayout {
+    Auto,
+    Xbox,
+    Nintendo,
+}
+
 /// Quais painéis aparecem na tela inicial.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PanelVisibility {
@@ -40,6 +48,9 @@ pub struct LauncherSettings {
     pub wallpaper: Option<String>,
     pub favorites: Vec<String>,
     pub panels: PanelVisibility,
+    pub button_layout: LauncherButtonLayout,
+    pub sounds: bool,
+    pub reduce_animations: bool,
 }
 
 fn settings_path() -> Result<std::path::PathBuf, String> {

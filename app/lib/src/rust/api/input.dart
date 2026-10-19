@@ -7,19 +7,25 @@ import '../frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+import 'settings.dart';
+
 // These functions are ignored because they are not marked as `pub`: `lock_listener`, `stop_listener`
 
 /// Ações do controle como stream. Uma nova chamada para a anterior antes de
 /// começar, para nunca haver dois leitores ativos. Falha se o sistema não
 /// permitir ler controles.
-Stream<GamepadAction> gamepadActions() =>
-    RustLib.instance.api.crateApiInputGamepadActions();
+Stream<GamepadAction> gamepadActions({required LauncherButtonLayout layout}) =>
+    RustLib.instance.api.crateApiInputGamepadActions(layout: layout);
 
 /// Para de ler controles (chamado quando a UI deixa de ouvir o stream).
 Future<void> gamepadStop() => RustLib.instance.api.crateApiInputGamepadStop();
 
 /// Há algum controle conectado agora? Sem leitura ativa, não.
 bool gamepadConnected() => RustLib.instance.api.crateApiInputGamepadConnected();
+
+/// Troca a disposição dos botões com a leitura rodando.
+void gamepadSetLayout({required LauncherButtonLayout layout}) =>
+    RustLib.instance.api.crateApiInputGamepadSetLayout(layout: layout);
 
 enum GamepadAction {
   up,

@@ -1,9 +1,15 @@
 use super::*;
-use crate::api::settings::{LauncherSettings, LauncherThemeMode, PanelVisibility, ResolvedTheme};
+use crate::api::search::SearchKind;
+use crate::api::settings::{
+    LauncherButtonLayout, LauncherSettings, LauncherThemeMode, PanelVisibility, ResolvedTheme,
+};
 use launcher_core::apps::AppEntry;
+use launcher_core::input::ButtonLayoutSetting;
 use launcher_core::recents::RecentItem;
+use launcher_core::search::{ItemKind, SearchItem};
 use launcher_core::settings::{Panel, Settings};
 use launcher_core::stats::SystemStats;
+use launcher_core::system::BluetoothDevice;
 use launcher_core::system::{QuickControlsSnapshot, SystemError, Volume, WifiState};
 use launcher_core::theme::Theme;
 use std::io;
@@ -31,6 +37,9 @@ fn dto() -> LauncherSettings {
             system: false,
             ..all_panels(true)
         },
+        button_layout: LauncherButtonLayout::Nintendo,
+        sounds: true,
+        reduce_animations: false,
     }
 }
 
@@ -43,6 +52,9 @@ fn default_settings_become_a_dto_with_every_panel_visible() {
     assert_eq!(converted.light_starts_minute, 6 * 60);
     assert_eq!(converted.wallpaper, None);
     assert_eq!(converted.panels, all_panels(true));
+    assert_eq!(converted.button_layout, LauncherButtonLayout::Auto);
+    assert!(!converted.sounds);
+    assert!(!converted.reduce_animations);
 }
 
 #[test]
@@ -294,4 +306,117 @@ fn every_theme_mode_round_trips() {
 fn core_themes_map_to_resolved_themes() {
     assert_eq!(resolved_theme(Theme::Light), ResolvedTheme::Light);
     assert_eq!(resolved_theme(Theme::Dark), ResolvedTheme::Dark);
+}
+
+#[test]
+fn every_button_layout_round_trips() {
+    for (dto_layout, core_layout) in [
+        (LauncherButtonLayout::Auto, ButtonLayoutSetting::Auto),
+        (LauncherButtonLayout::Xbox, ButtonLayoutSetting::Xbox),
+        (
+            LauncherButtonLayout::Nintendo,
+            ButtonLayoutSetting::Nintendo,
+        ),
+    ] {
+        assert_eq!(button_layout_from_dto(dto_layout), core_layout);
+        let settings = settings_from_dto(&LauncherSettings {
+            button_layout: dto_layout,
+            ..dto()
+        })
+        .unwrap();
+        assert_eq!(settings.button_layout, core_layout);
+        assert_eq!(settings_to_dto(&settings).button_layout, dto_layout);
+    }
+}
+
+#[test]
+fn sounds_and_reduced_animations_reach_the_core_settings() {
+    let settings = settings_from_dto(&LauncherSettings {
+        sounds: true,
+        reduce_animations: true,
+        ..dto()
+    })
+    .unwrap();
+
+    assert!(settings.sounds);
+    assert!(settings.reduce_animations);
+}
+
+fn search_item(kind: ItemKind, id: &str, title: &str, subtitle: Option<&str>) -> SearchItem {
+    SearchItem {
+        kind,
+        id: id.into(),
+        title: title.into(),
+        subtitle: subtitle.map(str::to_string),
+    }
+}
+
+#[test]
+fn search_items_keep_their_kind_and_apps_their_id() {
+    let app = search_result(&search_item(
+        ItemKind::App,
+        "app:code.desktop",
+        "VS Code",
+        None,
+    ));
+    let file = search_result(&search_item(
+        ItemKind::File,
+        "file:/home/b/notas.md",
+        "notas.md",
+        Some("/home/b"),
+    ));
+    let setting = search_result(&search_item(
+        ItemKind::Setting,
+        "setting:sound",
+        "Som",
+        None,
+    ));
+
+    assert_eq!(app.kind, SearchKind::App);
+    assert_eq!(app.app_id.as_deref(), Some("code.desktop"));
+    assert_eq!(app.id, "app:code.desktop");
+    assert_eq!(app.title, "VS Code");
+    assert_eq!(file.kind, SearchKind::File);
+    assert_eq!(file.subtitle.as_deref(), Some("/home/b"));
+    assert_eq!(file.app_id, None);
+    assert_eq!(setting.kind, SearchKind::Setting);
+    assert_eq!(setting.app_id, None);
+}
+
+#[test]
+fn file_results_show_the_folder_relative_to_home() {
+    let file = search_item(
+        ItemKind::File,
+        "file:/home/b/Projetos/notas.md",
+        "notas.md",
+        Some("/home/b/Projetos"),
+    );
+
+    let result = search_result_in(&file, Some(Path::new("/home/b")));
+
+    assert_eq!(result.subtitle.as_deref(), Some("~/Projetos"));
+}
+
+#[test]
+fn paired_devices_are_copied_in_order() {
+    let devices = [
+        BluetoothDevice {
+            address: "AA:BB:CC:DD:EE:01".into(),
+            name: "Fone".into(),
+            connected: true,
+        },
+        BluetoothDevice {
+            address: "AA:BB:CC:DD:EE:02".into(),
+            name: "Controle".into(),
+            connected: false,
+        },
+    ];
+
+    let converted = paired_devices(&devices);
+
+    assert_eq!(converted.len(), 2);
+    assert_eq!(converted[0].address, "AA:BB:CC:DD:EE:01");
+    assert_eq!(converted[0].name, "Fone");
+    assert!(converted[0].connected);
+    assert!(!converted[1].connected);
 }

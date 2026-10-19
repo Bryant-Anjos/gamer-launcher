@@ -48,6 +48,9 @@ extension LauncherSettingsEdit on LauncherSettings {
     int? lightStartsMinute,
     List<String>? favorites,
     PanelVisibility? panels,
+    LauncherButtonLayout? buttonLayout,
+    bool? sounds,
+    bool? reduceAnimations,
   }) => LauncherSettings(
     themeMode: themeMode ?? this.themeMode,
     darkStartsMinute: darkStartsMinute ?? this.darkStartsMinute,
@@ -55,6 +58,9 @@ extension LauncherSettingsEdit on LauncherSettings {
     wallpaper: wallpaper,
     favorites: favorites ?? this.favorites,
     panels: panels ?? this.panels,
+    buttonLayout: buttonLayout ?? this.buttonLayout,
+    sounds: sounds ?? this.sounds,
+    reduceAnimations: reduceAnimations ?? this.reduceAnimations,
   );
 
   /// `null` volta ao fundo liso do tema.
@@ -65,6 +71,9 @@ extension LauncherSettingsEdit on LauncherSettings {
     wallpaper: path,
     favorites: favorites,
     panels: panels,
+    buttonLayout: buttonLayout,
+    sounds: sounds,
+    reduceAnimations: reduceAnimations,
   );
 
   LauncherSettings toggleFavorite(String appId) => copyWith(
