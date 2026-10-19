@@ -6,8 +6,12 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/catalog.dart';
+import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
+import 'api/settings.dart';
+import 'api/system.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -36,13 +40,88 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AppCatalog dco_decode_app_catalog(dynamic raw);
+
+  @protected
+  AppInfo dco_decode_app_info(dynamic raw);
+
+  @protected
+  bool dco_decode_bool(dynamic raw);
+
+  @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw);
+
+  @protected
+  LauncherSettings dco_decode_box_autoadd_launcher_settings(dynamic raw);
+
+  @protected
+  int dco_decode_box_autoadd_u_8(dynamic raw);
+
+  @protected
+  double dco_decode_f_32(dynamic raw);
+
+  @protected
+  double dco_decode_f_64(dynamic raw);
+
+  @protected
   GamepadAction dco_decode_gamepad_action(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
+  LauncherSettings dco_decode_launcher_settings(dynamic raw);
+
+  @protected
+  LauncherThemeMode dco_decode_launcher_theme_mode(dynamic raw);
+
+  @protected
+  LevelReading dco_decode_level_reading(dynamic raw);
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
+  List<AppInfo> dco_decode_list_app_info(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  List<RecentFile> dco_decode_list_recent_file(dynamic raw);
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+
+  @protected
+  int? dco_decode_opt_box_autoadd_u_8(dynamic raw);
+
+  @protected
+  PanelVisibility dco_decode_panel_visibility(dynamic raw);
+
+  @protected
+  QuickControls dco_decode_quick_controls(dynamic raw);
+
+  @protected
+  RecentFile dco_decode_recent_file(dynamic raw);
+
+  @protected
+  ResolvedTheme dco_decode_resolved_theme(dynamic raw);
+
+  @protected
+  StatsSample dco_decode_stats_sample(dynamic raw);
+
+  @protected
+  ToggleReading dco_decode_toggle_reading(dynamic raw);
+
+  @protected
+  int dco_decode_u_16(dynamic raw);
+
+  @protected
+  int dco_decode_u_32(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -62,22 +141,98 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AppCatalog sse_decode_app_catalog(SseDeserializer deserializer);
+
+  @protected
+  AppInfo sse_decode_app_info(SseDeserializer deserializer);
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
+  LauncherSettings sse_decode_box_autoadd_launcher_settings(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  int sse_decode_box_autoadd_u_8(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
   GamepadAction sse_decode_gamepad_action(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
+  LauncherSettings sse_decode_launcher_settings(SseDeserializer deserializer);
+
+  @protected
+  LauncherThemeMode sse_decode_launcher_theme_mode(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  LevelReading sse_decode_level_reading(SseDeserializer deserializer);
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<AppInfo> sse_decode_list_app_info(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  List<RecentFile> sse_decode_list_recent_file(SseDeserializer deserializer);
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
+  int? sse_decode_opt_box_autoadd_u_8(SseDeserializer deserializer);
+
+  @protected
+  PanelVisibility sse_decode_panel_visibility(SseDeserializer deserializer);
+
+  @protected
+  QuickControls sse_decode_quick_controls(SseDeserializer deserializer);
+
+  @protected
+  RecentFile sse_decode_recent_file(SseDeserializer deserializer);
+
+  @protected
+  ResolvedTheme sse_decode_resolved_theme(SseDeserializer deserializer);
+
+  @protected
+  StatsSample sse_decode_stats_sample(SseDeserializer deserializer);
+
+  @protected
+  ToggleReading sse_decode_toggle_reading(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_u_16(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -95,10 +250,58 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_app_catalog(AppCatalog self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_app_info(AppInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_launcher_settings(
+    LauncherSettings self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_u_8(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
   void sse_encode_gamepad_action(GamepadAction self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_launcher_settings(
+    LauncherSettings self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_launcher_theme_mode(
+    LauncherThemeMode self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_level_reading(LevelReading self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_app_info(List<AppInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
@@ -107,13 +310,52 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_recent_file(
+    List<RecentFile> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_8(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_panel_visibility(
+    PanelVisibility self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_quick_controls(QuickControls self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_recent_file(RecentFile self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_resolved_theme(ResolvedTheme self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stats_sample(StatsSample self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_toggle_reading(ToggleReading self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_16(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer);
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
 }
 
 // Section: wire_class

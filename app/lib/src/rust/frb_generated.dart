@@ -3,8 +3,12 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/catalog.dart';
+import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
+import 'api/settings.dart';
+import 'api/system.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -70,7 +74,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1558629305;
+  int get rustContentHash => -1358231040;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -84,11 +88,52 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 abstract class RustLibApi extends BaseApi {
   String crateApiMetaCoreVersion();
 
+  LauncherSettings crateApiSettingsDefaultSettings();
+
   Stream<GamepadAction> crateApiInputGamepadActions();
+
+  bool crateApiInputGamepadConnected();
 
   Future<void> crateApiInputGamepadStop();
 
   Future<void> crateApiMetaInitApp();
+
+  Future<String?> crateApiCatalogLaunchApp({required String id});
+
+  Future<List<RecentFile>> crateApiFilesListRecents({required int limit});
+
+  Future<List<String>> crateApiFilesListWallpapers({required int limit});
+
+  Future<AppCatalog> crateApiCatalogLoadCatalog();
+
+  Future<LauncherSettings> crateApiSettingsLoadSettings();
+
+  Future<void> crateApiFilesOpenPath({required String path});
+
+  Future<QuickControls> crateApiSystemReadQuickControls();
+
+  ResolvedTheme crateApiSettingsResolveTheme({
+    required LauncherSettings settings,
+    required int minuteOfDay,
+  });
+
+  Future<StatsSample> crateApiSystemSampleStats();
+
+  Future<void> crateApiSettingsSaveSettings({
+    required LauncherSettings settings,
+  });
+
+  Future<void> crateApiSystemSetBluetoothEnabled({required bool enabled});
+
+  Future<void> crateApiSystemSetBrightnessPercent({required int percent});
+
+  Future<void> crateApiSystemSetSystemDarkMode({required bool dark});
+
+  Future<void> crateApiSystemSetVolumePercent({required int percent});
+
+  Future<void> crateApiSystemSetWifiEnabled({required bool enabled});
+
+  Future<String?> crateApiMetaUserFirstName();
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -122,6 +167,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "core_version", argNames: []);
 
   @override
+  LauncherSettings crateApiSettingsDefaultSettings() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_launcher_settings,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSettingsDefaultSettingsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSettingsDefaultSettingsConstMeta =>
+      const TaskConstMeta(debugName: "default_settings", argNames: []);
+
+  @override
   Stream<GamepadAction> crateApiInputGamepadActions() {
     final sink = RustStreamSink<GamepadAction>();
     unawaited(
@@ -133,7 +200,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 2,
+              funcId: 3,
               port: port_,
             );
           },
@@ -154,6 +221,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "gamepad_actions", argNames: ["sink"]);
 
   @override
+  bool crateApiInputGamepadConnected() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiInputGamepadConnectedConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiInputGamepadConnectedConstMeta =>
+      const TaskConstMeta(debugName: "gamepad_connected", argNames: []);
+
+  @override
   Future<void> crateApiInputGamepadStop() {
     return handler.executeNormal(
       NormalTask(
@@ -162,7 +251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 5,
             port: port_,
           );
         },
@@ -189,7 +278,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 6,
             port: port_,
           );
         },
@@ -206,6 +295,465 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiMetaInitAppConstMeta =>
       const TaskConstMeta(debugName: "init_app", argNames: []);
+
+  @override
+  Future<String?> crateApiCatalogLaunchApp({required String id}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(id, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_String,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiCatalogLaunchAppConstMeta,
+        argValues: [id],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiCatalogLaunchAppConstMeta =>
+      const TaskConstMeta(debugName: "launch_app", argNames: ["id"]);
+
+  @override
+  Future<List<RecentFile>> crateApiFilesListRecents({required int limit}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_32(limit, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_recent_file,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiFilesListRecentsConstMeta,
+        argValues: [limit],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFilesListRecentsConstMeta =>
+      const TaskConstMeta(debugName: "list_recents", argNames: ["limit"]);
+
+  @override
+  Future<List<String>> crateApiFilesListWallpapers({required int limit}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_32(limit, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 9,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiFilesListWallpapersConstMeta,
+        argValues: [limit],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFilesListWallpapersConstMeta =>
+      const TaskConstMeta(debugName: "list_wallpapers", argNames: ["limit"]);
+
+  @override
+  Future<AppCatalog> crateApiCatalogLoadCatalog() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_app_catalog,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiCatalogLoadCatalogConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiCatalogLoadCatalogConstMeta =>
+      const TaskConstMeta(debugName: "load_catalog", argNames: []);
+
+  @override
+  Future<LauncherSettings> crateApiSettingsLoadSettings() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_launcher_settings,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSettingsLoadSettingsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSettingsLoadSettingsConstMeta =>
+      const TaskConstMeta(debugName: "load_settings", argNames: []);
+
+  @override
+  Future<void> crateApiFilesOpenPath({required String path}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiFilesOpenPathConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFilesOpenPathConstMeta =>
+      const TaskConstMeta(debugName: "open_path", argNames: ["path"]);
+
+  @override
+  Future<QuickControls> crateApiSystemReadQuickControls() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_quick_controls,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSystemReadQuickControlsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemReadQuickControlsConstMeta =>
+      const TaskConstMeta(debugName: "read_quick_controls", argNames: []);
+
+  @override
+  ResolvedTheme crateApiSettingsResolveTheme({
+    required LauncherSettings settings,
+    required int minuteOfDay,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_launcher_settings(settings, serializer);
+          sse_encode_u_16(minuteOfDay, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_resolved_theme,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSettingsResolveThemeConstMeta,
+        argValues: [settings, minuteOfDay],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSettingsResolveThemeConstMeta =>
+      const TaskConstMeta(
+        debugName: "resolve_theme",
+        argNames: ["settings", "minuteOfDay"],
+      );
+
+  @override
+  Future<StatsSample> crateApiSystemSampleStats() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_stats_sample,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSystemSampleStatsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSampleStatsConstMeta =>
+      const TaskConstMeta(debugName: "sample_stats", argNames: []);
+
+  @override
+  Future<void> crateApiSettingsSaveSettings({
+    required LauncherSettings settings,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_launcher_settings(settings, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSettingsSaveSettingsConstMeta,
+        argValues: [settings],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSettingsSaveSettingsConstMeta =>
+      const TaskConstMeta(debugName: "save_settings", argNames: ["settings"]);
+
+  @override
+  Future<void> crateApiSystemSetBluetoothEnabled({required bool enabled}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_bool(enabled, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 17,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetBluetoothEnabledConstMeta,
+        argValues: [enabled],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetBluetoothEnabledConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_bluetooth_enabled",
+        argNames: ["enabled"],
+      );
+
+  @override
+  Future<void> crateApiSystemSetBrightnessPercent({required int percent}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_8(percent, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetBrightnessPercentConstMeta,
+        argValues: [percent],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetBrightnessPercentConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_brightness_percent",
+        argNames: ["percent"],
+      );
+
+  @override
+  Future<void> crateApiSystemSetSystemDarkMode({required bool dark}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_bool(dark, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 19,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetSystemDarkModeConstMeta,
+        argValues: [dark],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetSystemDarkModeConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_system_dark_mode",
+        argNames: ["dark"],
+      );
+
+  @override
+  Future<void> crateApiSystemSetVolumePercent({required int percent}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_8(percent, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetVolumePercentConstMeta,
+        argValues: [percent],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetVolumePercentConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_volume_percent",
+        argNames: ["percent"],
+      );
+
+  @override
+  Future<void> crateApiSystemSetWifiEnabled({required bool enabled}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_bool(enabled, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSystemSetWifiEnabledConstMeta,
+        argValues: [enabled],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSystemSetWifiEnabledConstMeta =>
+      const TaskConstMeta(debugName: "set_wifi_enabled", argNames: ["enabled"]);
+
+  @override
+  Future<String?> crateApiMetaUserFirstName() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 22,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiMetaUserFirstNameConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMetaUserFirstNameConstMeta =>
+      const TaskConstMeta(debugName: "user_first_name", argNames: []);
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
@@ -228,6 +776,71 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AppCatalog dco_decode_app_catalog(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return AppCatalog(
+      apps: dco_decode_list_app_info(arr[0]),
+      gameLauncherIds: dco_decode_list_String(arr[1]),
+      musicPlayerId: dco_decode_opt_String(arr[2]),
+      lastAppId: dco_decode_opt_String(arr[3]),
+      warnings: dco_decode_list_String(arr[4]),
+    );
+  }
+
+  @protected
+  AppInfo dco_decode_app_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return AppInfo(
+      id: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      iconPath: dco_decode_opt_String(arr[2]),
+      categories: dco_decode_list_String(arr[3]),
+    );
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  LauncherSettings dco_decode_box_autoadd_launcher_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_launcher_settings(raw);
+  }
+
+  @protected
+  int dco_decode_box_autoadd_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  double dco_decode_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
   GamepadAction dco_decode_gamepad_action(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return GamepadAction.values[raw as int];
@@ -240,9 +853,172 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LauncherSettings dco_decode_launcher_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return LauncherSettings(
+      themeMode: dco_decode_launcher_theme_mode(arr[0]),
+      darkStartsMinute: dco_decode_u_16(arr[1]),
+      lightStartsMinute: dco_decode_u_16(arr[2]),
+      wallpaper: dco_decode_opt_String(arr[3]),
+      favorites: dco_decode_list_String(arr[4]),
+      panels: dco_decode_panel_visibility(arr[5]),
+    );
+  }
+
+  @protected
+  LauncherThemeMode dco_decode_launcher_theme_mode(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LauncherThemeMode.values[raw as int];
+  }
+
+  @protected
+  LevelReading dco_decode_level_reading(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return LevelReading(
+      percent: dco_decode_opt_box_autoadd_u_8(arr[0]),
+      muted: dco_decode_bool(arr[1]),
+      error: dco_decode_opt_String(arr[2]),
+    );
+  }
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<AppInfo> dco_decode_list_app_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_app_info).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  List<RecentFile> dco_decode_list_recent_file(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_recent_file).toList();
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_bool(raw);
+  }
+
+  @protected
+  int? dco_decode_opt_box_autoadd_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_8(raw);
+  }
+
+  @protected
+  PanelVisibility dco_decode_panel_visibility(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return PanelVisibility(
+      search: dco_decode_bool(arr[0]),
+      quickControls: dco_decode_bool(arr[1]),
+      system: dco_decode_bool(arr[2]),
+      recents: dco_decode_bool(arr[3]),
+      favorites: dco_decode_bool(arr[4]),
+      featuredCards: dco_decode_bool(arr[5]),
+    );
+  }
+
+  @protected
+  QuickControls dco_decode_quick_controls(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return QuickControls(
+      wifi: dco_decode_toggle_reading(arr[0]),
+      wifiName: dco_decode_opt_String(arr[1]),
+      bluetooth: dco_decode_toggle_reading(arr[2]),
+      darkMode: dco_decode_toggle_reading(arr[3]),
+      volume: dco_decode_level_reading(arr[4]),
+      brightness: dco_decode_level_reading(arr[5]),
+    );
+  }
+
+  @protected
+  RecentFile dco_decode_recent_file(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return RecentFile(
+      path: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      location: dco_decode_String(arr[2]),
+      modified: dco_decode_String(arr[3]),
+      isDir: dco_decode_bool(arr[4]),
+    );
+  }
+
+  @protected
+  ResolvedTheme dco_decode_resolved_theme(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ResolvedTheme.values[raw as int];
+  }
+
+  @protected
+  StatsSample dco_decode_stats_sample(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return StatsSample(
+      cpuPercent: dco_decode_f_32(arr[0]),
+      ramUsedBytes: dco_decode_f_64(arr[1]),
+      ramTotalBytes: dco_decode_f_64(arr[2]),
+      diskUsedBytes: dco_decode_f_64(arr[3]),
+      diskTotalBytes: dco_decode_f_64(arr[4]),
+    );
+  }
+
+  @protected
+  ToggleReading dco_decode_toggle_reading(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ToggleReading(
+      enabled: dco_decode_opt_box_autoadd_bool(arr[0]),
+      error: dco_decode_opt_String(arr[1]),
+    );
+  }
+
+  @protected
+  int dco_decode_u_16(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
   }
 
   @protected
@@ -280,6 +1056,76 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AppCatalog sse_decode_app_catalog(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_apps = sse_decode_list_app_info(deserializer);
+    var var_gameLauncherIds = sse_decode_list_String(deserializer);
+    var var_musicPlayerId = sse_decode_opt_String(deserializer);
+    var var_lastAppId = sse_decode_opt_String(deserializer);
+    var var_warnings = sse_decode_list_String(deserializer);
+    return AppCatalog(
+      apps: var_apps,
+      gameLauncherIds: var_gameLauncherIds,
+      musicPlayerId: var_musicPlayerId,
+      lastAppId: var_lastAppId,
+      warnings: var_warnings,
+    );
+  }
+
+  @protected
+  AppInfo sse_decode_app_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_iconPath = sse_decode_opt_String(deserializer);
+    var var_categories = sse_decode_list_String(deserializer);
+    return AppInfo(
+      id: var_id,
+      name: var_name,
+      iconPath: var_iconPath,
+      categories: var_categories,
+    );
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_bool(deserializer));
+  }
+
+  @protected
+  LauncherSettings sse_decode_box_autoadd_launcher_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_launcher_settings(deserializer));
+  }
+
+  @protected
+  int sse_decode_box_autoadd_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_8(deserializer));
+  }
+
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat32();
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
   GamepadAction sse_decode_gamepad_action(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -293,10 +1139,219 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LauncherSettings sse_decode_launcher_settings(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_themeMode = sse_decode_launcher_theme_mode(deserializer);
+    var var_darkStartsMinute = sse_decode_u_16(deserializer);
+    var var_lightStartsMinute = sse_decode_u_16(deserializer);
+    var var_wallpaper = sse_decode_opt_String(deserializer);
+    var var_favorites = sse_decode_list_String(deserializer);
+    var var_panels = sse_decode_panel_visibility(deserializer);
+    return LauncherSettings(
+      themeMode: var_themeMode,
+      darkStartsMinute: var_darkStartsMinute,
+      lightStartsMinute: var_lightStartsMinute,
+      wallpaper: var_wallpaper,
+      favorites: var_favorites,
+      panels: var_panels,
+    );
+  }
+
+  @protected
+  LauncherThemeMode sse_decode_launcher_theme_mode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LauncherThemeMode.values[inner];
+  }
+
+  @protected
+  LevelReading sse_decode_level_reading(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_percent = sse_decode_opt_box_autoadd_u_8(deserializer);
+    var var_muted = sse_decode_bool(deserializer);
+    var var_error = sse_decode_opt_String(deserializer);
+    return LevelReading(
+      percent: var_percent,
+      muted: var_muted,
+      error: var_error,
+    );
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AppInfo> sse_decode_list_app_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AppInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_app_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<RecentFile> sse_decode_list_recent_file(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RecentFile>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_recent_file(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_bool(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  int? sse_decode_opt_box_autoadd_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_8(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  PanelVisibility sse_decode_panel_visibility(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_search = sse_decode_bool(deserializer);
+    var var_quickControls = sse_decode_bool(deserializer);
+    var var_system = sse_decode_bool(deserializer);
+    var var_recents = sse_decode_bool(deserializer);
+    var var_favorites = sse_decode_bool(deserializer);
+    var var_featuredCards = sse_decode_bool(deserializer);
+    return PanelVisibility(
+      search: var_search,
+      quickControls: var_quickControls,
+      system: var_system,
+      recents: var_recents,
+      favorites: var_favorites,
+      featuredCards: var_featuredCards,
+    );
+  }
+
+  @protected
+  QuickControls sse_decode_quick_controls(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_wifi = sse_decode_toggle_reading(deserializer);
+    var var_wifiName = sse_decode_opt_String(deserializer);
+    var var_bluetooth = sse_decode_toggle_reading(deserializer);
+    var var_darkMode = sse_decode_toggle_reading(deserializer);
+    var var_volume = sse_decode_level_reading(deserializer);
+    var var_brightness = sse_decode_level_reading(deserializer);
+    return QuickControls(
+      wifi: var_wifi,
+      wifiName: var_wifiName,
+      bluetooth: var_bluetooth,
+      darkMode: var_darkMode,
+      volume: var_volume,
+      brightness: var_brightness,
+    );
+  }
+
+  @protected
+  RecentFile sse_decode_recent_file(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_path = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_location = sse_decode_String(deserializer);
+    var var_modified = sse_decode_String(deserializer);
+    var var_isDir = sse_decode_bool(deserializer);
+    return RecentFile(
+      path: var_path,
+      name: var_name,
+      location: var_location,
+      modified: var_modified,
+      isDir: var_isDir,
+    );
+  }
+
+  @protected
+  ResolvedTheme sse_decode_resolved_theme(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ResolvedTheme.values[inner];
+  }
+
+  @protected
+  StatsSample sse_decode_stats_sample(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_cpuPercent = sse_decode_f_32(deserializer);
+    var var_ramUsedBytes = sse_decode_f_64(deserializer);
+    var var_ramTotalBytes = sse_decode_f_64(deserializer);
+    var var_diskUsedBytes = sse_decode_f_64(deserializer);
+    var var_diskTotalBytes = sse_decode_f_64(deserializer);
+    return StatsSample(
+      cpuPercent: var_cpuPercent,
+      ramUsedBytes: var_ramUsedBytes,
+      ramTotalBytes: var_ramTotalBytes,
+      diskUsedBytes: var_diskUsedBytes,
+      diskTotalBytes: var_diskTotalBytes,
+    );
+  }
+
+  @protected
+  ToggleReading sse_decode_toggle_reading(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_enabled = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_error = sse_decode_opt_String(deserializer);
+    return ToggleReading(enabled: var_enabled, error: var_error);
+  }
+
+  @protected
+  int sse_decode_u_16(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint16();
+  }
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
   }
 
   @protected
@@ -308,12 +1363,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-  }
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
@@ -349,6 +1398,64 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_app_catalog(AppCatalog self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_app_info(self.apps, serializer);
+    sse_encode_list_String(self.gameLauncherIds, serializer);
+    sse_encode_opt_String(self.musicPlayerId, serializer);
+    sse_encode_opt_String(self.lastAppId, serializer);
+    sse_encode_list_String(self.warnings, serializer);
+  }
+
+  @protected
+  void sse_encode_app_info(AppInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_opt_String(self.iconPath, serializer);
+    sse_encode_list_String(self.categories, serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_launcher_settings(
+    LauncherSettings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_launcher_settings(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_8(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self, serializer);
+  }
+
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat32(self);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
   void sse_encode_gamepad_action(GamepadAction self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
@@ -358,6 +1465,55 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_launcher_settings(
+    LauncherSettings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_launcher_theme_mode(self.themeMode, serializer);
+    sse_encode_u_16(self.darkStartsMinute, serializer);
+    sse_encode_u_16(self.lightStartsMinute, serializer);
+    sse_encode_opt_String(self.wallpaper, serializer);
+    sse_encode_list_String(self.favorites, serializer);
+    sse_encode_panel_visibility(self.panels, serializer);
+  }
+
+  @protected
+  void sse_encode_launcher_theme_mode(
+    LauncherThemeMode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_level_reading(LevelReading self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_u_8(self.percent, serializer);
+    sse_encode_bool(self.muted, serializer);
+    sse_encode_opt_String(self.error, serializer);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_app_info(List<AppInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_app_info(item, serializer);
+    }
   }
 
   @protected
@@ -371,6 +1527,118 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_recent_file(
+    List<RecentFile> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_recent_file(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_bool(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_8(int? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_8(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_panel_visibility(
+    PanelVisibility self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.search, serializer);
+    sse_encode_bool(self.quickControls, serializer);
+    sse_encode_bool(self.system, serializer);
+    sse_encode_bool(self.recents, serializer);
+    sse_encode_bool(self.favorites, serializer);
+    sse_encode_bool(self.featuredCards, serializer);
+  }
+
+  @protected
+  void sse_encode_quick_controls(QuickControls self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_toggle_reading(self.wifi, serializer);
+    sse_encode_opt_String(self.wifiName, serializer);
+    sse_encode_toggle_reading(self.bluetooth, serializer);
+    sse_encode_toggle_reading(self.darkMode, serializer);
+    sse_encode_level_reading(self.volume, serializer);
+    sse_encode_level_reading(self.brightness, serializer);
+  }
+
+  @protected
+  void sse_encode_recent_file(RecentFile self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.path, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.location, serializer);
+    sse_encode_String(self.modified, serializer);
+    sse_encode_bool(self.isDir, serializer);
+  }
+
+  @protected
+  void sse_encode_resolved_theme(ResolvedTheme self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_stats_sample(StatsSample self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_32(self.cpuPercent, serializer);
+    sse_encode_f_64(self.ramUsedBytes, serializer);
+    sse_encode_f_64(self.ramTotalBytes, serializer);
+    sse_encode_f_64(self.diskUsedBytes, serializer);
+    sse_encode_f_64(self.diskTotalBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_toggle_reading(ToggleReading self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_bool(self.enabled, serializer);
+    sse_encode_opt_String(self.error, serializer);
+  }
+
+  @protected
+  void sse_encode_u_16(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint16(self);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -379,11 +1647,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

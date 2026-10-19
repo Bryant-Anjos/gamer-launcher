@@ -1,0 +1,120 @@
+import 'package:gamer_launcher/src/rust/api/catalog.dart';
+import 'package:gamer_launcher/src/rust/api/files.dart';
+import 'package:gamer_launcher/src/rust/api/settings.dart';
+import 'package:gamer_launcher/src/rust/api/system.dart';
+
+/// Dados de exemplo parecidos com os da arte de conceito.
+
+const allPanelsVisible = PanelVisibility(
+  search: true,
+  quickControls: true,
+  system: true,
+  recents: true,
+  favorites: true,
+  featuredCards: true,
+);
+
+LauncherSettings sampleSettings({
+  LauncherThemeMode themeMode = LauncherThemeMode.dark,
+  List<String>? favorites,
+  PanelVisibility panels = allPanelsVisible,
+  String? wallpaper,
+}) => LauncherSettings(
+  themeMode: themeMode,
+  darkStartsMinute: 19 * 60,
+  lightStartsMinute: 6 * 60,
+  wallpaper: wallpaper,
+  favorites:
+      favorites ??
+      const [
+        'code.desktop',
+        'chrome.desktop',
+        'files.desktop',
+        'spotify.desktop',
+        'discord.desktop',
+      ],
+  panels: panels,
+);
+
+AppInfo sampleApp(
+  String id,
+  String name, {
+  List<String> categories = const [],
+}) => AppInfo(id: id, name: name, categories: categories);
+
+final sampleApps = [
+  sampleApp('chrome.desktop', 'Chrome'),
+  sampleApp('discord.desktop', 'Discord'),
+  sampleApp('files.desktop', 'Arquivos'),
+  sampleApp(
+    'spotify.desktop',
+    'Spotify',
+    categories: ['Audio', 'Music', 'Player'],
+  ),
+  sampleApp('steam.desktop', 'Steam', categories: ['Game']),
+  sampleApp('code.desktop', 'VS Code'),
+];
+
+AppCatalog sampleCatalog({
+  List<AppInfo>? apps,
+  List<String> gameLauncherIds = const ['steam.desktop'],
+  String? musicPlayerId = 'spotify.desktop',
+  String? lastAppId = 'code.desktop',
+  List<String> warnings = const [],
+}) => AppCatalog(
+  apps: apps ?? sampleApps,
+  gameLauncherIds: gameLauncherIds,
+  musicPlayerId: musicPlayerId,
+  lastAppId: lastAppId,
+  warnings: warnings,
+);
+
+final sampleRecents = [
+  const RecentFile(
+    path: '/home/b/Projetos/granspace',
+    name: 'granspace',
+    location: '~/Projetos',
+    modified: '2026-10-16T20:42:00Z',
+    isDir: true,
+  ),
+  const RecentFile(
+    path: '/home/b/Projetos/eisaqui',
+    name: 'eisaqui',
+    location: '~/Projetos',
+    modified: '2026-10-16T17:42:00Z',
+    isDir: true,
+  ),
+  const RecentFile(
+    path: '/home/b/Documentos/Documentação.docx',
+    name: 'Documentação.docx',
+    location: '~/Documentos',
+    modified: '2026-10-15T22:42:00Z',
+    isDir: false,
+  ),
+];
+
+const sampleQuickControls = QuickControls(
+  wifi: ToggleReading(enabled: true),
+  wifiName: 'Casa_5G',
+  bluetooth: ToggleReading(enabled: true),
+  darkMode: ToggleReading(enabled: true),
+  volume: LevelReading(percent: 80, muted: false),
+  brightness: LevelReading(percent: 60, muted: false),
+);
+
+const sampleStatsReading = StatsSample(
+  cpuPercent: 12,
+  ramUsedBytes: 4.2e9,
+  ramTotalBytes: 16e9,
+  diskUsedBytes: 120e9,
+  diskTotalBytes: 500e9,
+);
+
+/// Nada pôde ser lido: tudo indisponível.
+const offlineQuickControls = QuickControls(
+  wifi: ToggleReading(error: 'nmcli falhou'),
+  bluetooth: ToggleReading(error: 'indisponível: sem adaptador bluetooth'),
+  darkMode: ToggleReading(error: 'o COSMIC ainda não gravou o tema'),
+  volume: LevelReading(muted: false, error: 'wpctl falhou'),
+  brightness: LevelReading(muted: false, error: 'sem controle de brilho'),
+);

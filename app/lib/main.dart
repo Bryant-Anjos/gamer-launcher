@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gamer_launcher/backend/rust_backend.dart';
 import 'package:gamer_launcher/input/gamepad_stream.dart';
 import 'package:gamer_launcher/launcher_app.dart';
 import 'package:gamer_launcher/src/rust/api/meta.dart';
@@ -9,6 +10,7 @@ Future<void> main() async {
   await RustLib.init();
   runApp(
     LauncherApp(
+      backend: const RustBackend(),
       coreVersion: coreVersion(),
       actions: gamepadStream(),
       onClose: SystemNavigator.pop,

@@ -21,7 +21,7 @@ Todos os painéis são **ocultáveis** pelo usuário (sobra só a navegação pr
 | Navegação | Início, Aplicativos, Jogos, Arquivos, Configurações |
 | Cartões de destaque | Continuar (último app), Projetos, Jogos, Músicas |
 | Pesquisa global | Apps, arquivos e configurações |
-| Controle rápido | Wi-Fi, Bluetooth, modo escuro, luz noturna, volume, brilho |
+| Controle rápido | Wi-Fi, Bluetooth, modo escuro, volume, brilho (luz noturna fora da v1, ver Fase 3) |
 | Sistema | CPU, RAM, disco (gráficos) |
 | Recentes | Arquivos/pastas recentes |
 | Favoritos | Grade de apps favoritos, com "Adicionar" |
@@ -62,6 +62,24 @@ gamer-launcher/
 - Navegação por **foco direcional** (D-pad/analógico), com `Focus`/`FocusTraversalGroup` do Flutter.
 - Mapeamento (implementado): A confirma, B volta, Y pesquisa, Start abre o controle rápido, LB/RB trocam de aba, **Guide fecha o app** (Ctrl+Q no teclado). D-pad e analógico esquerdo movem o foco; segurar uma direção repete (400 ms de espera, depois a cada 120 ms).
 - A lógica é pura (`core/src/input.rs`, tempo como parâmetro) e só a casca fina (`gamepad.rs`) lê o `gilrs`. No Flutter, o `InputRouter` traduz as ações em foco/ativação, como se fossem teclas.
+- (Fase 5) O `InputRouter` fica em `MaterialApp.builder`, **acima do `Navigator`**: o Ctrl+Q vale com diálogos abertos e a travessia parte sempre do foco primário (a camada de cima). Esquerda/direita primeiro tentam um `AdjustIntent` no item focado (volume, brilho, horários); se ninguém aceitar, movem o foco.
+
+### UI (decidido na Fase 5)
+
+- **Ponte:** tipos próprios e simples (`LauncherSettings`, `LauncherThemeMode`, `ResolvedTheme`, `AppCatalog`, `RecentFile`, `QuickControls`, `StatsSample`), com nomes que não colidem com os do Flutter. Erros chegam como `String` e viram `BackendException`. Conversões em `app/rust/src/convert/` (testadas, fora de `api` para o gerador não expor). Funções pesadas (listar apps, ler controles, stats) são assíncronas: rodam fora da thread da UI. Tamanhos em bytes vão como `f64` (o `u64` viraria `BigInt` no Dart).
+- **Estado sem pacote:** `ValueNotifier`/`ChangeNotifier` e estado imutável (`LauncherState`, edição por cópia). A UI só conhece a interface `LauncherBackend` (`RustBackend` no app, `FakeBackend` nos testes).
+- **Sondagem:** CPU/RAM/disco a 1 Hz só com o painel Sistema na tela; controle rápido a cada **5 s** (cada leitura roda nmcli, bluetoothctl e wpctl) só com a barra superior ou o painel na tela; controle conectado a 1 Hz (lê um contador atômico da thread do gilrs). Tudo pausa quando o app sai de `resumed` (um jogo por cima, por exemplo). Cada tela "se inscreve" no `Poller` enquanto existe.
+- **Escrita no sistema:** otimista (a tela muda na hora; se o sistema recusar, aviso e releitura). Leituras que chegam durante uma escrita são descartadas. Volume e brilho são coalescidos: segurando o direcional só o último valor espera.
+- **Ícones:** localizados no núcleo (temas `hicolor`, `Cosmic`, `Pop`, `Adwaita`, `breeze` e `pixmaps`, do usuário para o sistema; SVG primeiro, depois o maior PNG). SVG desenhado com `flutter_svg`; bitmaps decodificados no tamanho exibido; sem ícone, a inicial num quadrado colorido. Grades preguiçosas (só os itens visíveis são montados).
+- **Histórico:** último app aberto pelo launcher em `$XDG_STATE_HOME/gamer-launcher/history.json` (separado das configurações, que são escolhas do usuário).
+- **Saudação:** "Bom dia/Boa tarde/Boa noite" pela hora + primeiro nome do campo GECOS do `/etc/passwd` (sem nome, só a saudação).
+- **Cartões de destaque:** *Continuar* abre o último app aberto pelo launcher; *Projetos* mostra quantos recentes há e leva à seção Arquivos; *Jogos* abre o lançador se houver um só (Steam, Heroic ou Lutris, nessa ordem) ou leva à seção Jogos se houver mais; *Músicas* abre o primeiro app com categorias `Player` + `Music` (ou `Player` + `Audio`). Cartão sem app fica apagado e diz por quê. Sem ilustrações próprias: degradês no lugar das imagens da arte.
+- **Seções:** Início (painéis), Aplicativos (todos os apps), Jogos (lançadores instalados), Arquivos (lista completa de recentes), Configurações (tema e horários do automático de 30 em 30 min, wallpaper, painéis visíveis).
+- **Botões:** Start abre o controle rápido **sobreposto** em qualquer seção (Start ou B fecham; com o painel oculto nas configurações, não abre). Y vai à Início e foca a pesquisa (só avisa que chega na Fase 6). LB/RB levam o foco junto para o item da seção na navegação; com um painel sobreposto aberto, LB/RB/Y são ignorados.
+- **Favoritos:** escolhidos num diálogo com todos os apps (A marca/desmarca, B fecha). Sem favoritos padrão.
+- **Wallpaper:** imagens da pasta de imagens do usuário (`user-dirs.dirs`) e de `/usr/share/backgrounds`, até 2 níveis e 60 imagens; decodificado na largura da tela, com um véu do tema por cima. Arquivo que não abre volta à cor lisa.
+- **Foco visível:** borda de 3 px na cor de destaque, brilho e leve aumento (1,04×); segue o foco real (não o modo de destaque do Flutter, que só liga com teclado).
+- **Avisos:** falhas (abrir app, salvar configurações, alterar Wi-Fi...) aparecem como SnackBar; nada derruba a tela. Leitura de controle que falha mostra o item como "Indisponível" (com o motivo numa dica).
 
 ## Fases (cada uma termina com testes verdes e commit antes da próxima)
 
@@ -106,6 +124,7 @@ gamer-launcher/
 |---|---|---|
 | 1 (tela cheia vazia, release, Linux) | ~209 MB | 0% |
 | 2 (só núcleo Rust, sem mudança na UI) | igual à Fase 1 | igual |
+| 5 (tela inicial completa, release, Linux, sem wallpaper) | ~207 MB RSS (~184 MB PSS) | 0 a 0,6% de um núcleo (0 a 6 ticks em 10 s, com as sondagens ativas) |
 
 Dentro da faixa esperada do Flutter (150-250 MB). Meta definitiva: ver "Em aberto".
 
@@ -120,9 +139,30 @@ python3 tools/virtual_pad.py 1.5 DPAD_DOWN SOUTH EAST MODE   # MODE = Guide: o a
 - Precisa de acesso de escrita a `/dev/uinput` (no Pop!_OS o usuário da sessão já tem por ACL). O `gilrs` só aceita dispositivos com **pelo menos 1 botão e 2 eixos**, e só aplica o mapeamento SDL (D-pad como botão, Guide reconhecido) se o dispositivo for um modelo conhecido; por isso o script imita um Xbox 360 de verdade.
 - Dependência de sistema para compilar o núcleo: `libudev-dev`.
 
-### Fase 4: pendência para a Fase 5 (da revisão de código)
+### Fase 4: pendência para a Fase 5 (resolvida na Fase 5)
 
-- **Diálogos e rotas empilhadas:** o `InputRouter` resolve a travessia de foco a partir do contexto da tela de baixo, e o Ctrl+Q fica dentro dessa tela. Com um diálogo ou o painel de controle rápido aberto, a direção pode focar um item escondido atrás dele, e o Ctrl+Q não age ali (o Guide continua funcionando). Ao criar o primeiro painel sobreposto: usar o contexto do foco primário para a travessia e subir o `Shortcuts` para acima do `Navigator`. Não há diálogos hoje, por isso não foi tratado.
+- **Diálogos e rotas empilhadas:** resolvido. O `InputRouter` subiu para acima do `Navigator` e a travessia parte do foco primário; há testes com diálogo aberto (direção, confirmar, voltar e Ctrl+Q).
+
+## Fase 5: como testar à mão
+
+- **Alternar Wi-Fi e Bluetooth de verdade** pelo controle rápido (Start): só foram testados com executor falso. Pode derrubar a conexão; fazer com o computador ao lado.
+- **Modo escuro do sistema** pelo painel: grava o `is_dark` do COSMIC (testado com executor falso).
+- **Wallpaper real:** escolher uma imagem em Configurações e conferir legibilidade nos dois temas.
+- **Volume** segurando o direcional (coalescido; conferir que o valor final bate).
+- **Abrir apps e recentes** de verdade (só o caminho de erro e o `true` foram testados automaticamente); confirmar que o cartão Continuar passa a mostrar o app.
+- Ícones reais (SVG e PNG) e a navegação por controle físico em todas as seções.
+- Monitor ultrawide (2560×1080): os goldens são em 1920×1080.
+
+## Fase 5: pendências e dúvidas para a Fase 6
+
+- **Pesquisa:** o campo existe e recebe foco (Y), mas a busca é da Fase 6 (o núcleo já tem `search`).
+- **Dúvidas de design (a arte sugere, o PLAN não define; ficaram de fora):** a linha de atalhos "Tela, Som, Energia, Rede" no controle rápido; o que exatamente é "Projetos" (hoje: conta de recentes e leva a Arquivos); qual player usar em "Músicas" se houver vários; favoritos padrão; ilustrações dos cartões; se Start deve abrir o painel mesmo com ele oculto.
+- **Limitações da Fase 2 que continuam:** nomes localizados (`Name[pt_BR]`), `TryExec`/`OnlyShowIn`, `%i`/`%c`, apps de terminal (a UI mostra o erro amigável ao abrir).
+- **Ícones:** só os temas listados acima; o tema de ícones configurado no COSMIC não é lido; ícones `.ico`/`.xpm` caem na inicial. Ícones de categorias que não ficam em `apps/` (ex.: impressoras) também.
+- **Golden tests** usam Roboto e os ícones do SDK; podem diferir em outra máquina/versão do Flutter (regenerar com `flutter test --update-goldens`).
+- **Captura de tela do app real:** `grim` não funciona no COSMIC (sem wlr-screencopy) e o `cosmic-screenshot` não interativo falhou pelo portal; a verificação visual foi pelos goldens.
+- **Animações e sons** (Fase 6): só há a animação curta do foco.
+- **Da revisão de código (LOW, não corrigidos):** alguns `build` passam de 50 linhas (`FeaturedCards`, `FocusTile`, `QuickControlsPanel`) e há medidas soltas (paddings e fontes) fora de `Dimens`; o `MaterialApp` inteiro é reconstruído a cada minuto e a cada mudança do controlador (o tema chama o `resolveTheme` síncrono do Rust nessas horas). A barra superior mantém a leitura do controle rápido (5 s) em qualquer seção, por projeto.
 
 ## Fase 3: o que ficou de fora
 
@@ -144,6 +184,5 @@ Ficam para quando a UI for ligada (Fase 5), pois dependem do locale e do ambient
 
 - Nome definitivo do projeto.
 - Meta de RAM/CPU em repouso (referência atual: ~209 MB / 0%).
-- A janela em tela cheia ainda não tem como fechar; atalho (Esc/botão Guide) entra na Fase 4.
 - Atalho global para abrir/fechar o launcher.
-- Quais apps entram como favoritos padrão.
+- Quais apps entram como favoritos padrão (hoje nenhum).

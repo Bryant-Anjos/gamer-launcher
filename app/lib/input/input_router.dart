@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gamer_launcher/input/adjust_intent.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 
 class _CloseIntent extends Intent {
@@ -10,6 +11,10 @@ class _CloseIntent extends Intent {
 
 /// Traduz as ações do controle em foco, ativação e navegação, como se
 /// fossem teclas. Também fecha o app com Ctrl+Q.
+///
+/// Fica acima do `Navigator` (em `MaterialApp.builder`), para o Ctrl+Q
+/// valer com diálogos abertos; por isso tudo parte do foco primário, que
+/// está sempre na camada de cima (o diálogo aberto ou a tela).
 class InputRouter extends StatefulWidget {
   const InputRouter({
     super.key,
@@ -19,6 +24,7 @@ class InputRouter extends StatefulWidget {
     this.onSearch,
     this.onQuickControls,
     this.onTabChange,
+    this.onError,
   });
 
   final Stream<GamepadAction> actions;
@@ -28,6 +34,9 @@ class InputRouter extends StatefulWidget {
 
   /// -1 para a aba anterior, +1 para a próxima.
   final ValueChanged<int>? onTabChange;
+
+  /// Falha da leitura do controle (ex.: [GamepadUnavailable]).
+  final ValueChanged<Object>? onError;
   final Widget child;
 
   @override
@@ -46,15 +55,20 @@ class _InputRouterState extends State<InputRouter> {
   @override
   void initState() {
     super.initState();
-    _subscription = widget.actions.listen(_handle);
+    _subscription = _listen();
   }
+
+  StreamSubscription<GamepadAction> _listen() => widget.actions.listen(
+    _handle,
+    onError: (Object error) => widget.onError?.call(error),
+  );
 
   @override
   void didUpdateWidget(InputRouter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.actions != widget.actions) {
       _subscription?.cancel();
-      _subscription = widget.actions.listen(_handle);
+      _subscription = _listen();
     }
   }
 
@@ -78,7 +92,7 @@ class _InputRouterState extends State<InputRouter> {
       case GamepadAction.confirm:
         _activate();
       case GamepadAction.back:
-        Navigator.of(context).maybePop();
+        _back();
       case GamepadAction.search:
         widget.onSearch?.call();
       case GamepadAction.quickControls:
@@ -92,8 +106,10 @@ class _InputRouterState extends State<InputRouter> {
     }
   }
 
+  FocusNode? get _primary => FocusManager.instance.primaryFocus;
+
   FocusNode? get _focusedItem {
-    final primary = FocusManager.instance.primaryFocus;
+    final primary = _primary;
     if (primary == null || primary == _landing || primary is FocusScopeNode) {
       return null;
     }
@@ -102,13 +118,40 @@ class _InputRouterState extends State<InputRouter> {
 
   void _move(TraversalDirection direction) {
     final focused = _focusedItem;
-    if (focused != null) {
-      focused.focusInDirection(direction);
+    if (focused == null) {
+      _focusFirstItem();
       return;
     }
-    FocusTraversalGroup.of(context)
-        .findFirstFocus(_landing, ignoreCurrentFocus: true)
-        ?.requestFocus();
+    if (!_tryAdjust(focused, direction)) {
+      focused.focusInDirection(direction);
+    }
+  }
+
+  /// Sem item focado, entra no primeiro item da camada de cima. Partir do
+  /// foco primário (e não do contexto deste widget) evita focar um item
+  /// escondido atrás de um diálogo.
+  void _focusFirstItem() {
+    final start = _primary ?? _landing;
+    final startContext = start.context ?? context;
+    final policy =
+        FocusTraversalGroup.maybeOf(startContext) ??
+        ReadingOrderTraversalPolicy();
+    policy.findFirstFocus(start, ignoreCurrentFocus: true)?.requestFocus();
+  }
+
+  /// Esquerda e direita ajustam o item focado se ele aceitar [AdjustIntent]
+  /// (volume, brilho...). Devolve se o ajuste aconteceu.
+  bool _tryAdjust(FocusNode focused, TraversalDirection direction) {
+    final isHorizontal =
+        direction == TraversalDirection.left ||
+        direction == TraversalDirection.right;
+    final focusedContext = focused.context;
+    if (!isHorizontal || focusedContext == null) return false;
+    final intent = AdjustIntent(direction == TraversalDirection.right ? 1 : -1);
+    final action = Actions.maybeFind<AdjustIntent>(focusedContext);
+    if (action == null || !action.isEnabled(intent)) return false;
+    Actions.invoke(focusedContext, intent);
+    return true;
   }
 
   void _activate() {
@@ -116,6 +159,13 @@ class _InputRouterState extends State<InputRouter> {
     if (focusedContext != null) {
       Actions.maybeInvoke(focusedContext, const ActivateIntent());
     }
+  }
+
+  /// Volta no Navigator da camada de cima; na tela inicial não há o que fechar.
+  void _back() {
+    final primaryContext = _primary?.context;
+    if (primaryContext == null) return;
+    Navigator.maybeOf(primaryContext)?.maybePop();
   }
 
   @override

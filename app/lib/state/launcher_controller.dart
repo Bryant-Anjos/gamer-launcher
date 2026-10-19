@@ -1,0 +1,146 @@
+import 'package:flutter/foundation.dart';
+import 'package:gamer_launcher/backend/launcher_backend.dart';
+import 'package:gamer_launcher/src/rust/api/files.dart';
+import 'package:gamer_launcher/src/rust/api/settings.dart';
+import 'package:gamer_launcher/state/launcher_state.dart';
+import 'package:gamer_launcher/state/messages.dart';
+import 'package:gamer_launcher/state/settings_edit.dart';
+
+export 'package:gamer_launcher/state/launcher_state.dart';
+
+/// Recentes lidos de uma vez; a tela inicial mostra só os primeiros.
+const recentsLimit = 30;
+
+/// Dono do estado da tela: configurações, apps, recentes e seção atual.
+/// Toda falha vira aviso em [LauncherMessages]; nada derruba a tela.
+class LauncherController extends ValueNotifier<LauncherState> {
+  LauncherController(this._backend, this._messages)
+    : super(LauncherState(settings: _backend.defaultSettings()));
+
+  final LauncherBackend _backend;
+  final LauncherMessages _messages;
+  bool _disposed = false;
+
+  @override
+  set value(LauncherState next) {
+    // leituras que terminam depois do fechamento do app são descartadas
+    if (!_disposed) super.value = next;
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  Future<T?> _attempt<T>(Future<T> Function() call, String context) async {
+    try {
+      return await call();
+    } on BackendException catch (error) {
+      _messages.show('$context: ${error.message}');
+      return null;
+    }
+  }
+
+  Future<void> load() async {
+    final settings = await _attempt(
+      _backend.loadSettings,
+      'Configurações inválidas, usando o padrão',
+    );
+    final catalog = await _attempt(
+      _backend.loadCatalog,
+      'Não foi possível listar os apps',
+    );
+    catalog?.warnings.forEach(_messages.show);
+    final recents = await _attempt(
+      () => _backend.listRecents(recentsLimit),
+      'Não foi possível ler os recentes',
+    );
+    final userName = await _loadUserName();
+    // `value` lido só agora: uma troca de seção durante a carga é mantida
+    value = value.copyWith(
+      settings: settings,
+      catalog: catalog,
+      recents: recents,
+      userName: userName,
+      lastAppId: catalog?.lastAppId,
+      isReady: true,
+    );
+  }
+
+  /// Sem nome a saudação só fica genérica; não vale um aviso.
+  Future<String?> _loadUserName() async {
+    try {
+      return await _backend.userFirstName();
+    } on BackendException {
+      return null;
+    }
+  }
+
+  Future<void> refreshRecents() async {
+    final recents = await _attempt(
+      () => _backend.listRecents(recentsLimit),
+      'Não foi possível ler os recentes',
+    );
+    if (recents != null) value = value.copyWith(recents: recents);
+  }
+
+  void selectSection(Section section) {
+    value = value.copyWith(section: section);
+  }
+
+  /// LB/RB: anda pelas seções dando a volta nas pontas.
+  void cycleSection(int delta) {
+    const sections = Section.values;
+    final next = (value.section.index + delta) % sections.length;
+    selectSection(sections[next]);
+  }
+
+  /// Fila das gravações: cada edição parte do resultado da anterior.
+  Future<void> _settingsQueue = Future.value();
+
+  /// Aplica [edit] às configurações atuais, grava e só então mostra.
+  /// Edições rápidas em sequência (dois favoritos seguidos) entram na fila
+  /// em vez de partirem do mesmo estado antigo e se sobrescreverem.
+  Future<void> editSettings(
+    LauncherSettings Function(LauncherSettings current) edit,
+  ) {
+    final run = _settingsQueue.then((_) => _save(edit(value.settings)));
+    // o erro chega a quem chamou por `run`; a fila segue para as próximas
+    _settingsQueue = run.then<void>((_) {}, onError: (Object _) {});
+    return run;
+  }
+
+  /// Grava primeiro e só aplica se o núcleo aceitar.
+  Future<void> _save(LauncherSettings next) async {
+    final saved = await _attempt(() async {
+      await _backend.saveSettings(next);
+      return true;
+    }, 'Não foi possível salvar as configurações');
+    if (saved == true) value = value.copyWith(settings: next);
+  }
+
+  Future<void> updateSettings(LauncherSettings next) =>
+      editSettings((_) => next);
+
+  Future<void> toggleFavorite(String appId) =>
+      editSettings((settings) => settings.toggleFavorite(appId));
+
+  Future<void> launchApp(String appId) async {
+    final name = value.appById(appId)?.name ?? appId;
+    try {
+      final warning = await _backend.launchApp(appId);
+      if (warning != null) _messages.show(warning);
+      value = value.copyWith(lastAppId: appId);
+    } on BackendException catch (error) {
+      _messages.show('Não foi possível abrir $name: ${error.message}');
+    }
+  }
+
+  Future<void> openRecent(RecentFile file) async {
+    await _attempt(
+      () => _backend.openPath(file.path),
+      'Não foi possível abrir ${file.name}',
+    );
+  }
+}

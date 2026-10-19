@@ -10,5 +10,8 @@ crate-type = ["cdylib", "staticlib"]
 flutter_rust_bridge = "=2.13.0"
 launcher_core = { path = "../../core" }
 
+[dev-dependencies]
+tempfile = "3.27.0"
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

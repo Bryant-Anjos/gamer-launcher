@@ -17,7 +17,21 @@ jobs:
         with:
           components: clippy, rustfmt
       - run: cargo fmt --check
-      - run: cargo clippy -- -D warnings
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+
+  bridge:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: app/rust
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
 
   app:

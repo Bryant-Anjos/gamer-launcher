@@ -49,6 +49,15 @@ pub fn data_dirs_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Vec<PathBuf
         .collect()
 }
 
+pub fn state_home_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    absolute_env_dir(lookup, "XDG_STATE_HOME").or_else(|| under_home(lookup, ".local/state"))
+}
+
+/// Estado do launcher (não são escolhas do usuário), como o último app aberto.
+pub fn history_path_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    state_home_with(lookup).map(|dir| dir.join(APP_DIR).join("history.json"))
+}
+
 pub fn settings_path_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
     config_home_with(lookup).map(|dir| dir.join(APP_DIR).join("settings.json"))
 }
@@ -88,4 +97,12 @@ pub fn default_settings_path() -> Option<PathBuf> {
 
 pub fn default_recents_path() -> Option<PathBuf> {
     recents_path_with(&process_env)
+}
+
+pub fn config_home() -> Option<PathBuf> {
+    config_home_with(&process_env)
+}
+
+pub fn default_history_path() -> Option<PathBuf> {
+    history_path_with(&process_env)
 }

@@ -4,7 +4,7 @@
 use crate::input::{GamepadAction, InputMapper, PadButton, PadEvent, StickAxis};
 use gilrs::{Axis, Button, EventType, Gilrs};
 use std::ops::ControlFlow;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, mpsc};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
@@ -66,7 +66,22 @@ fn pad_event_from(event: EventType) -> Option<PadEvent> {
 /// Mantém a leitura ativa; ao ser descartado, para a thread e espera ela acabar.
 pub struct ListenerHandle {
     stop: Arc<AtomicBool>,
+    connected: Arc<AtomicUsize>,
     thread: Option<JoinHandle<()>>,
+}
+
+impl ListenerHandle {
+    /// Controles conectados agora (atualizado pela thread de leitura).
+    pub fn connected_gamepads(&self) -> usize {
+        self.connected.load(Ordering::Relaxed)
+    }
+}
+
+fn count_connected(gilrs: &Gilrs) -> usize {
+    gilrs
+        .gamepads()
+        .filter(|(_, pad)| pad.is_connected())
+        .count()
 }
 
 impl Drop for ListenerHandle {
@@ -78,7 +93,7 @@ impl Drop for ListenerHandle {
     }
 }
 
-fn run_loop<F>(mut gilrs: Gilrs, stop: &AtomicBool, mut on_action: F)
+fn run_loop<F>(mut gilrs: Gilrs, stop: &AtomicBool, connected: &AtomicUsize, mut on_action: F)
 where
     F: FnMut(GamepadAction) -> ControlFlow<()>,
 {
@@ -90,6 +105,12 @@ where
             Duration::from_millis(deadline.saturating_sub(now_ms()))
         });
         let event = gilrs.next_event_blocking(Some(until_repeat.min(STOP_POLL)));
+        // recontar só quando a lista pode ter mudado, não a cada eixo
+        if event.as_ref().is_none_or(|event| {
+            matches!(event.event, EventType::Connected | EventType::Disconnected)
+        }) {
+            connected.store(count_connected(&gilrs), Ordering::Relaxed);
+        }
 
         let from_event = event
             .and_then(|event| pad_event_from(event.event))
@@ -110,15 +131,18 @@ where
     F: FnMut(GamepadAction) -> ControlFlow<()> + Send + 'static,
 {
     let stop = Arc::new(AtomicBool::new(false));
+    let connected = Arc::new(AtomicUsize::new(0));
     let (ready_tx, ready_rx) = mpsc::channel();
     let thread_stop = Arc::clone(&stop);
+    let thread_connected = Arc::clone(&connected);
     // `Gilrs` não atravessa threads: nasce e morre dentro da thread de leitura.
     let thread = thread::Builder::new()
         .name("gamepad-listener".into())
         .spawn(move || match Gilrs::new() {
             Ok(gilrs) => {
+                thread_connected.store(count_connected(&gilrs), Ordering::Relaxed);
                 let _ = ready_tx.send(Ok(()));
-                run_loop(gilrs, &thread_stop, on_action);
+                run_loop(gilrs, &thread_stop, &thread_connected, on_action);
             }
             Err(error) => {
                 let _ = ready_tx.send(Err(error.to_string()));
@@ -129,6 +153,7 @@ where
     match ready_rx.recv() {
         Ok(Ok(())) => Ok(ListenerHandle {
             stop,
+            connected,
             thread: Some(thread),
         }),
         Ok(Err(message)) => Err(GamepadError::Init(message)),

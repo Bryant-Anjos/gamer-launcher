@@ -52,3 +52,13 @@ fn the_listener_starts_and_stops_without_a_gamepad() {
         "parar não pode travar"
     );
 }
+
+#[test]
+fn the_listener_reports_how_many_gamepads_are_connected() {
+    let handle = spawn_listener(|_| ControlFlow::Continue(())).expect("udev disponível");
+
+    // sem garantir hardware, só dá para checar que a leitura existe e é coerente
+    let connected = handle.connected_gamepads();
+
+    assert!(connected < 64, "contagem absurda: {connected}");
+}

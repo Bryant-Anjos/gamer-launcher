@@ -48,19 +48,35 @@ void main() {
     expect(source.hasListener, isFalse);
   });
 
-  test('a source that fails does not break the stream', () async {
+  test(
+    'a failing source becomes one friendly error, then stays quiet',
+    () async {
+      final stream = gamepadStream(
+        start: () => Stream<GamepadAction>.error(StateError('sem udev')),
+        stop: () {},
+      );
+      final errors = <Object>[];
+
+      final subscription = stream.listen((_) {}, onError: errors.add);
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+
+      expect(errors.single, isA<GamepadUnavailable>());
+      expect(errors.single.toString(), contains('sem udev'));
+    },
+  );
+
+  test('a start that throws right away is reported the same way', () async {
     final stream = gamepadStream(
-      start: () => Stream<GamepadAction>.error(StateError('sem udev')),
+      start: () => throw StateError('sem permissão'),
       stop: () {},
     );
-    final received = <GamepadAction>[];
-    var errors = 0;
+    final errors = <Object>[];
 
-    final subscription = stream.listen(received.add, onError: (_) => errors++);
+    final subscription = stream.listen((_) {}, onError: errors.add);
     await Future<void>.delayed(Duration.zero);
     await subscription.cancel();
 
-    expect(received, isEmpty);
-    expect(errors, 0, reason: 'o erro é registrado, não repassado à UI');
+    expect(errors.single.toString(), contains('sem permissão'));
   });
 }

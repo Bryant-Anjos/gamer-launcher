@@ -1,6 +1,6 @@
 use launcher_core::paths::{
-    config_home_with, data_dirs_with, data_home_with, home_dir_with, recents_path_with,
-    settings_path_with,
+    config_home_with, data_dirs_with, data_home_with, history_path_with, home_dir_with,
+    recents_path_with, settings_path_with, state_home_with,
 };
 use std::ffi::OsString;
 use std::path::PathBuf;
@@ -94,5 +94,25 @@ fn absolute_home_is_used() {
     assert_eq!(
         home_dir_with(&env(&[("HOME", "/home/b")])),
         Some(PathBuf::from("/home/b"))
+    );
+}
+
+#[test]
+fn state_home_prefers_xdg_and_falls_back_to_local_state() {
+    assert_eq!(
+        state_home_with(&env(&[("XDG_STATE_HOME", "/state"), ("HOME", "/home/b")])),
+        Some(PathBuf::from("/state"))
+    );
+    assert_eq!(
+        state_home_with(&env(&[("HOME", "/home/b")])),
+        Some(PathBuf::from("/home/b/.local/state"))
+    );
+}
+
+#[test]
+fn launch_history_lives_under_the_state_home() {
+    assert_eq!(
+        history_path_with(&env(&[("XDG_STATE_HOME", "/state")])),
+        Some(PathBuf::from("/state/gamer-launcher/history.json"))
     );
 }

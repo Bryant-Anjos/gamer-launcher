@@ -1,5 +1,6 @@
 use launcher_core::apps::{
-    AppEntry, app_dirs_from, discover_apps, exec_args, launch, parse_desktop_entry,
+    AppEntry, app_dirs_from, discover_apps, exec_args, find_app, launch, open_path_with,
+    parse_desktop_entry,
 };
 use std::fs;
 use std::path::PathBuf;
@@ -224,4 +225,52 @@ fn launch_runs_in_the_working_directory() {
         PathBuf::from(written.trim()).canonicalize().unwrap(),
         dir.path().canonicalize().unwrap()
     );
+}
+
+#[test]
+fn apps_are_found_by_id() {
+    let apps = vec![
+        app_running("a"),
+        AppEntry {
+            id: "b.desktop".into(),
+            ..app_running("b")
+        },
+    ];
+
+    assert_eq!(
+        find_app(&apps, "b.desktop").map(|app| app.exec.as_str()),
+        Some("b")
+    );
+    assert_eq!(find_app(&apps, "missing.desktop"), None);
+}
+
+#[cfg(unix)]
+#[test]
+fn opening_an_existing_path_runs_the_opener() {
+    let dir = tempdir().unwrap();
+
+    assert!(open_path_with("true", dir.path()).is_ok());
+}
+
+#[test]
+fn opening_a_missing_path_fails_before_running_anything() {
+    let error = open_path_with("true", std::path::Path::new("/no/such/file")).unwrap_err();
+
+    assert_eq!(error.kind(), std::io::ErrorKind::NotFound);
+}
+
+#[test]
+fn opening_without_an_opener_reports_it() {
+    let dir = tempdir().unwrap();
+
+    let error = open_path_with("definitely-not-a-real-opener-xyz", dir.path()).unwrap_err();
+
+    assert_eq!(error.kind(), std::io::ErrorKind::NotFound);
+}
+
+#[test]
+fn opening_a_relative_path_is_refused() {
+    let error = open_path_with("true", std::path::Path::new("-v")).unwrap_err();
+
+    assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
 }

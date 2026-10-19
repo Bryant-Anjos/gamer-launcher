@@ -2,7 +2,7 @@
 
 use crate::paths;
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::{fs, io, thread};
 
@@ -196,8 +196,33 @@ pub fn default_app_dirs() -> Vec<PathBuf> {
     app_dirs_from(paths::data_home(), paths::home_dir(), &paths::data_dirs())
 }
 
-/// Abre o app sem esperar por ele; o processo filho é recolhido em segundo
-/// plano para não virar zumbi.
+const DEFAULT_OPENER: &str = "xdg-open";
+
+pub fn find_app<'a>(apps: &'a [AppEntry], id: &str) -> Option<&'a AppEntry> {
+    apps.iter().find(|app| app.id == id)
+}
+
+/// Inicia o programa sem esperar por ele; o processo filho é recolhido em
+/// segundo plano para não virar zumbi.
+fn spawn_detached(program: &str, args: &[String], dir: Option<&Path>) -> io::Result<()> {
+    let mut command = Command::new(program);
+    command
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    if let Some(dir) = dir {
+        command.current_dir(dir);
+    }
+    #[cfg(unix)]
+    std::os::unix::process::CommandExt::process_group(&mut command, 0);
+    let mut child = command.spawn()?;
+    thread::spawn(move || {
+        let _ = child.wait();
+    });
+    Ok(())
+}
+
 pub fn launch(app: &AppEntry) -> io::Result<()> {
     if app.terminal {
         return Err(io::Error::new(
@@ -209,20 +234,28 @@ pub fn launch(app: &AppEntry) -> io::Result<()> {
     let (program, rest) = args
         .split_first()
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "comando de execução vazio"))?;
-    let mut command = Command::new(program);
-    command
-        .args(rest)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
-    if let Some(dir) = &app.working_dir {
-        command.current_dir(dir);
+    spawn_detached(program, rest, app.working_dir.as_deref())
+}
+
+/// Abre um arquivo ou pasta com `opener` (o programa padrão do sistema em
+/// [`open_path`]). Caminho inexistente falha antes de rodar qualquer coisa.
+pub fn open_path_with(opener: &str, path: &Path) -> io::Result<()> {
+    // só absolutos: um nome como "-v" nunca vira opção do programa
+    if !path.is_absolute() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "o caminho precisa ser absoluto",
+        ));
     }
-    #[cfg(unix)]
-    std::os::unix::process::CommandExt::process_group(&mut command, 0);
-    let mut child = command.spawn()?;
-    thread::spawn(move || {
-        let _ = child.wait();
-    });
-    Ok(())
+    if !path.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("{} não existe mais", path.display()),
+        ));
+    }
+    spawn_detached(opener, &[path.to_string_lossy().into_owned()], None)
+}
+
+pub fn open_path(path: &Path) -> io::Result<()> {
+    open_path_with(DEFAULT_OPENER, path)
 }

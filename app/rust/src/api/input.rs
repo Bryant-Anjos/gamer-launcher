@@ -1,6 +1,6 @@
 use crate::frb_generated::StreamSink;
 use flutter_rust_bridge::frb;
-use launcher_core::gamepad::{ListenerHandle, spawn_listener};
+use launcher_core::gamepad::{spawn_listener, ListenerHandle};
 pub use launcher_core::input::GamepadAction;
 use std::ops::ControlFlow;
 use std::sync::{Mutex, MutexGuard, PoisonError};
@@ -52,4 +52,12 @@ pub fn gamepad_actions(sink: StreamSink<GamepadAction>) -> Result<(), String> {
 /// Para de ler controles (chamado quando a UI deixa de ouvir o stream).
 pub fn gamepad_stop() {
     stop_listener();
+}
+
+/// Há algum controle conectado agora? Sem leitura ativa, não.
+#[frb(sync)]
+pub fn gamepad_connected() -> bool {
+    lock_listener()
+        .as_ref()
+        .is_some_and(|handle| handle.connected_gamepads() > 0)
 }

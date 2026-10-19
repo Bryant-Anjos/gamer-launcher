@@ -18,6 +18,9 @@ Stream<GamepadAction> gamepadActions() =>
 /// Para de ler controles (chamado quando a UI deixa de ouvir o stream).
 Future<void> gamepadStop() => RustLib.instance.api.crateApiInputGamepadStop();
 
+/// Há algum controle conectado agora? Sem leitura ativa, não.
+bool gamepadConnected() => RustLib.instance.api.crateApiInputGamepadConnected();
+
 enum GamepadAction {
   up,
   down,

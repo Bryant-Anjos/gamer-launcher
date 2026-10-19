@@ -9,3 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Versão do núcleo Rust; confirma que a ponte está viva.
 String coreVersion() => RustLib.instance.api.crateApiMetaCoreVersion();
+
+/// Primeiro nome do usuário para a saudação; vazio se o sistema não souber.
+Future<String?> userFirstName() =>
+    RustLib.instance.api.crateApiMetaUserFirstName();
