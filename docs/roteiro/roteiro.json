@@ -763,6 +763,29 @@
       ]
     },
     {
+      "id": "claude",
+      "title": "Claude Code",
+      "sub": "Sessões, agentes e uso do Claude Code (só leitura)",
+      "priority": "Ainda sem tela: só o núcleo está pronto",
+      "items": [
+        "Numa máquina com o Claude Code, rode no terminal: cd core && cargo run --release --example claude_scan. Confira se mostra a quantidade de sessões abertas agora e os números de hoje e da semana, e se cada ciclo leva poucos milissegundos."
+      ],
+      "covers": [
+        "core/src/claude/*.rs"
+      ],
+      "reviewed": {
+        "core/src/claude/agents.rs": "2d10c3d8a267",
+        "core/src/claude/cache.rs": "cc9bac60288f",
+        "core/src/claude/fields.rs": "73969198e3e8",
+        "core/src/claude/mod.rs": "c97bafabc1d9",
+        "core/src/claude/sessions.rs": "f32eb6e3332d",
+        "core/src/claude/time.rs": "759eead133c3",
+        "core/src/claude/usage.rs": "732fa6a0df7e"
+      },
+      "itemsHash": "54e9f9977200",
+      "reviews": []
+    },
+    {
       "id": "jogos",
       "title": "Jogos",
       "sub": "Atalho para Steam, Heroic e Lutris",

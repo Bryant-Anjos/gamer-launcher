@@ -247,3 +247,20 @@ Pedido do usuário: iniciar com o sistema, bateria, desligar/reiniciar e fechar 
 - **Filtro no seletor de favoritos (feito)**: campo "Filtrar pelo nome" no topo; digitar com um app focado leva a letra ao campo. Usa a **pesquisa do núcleo restrita a apps**, e não um filtro local, para achar do mesmo jeito que a pesquisa global (sem acentos, sem maiúsculas e por sigla).
 - **Filtro em Aplicativos (feito)**: o mesmo campo do seletor de favoritos (`AppFilter`, reutilizável), no alto à direita da seção; Enter abre o primeiro app achado. O primeiro item ao entrar na página continua sendo o primeiro app (campos de texto não contam como primeiro item). **Não** foi para Jogos (poucos lançadores, nada a filtrar) nem para Arquivos (os recentes não são apps; filtrar arquivos seria outro tipo de busca, e a pesquisa global já acha recentes).
 - **Ficou de fora da UI da Fase 6**: teclado na tela (decisão anterior: só teclado físico), lista de redes Wi-Fi e pareamento de dispositivos novos, "esconder ao abrir"/"Guide alterna" (aguardando entender o comportamento do COSMIC).
+
+## Fase 6b: integração com o Claude Code
+
+Pedido do usuário: em máquinas com o Claude Code, acompanhar sessões, agentes e uso; sem ele (sem `~/.claude` e sem `claude` no PATH), nada aparece e nada é lido.
+
+**O que existe de verdade nesta máquina (Claude Code 2.1.304, conferido só pela estrutura):**
+
+- `~/.claude/sessions/<pid>.json`: registro de cada sessão aberta (pid, sessionId, cwd, status `busy`/`idle`, nome derivado, versão, início, última atualização). Conferido contra `/proc/<pid>`: é a fonte das **sessões ativas**.
+- `~/.claude/projects/<projeto>/<sessão>.jsonl`: transcrito, um JSON por linha. Das linhas `assistant` saem modelo, `gitBranch`, uso de tokens (`message.usage`) e os blocos `tool_use`; uma resposta vem dividida em várias linhas com o mesmo `message.id` (contada uma vez).
+- `<sessão>/subagents/agent-*.meta.json` (agentType, description, model) e `agent-*.jsonl`: **subagentes**; "trabalhando" = transcrito do subagente mexido nos últimos 90 s (heurística: o arquivo não diz se terminou).
+- `stats-cache.json` (versão 5): totais, atividade por dia e uso por modelo, **calculados pelo Claude de vez em quando** (aqui, parado em 2026-10-13): só servem para o histórico.
+
+**Descartado (não dá para extrair com confiança):** lista de tarefas (nenhum transcrito desta máquina usa `TodoWrite` nem `TaskCreate`/`TaskUpdate`; o formato não pôde ser conferido), saídas de tarefas em segundo plano (em `/tmp`, enormes, não são lidas), atividade por hora (só no cache velho).
+
+**Núcleo (`core/src/claude/`, só leitura, pasta raiz injetável):** `sessions` (registro + fim do transcrito, só os últimos 256 KB), `agents`, `usage` (leitura **incremental**: guarda até onde leu cada arquivo, só arquivos dos últimos 8 dias, só linhas `assistant`, limite de bytes por ciclo, linha pela metade espera o próximo ciclo; dias locais com o deslocamento de fora), `cache`. Todo campo é opcional; JSON inválido é ignorado. Medido aqui (`cargo run --release --example claude_scan`): 51 MB de transcritos na primeira leitura em ~70 ms (dois ciclos de 32 MB); depois, menos de 1 ms por ciclo.
+
+**Dúvidas para o usuário (não implementadas):** mostrar custo em dinheiro (o cache tem `costUSD`, mas num plano por assinatura isso não é o que se paga); limites de uso do plano (não existem localmente); mostrar o nome da sessão (é derivado das mensagens).

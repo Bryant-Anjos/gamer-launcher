@@ -3,6 +3,7 @@
 pub mod apps;
 pub mod autostart;
 pub mod catalog;
+pub mod claude;
 pub mod featured;
 mod fs_util;
 pub mod gamepad;
