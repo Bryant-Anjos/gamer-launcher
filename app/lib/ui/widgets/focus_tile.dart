@@ -50,7 +50,7 @@ class _FocusTileState extends State<FocusTile> {
       Scrollable.ensureVisible(
         context,
         alignment: 0.5,
-        duration: Motion.scroll,
+        duration: Motion.of(context, Motion.scroll),
       );
     }
   }
@@ -59,6 +59,7 @@ class _FocusTileState extends State<FocusTile> {
   Widget build(BuildContext context) {
     final palette = LauncherPalette.of(context);
     final radius = BorderRadius.circular(widget.borderRadius);
+    final motion = Motion.of(context, Motion.focus);
     final inner = BorderRadius.circular(
       (widget.borderRadius - Dimens.focusBorder).clamp(0, widget.borderRadius),
     );
@@ -86,9 +87,9 @@ class _FocusTileState extends State<FocusTile> {
           onTap: widget.onActivate,
           child: AnimatedScale(
             scale: _focused ? Dimens.focusScale : 1,
-            duration: Motion.focus,
+            duration: motion,
             child: AnimatedContainer(
-              duration: Motion.focus,
+              duration: motion,
               decoration: BoxDecoration(
                 borderRadius: radius,
                 border: Border.all(

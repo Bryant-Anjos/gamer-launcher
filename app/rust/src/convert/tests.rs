@@ -420,3 +420,17 @@ fn paired_devices_are_copied_in_order() {
     assert!(converted[0].connected);
     assert!(!converted[1].connected);
 }
+
+#[test]
+fn detected_layouts_map_to_the_forced_settings() {
+    use launcher_core::input::ButtonLayout;
+
+    assert_eq!(
+        detected_layout_to_dto(ButtonLayout::Xbox),
+        LauncherButtonLayout::Xbox
+    );
+    assert_eq!(
+        detected_layout_to_dto(ButtonLayout::Nintendo),
+        LauncherButtonLayout::Nintendo
+    );
+}

@@ -1,6 +1,7 @@
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
+import 'package:gamer_launcher/src/rust/api/sound.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 
 /// Falha vinda do núcleo, já com mensagem em português para a tela.
@@ -52,4 +53,14 @@ abstract interface class LauncherBackend {
   Future<StatsSample> sampleStats();
   Future<String?> userFirstName();
   bool gamepadConnected();
+
+  /// Layout que o modo automático escolheu para o último controle usado
+  /// (`xbox` ou `nintendo`).
+  LauncherButtonLayout detectedButtonLayout();
+
+  /// Troca a disposição dos botões com a leitura do controle rodando.
+  void setButtonLayout(LauncherButtonLayout layout);
+
+  /// Toca um som curto da interface sem esperar.
+  void playUiSound(LauncherSound sound);
 }

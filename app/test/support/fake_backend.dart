@@ -4,6 +4,7 @@ import 'package:gamer_launcher/backend/launcher_backend.dart';
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
+import 'package:gamer_launcher/src/rust/api/sound.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 
 import 'samples.dart';
@@ -24,6 +25,7 @@ class FakeBackend implements LauncherBackend {
     this.battery = const BatteryReading(percent: 80, charging: false),
     this.autostart = false,
     this.pairedDevices = const [],
+    this.detectedLayout = LauncherButtonLayout.xbox,
   }) : settings = settings ?? sampleSettings(),
        catalog = catalog ?? sampleCatalog(),
        recents = recents ?? sampleRecents;
@@ -41,11 +43,20 @@ class FakeBackend implements LauncherBackend {
   BatteryReading? battery;
   bool autostart;
   List<PairedDevice> pairedDevices;
+  LauncherButtonLayout detectedLayout;
 
   /// Nome do método -> mensagem do erro que ele deve lançar.
   final failures = <String, String>{};
   final calls = <String>[];
   final saved = <LauncherSettings>[];
+
+  /// Chamadas síncronas: registra e falha quando o teste pede.
+  T _answerNow<T>(String call, T Function() value) {
+    calls.add(call);
+    final failure = failures[call.split('(').first];
+    if (failure != null) throw BackendException(failure);
+    return value();
+  }
 
   /// Nome do método -> portão: a chamada espera até ele ser completado.
   final gates = <String, Completer<void>>{};
@@ -164,4 +175,15 @@ class FakeBackend implements LauncherBackend {
 
   @override
   bool gamepadConnected() => isGamepadConnected;
+
+  @override
+  LauncherButtonLayout detectedButtonLayout() => detectedLayout;
+
+  @override
+  void setButtonLayout(LauncherButtonLayout layout) =>
+      _answerNow('setButtonLayout(${layout.name})', () {});
+
+  @override
+  void playUiSound(LauncherSound sound) =>
+      _answerNow('playUiSound(${sound.name})', () {});
 }

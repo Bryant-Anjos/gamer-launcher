@@ -251,4 +251,51 @@ void main() {
 
     expect(s.state.settings.themeMode, LauncherThemeMode.auto);
   });
+
+  group('button layout', () {
+    test('the loaded layout is applied to the gamepad reader', () async {
+      final s = _Setup(
+        FakeBackend(
+          settings: sampleSettings(
+            buttonLayout: LauncherButtonLayout.nintendo,
+          ),
+        ),
+      );
+
+      await s.controller.load();
+
+      expect(s.backend.calls, contains('setButtonLayout(nintendo)'));
+    });
+
+    test('changing the layout applies it live, once', () async {
+      final s = _Setup();
+      await s.controller.load();
+      s.backend.calls.clear();
+
+      await s.controller.editSettings(
+        (current) => current.copyWith(buttonLayout: LauncherButtonLayout.xbox),
+      );
+      await s.controller.toggleFavorite('steam.desktop');
+
+      expect(
+        s.backend.calls.where((call) => call.startsWith('setButtonLayout')),
+        ['setButtonLayout(xbox)'],
+      );
+    });
+
+    test('a reader that refuses the layout becomes a message', () async {
+      final s = _Setup();
+      s.backend.failures['setButtonLayout'] = 'sem controle';
+      await s.controller.load();
+
+      await s.controller.editSettings(
+        (current) =>
+            current.copyWith(buttonLayout: LauncherButtonLayout.nintendo),
+      );
+      await s.settle();
+
+      expect(s.state.settings.buttonLayout, LauncherButtonLayout.nintendo);
+      expect(s.shown.last, contains('sem controle'));
+    });
+  });
 }

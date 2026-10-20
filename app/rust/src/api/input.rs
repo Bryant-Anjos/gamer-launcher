@@ -1,8 +1,9 @@
 use crate::api::settings::LauncherButtonLayout;
-use crate::convert::button_layout_from_dto;
+use crate::convert::{button_layout_from_dto, detected_layout_to_dto};
 use crate::frb_generated::StreamSink;
 use flutter_rust_bridge::frb;
 use launcher_core::gamepad::{spawn_listener_with, ListenerHandle};
+use launcher_core::input::ButtonLayout;
 pub use launcher_core::input::GamepadAction;
 use std::ops::ControlFlow;
 use std::sync::{Mutex, MutexGuard, PoisonError};
@@ -75,4 +76,15 @@ pub fn gamepad_set_layout(layout: LauncherButtonLayout) {
     if let Some(handle) = lock_listener().as_ref() {
         handle.set_layout_setting(button_layout_from_dto(layout));
     }
+}
+
+/// Layout que o modo automático escolhe para o último controle usado (Xbox
+/// ou Nintendo), para a tela mostrar os nomes certos dos botões. Sem leitura
+/// ativa, Xbox.
+#[frb(sync)]
+pub fn gamepad_detected_layout() -> LauncherButtonLayout {
+    let detected = lock_listener()
+        .as_ref()
+        .map_or(ButtonLayout::Xbox, ListenerHandle::detected_layout);
+    detected_layout_to_dto(detected)
 }

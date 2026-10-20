@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 /// Medidas da tela (em pixels lógicos), num lugar só.
 abstract final class Dimens {
   static const gutter = 24.0;
@@ -35,9 +37,17 @@ abstract final class Dimens {
   static const divider = 1.0;
 }
 
+/// Durações das animações. Com "Reduzir animações" (ou o pedido do sistema)
+/// [of] devolve zero e tudo muda na hora.
 abstract final class Motion {
   static const focus = Duration(milliseconds: 140);
   static const scroll = Duration(milliseconds: 160);
+  static const overlay = Duration(milliseconds: 160);
+
+  static Duration of(BuildContext context, Duration normal) =>
+      MediaQuery.maybeDisableAnimationsOf(context) ?? false
+      ? Duration.zero
+      : normal;
 }
 
 /// Opacidades usadas em mais de um lugar.

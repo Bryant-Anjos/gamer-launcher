@@ -211,6 +211,8 @@ void main() {
       final h = await pumpLauncher(tester, backend: backend);
       await tester.tap(find.text('Configurações').first);
       await tester.pumpAndSettle();
+      // a chave fica no fim da página: só é montada depois de rolar
+      await tester.scrollUntilVisible(find.text('Iniciar com o sistema'), 200);
       return h;
     }
 

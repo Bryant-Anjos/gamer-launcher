@@ -2,11 +2,11 @@
 //! A interpretação dos eventos fica em [`crate::input`].
 
 use crate::input::{
-    ButtonLayoutSetting, GamepadAction, InputMapper, PadButton, PadEvent, StickAxis,
+    ButtonLayout, ButtonLayoutSetting, GamepadAction, InputMapper, PadButton, PadEvent, StickAxis,
 };
 use gilrs::{Axis, Button, EventType, Gilrs};
 use std::ops::ControlFlow;
-use std::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, AtomicUsize, Ordering};
 use std::sync::{Arc, mpsc};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
@@ -99,11 +99,45 @@ impl SharedLayout {
     }
 }
 
+/// Fabricante do último controle usado, compartilhado entre a thread de
+/// leitura (que grava a cada evento) e a UI (que mostra os nomes dos botões
+/// do layout detectado).
+#[derive(Debug, Clone)]
+pub struct LastVendor(Arc<AtomicU32>);
+
+impl Default for LastVendor {
+    fn default() -> Self {
+        Self(Arc::new(AtomicU32::new(Self::UNKNOWN)))
+    }
+}
+
+impl LastVendor {
+    /// Fora da faixa de um `u16`: nenhum controle usado ainda.
+    const UNKNOWN: u32 = u32::MAX;
+
+    /// Controle sem fabricante conhecido não apaga o anterior.
+    pub fn set(&self, vendor: Option<u16>) {
+        if let Some(vendor) = vendor {
+            self.0.store(u32::from(vendor), Ordering::Relaxed);
+        }
+    }
+
+    pub fn get(&self) -> Option<u16> {
+        u16::try_from(self.0.load(Ordering::Relaxed)).ok()
+    }
+
+    /// Layout do modo automático para o último controle usado.
+    pub fn detected_layout(&self) -> ButtonLayout {
+        ButtonLayoutSetting::Auto.resolve(self.get())
+    }
+}
+
 /// Mantém a leitura ativa; ao ser descartado, para a thread e espera ela acabar.
 pub struct ListenerHandle {
     stop: Arc<AtomicBool>,
     connected: Arc<AtomicUsize>,
     layout: SharedLayout,
+    last_vendor: LastVendor,
     thread: Option<JoinHandle<()>>,
 }
 
@@ -121,6 +155,19 @@ impl ListenerHandle {
     pub fn layout_setting(&self) -> ButtonLayoutSetting {
         self.layout.get()
     }
+
+    /// Layout que o modo automático escolheu para o último controle usado.
+    pub fn detected_layout(&self) -> ButtonLayout {
+        self.last_vendor.detected_layout()
+    }
+}
+
+/// Fabricante do primeiro controle conectado (antes de qualquer evento).
+fn first_vendor(gilrs: &Gilrs) -> Option<u16> {
+    gilrs
+        .gamepads()
+        .find(|(_, pad)| pad.is_connected())
+        .and_then(|(_, pad)| pad.vendor_id())
 }
 
 fn count_connected(gilrs: &Gilrs) -> usize {
@@ -139,18 +186,21 @@ impl Drop for ListenerHandle {
     }
 }
 
-fn run_loop<F>(
-    mut gilrs: Gilrs,
-    stop: &AtomicBool,
-    connected: &AtomicUsize,
-    layout: &SharedLayout,
-    mut on_action: F,
-) where
+/// O que a thread de leitura divide com o [`ListenerHandle`].
+struct Shared {
+    stop: Arc<AtomicBool>,
+    connected: Arc<AtomicUsize>,
+    layout: SharedLayout,
+    last_vendor: LastVendor,
+}
+
+fn run_loop<F>(mut gilrs: Gilrs, shared: &Shared, mut on_action: F)
+where
     F: FnMut(GamepadAction) -> ControlFlow<()>,
 {
     let started = Instant::now();
     let mut mapper = InputMapper::new();
-    while !stop.load(Ordering::Relaxed) {
+    while !shared.stop.load(Ordering::Relaxed) {
         let now_ms = || started.elapsed().as_millis() as u64;
         let until_repeat = mapper.next_deadline_ms().map_or(STOP_POLL, |deadline| {
             Duration::from_millis(deadline.saturating_sub(now_ms()))
@@ -160,7 +210,9 @@ fn run_loop<F>(
         if event.as_ref().is_none_or(|event| {
             matches!(event.event, EventType::Connected | EventType::Disconnected)
         }) {
-            connected.store(count_connected(&gilrs), Ordering::Relaxed);
+            shared
+                .connected
+                .store(count_connected(&gilrs), Ordering::Relaxed);
         }
 
         let from_event = event.and_then(|event| {
@@ -169,7 +221,8 @@ fn run_loop<F>(
             let vendor = gilrs
                 .connected_gamepad(event.id)
                 .and_then(|pad| pad.vendor_id());
-            let layout = layout.get().resolve(vendor);
+            shared.last_vendor.set(vendor);
+            let layout = shared.layout.get().resolve(vendor);
             let pad_event = pad_event_from(event.event)?;
             mapper.handle_with(layout, pad_event, now_ms())
         });
@@ -199,27 +252,30 @@ pub fn spawn_listener_with<F>(
 where
     F: FnMut(GamepadAction) -> ControlFlow<()> + Send + 'static,
 {
-    let shared_layout = SharedLayout::new(layout);
-    let thread_layout = shared_layout.clone();
-    let stop = Arc::new(AtomicBool::new(false));
-    let connected = Arc::new(AtomicUsize::new(0));
+    let shared = Shared {
+        stop: Arc::new(AtomicBool::new(false)),
+        connected: Arc::new(AtomicUsize::new(0)),
+        layout: SharedLayout::new(layout),
+        last_vendor: LastVendor::default(),
+    };
+    let handle_parts = (
+        Arc::clone(&shared.stop),
+        Arc::clone(&shared.connected),
+        shared.layout.clone(),
+        shared.last_vendor.clone(),
+    );
     let (ready_tx, ready_rx) = mpsc::channel();
-    let thread_stop = Arc::clone(&stop);
-    let thread_connected = Arc::clone(&connected);
     // `Gilrs` não atravessa threads: nasce e morre dentro da thread de leitura.
     let thread = thread::Builder::new()
         .name("gamepad-listener".into())
         .spawn(move || match Gilrs::new() {
             Ok(gilrs) => {
-                thread_connected.store(count_connected(&gilrs), Ordering::Relaxed);
+                shared
+                    .connected
+                    .store(count_connected(&gilrs), Ordering::Relaxed);
+                shared.last_vendor.set(first_vendor(&gilrs));
                 let _ = ready_tx.send(Ok(()));
-                run_loop(
-                    gilrs,
-                    &thread_stop,
-                    &thread_connected,
-                    &thread_layout,
-                    on_action,
-                );
+                run_loop(gilrs, &shared, on_action);
             }
             Err(error) => {
                 let _ = ready_tx.send(Err(error.to_string()));
@@ -228,12 +284,16 @@ where
         .map_err(|error| GamepadError::Init(error.to_string()))?;
 
     match ready_rx.recv() {
-        Ok(Ok(())) => Ok(ListenerHandle {
-            stop,
-            connected,
-            layout: shared_layout,
-            thread: Some(thread),
-        }),
+        Ok(Ok(())) => {
+            let (stop, connected, layout, last_vendor) = handle_parts;
+            Ok(ListenerHandle {
+                stop,
+                connected,
+                layout,
+                last_vendor,
+                thread: Some(thread),
+            })
+        }
         Ok(Err(message)) => Err(GamepadError::Init(message)),
         Err(_) => Err(GamepadError::Init(
             "a thread de leitura terminou antes de iniciar".into(),

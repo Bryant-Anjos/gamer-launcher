@@ -57,6 +57,7 @@ class LauncherController extends ValueNotifier<LauncherState> {
       'Não foi possível ler os recentes',
     );
     final userName = await _loadUserName();
+    if (settings != null) _applyButtonLayout(settings.buttonLayout);
     // `value` lido só agora: uma troca de seção durante a carga é mantida
     value = value.copyWith(
       settings: settings,
@@ -117,7 +118,22 @@ class LauncherController extends ValueNotifier<LauncherState> {
       await _backend.saveSettings(next);
       return true;
     }, 'Não foi possível salvar as configurações');
-    if (saved == true) value = value.copyWith(settings: next);
+    if (saved != true) return;
+    final previous = value.settings.buttonLayout;
+    value = value.copyWith(settings: next);
+    if (next.buttonLayout != previous) _applyButtonLayout(next.buttonLayout);
+  }
+
+  /// O leitor do controle troca o layout na hora; recusa vira aviso (a
+  /// escolha fica salva e vale na próxima abertura).
+  void _applyButtonLayout(LauncherButtonLayout layout) {
+    try {
+      _backend.setButtonLayout(layout);
+    } on BackendException catch (error) {
+      _messages.show(
+        'Não foi possível aplicar o layout dos botões: ${error.message}',
+      );
+    }
   }
 
   Future<void> updateSettings(LauncherSettings next) =>

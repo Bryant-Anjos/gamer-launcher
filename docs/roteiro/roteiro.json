@@ -55,7 +55,7 @@
       ],
       "reviewed": {
         ".github/workflows/release.yml": "7d01b146f691",
-        "app/lib/main.dart": "2528dc338540",
+        "app/lib/main.dart": "0149ccf9c36f",
         "app/linux/CMakeLists.txt": "41cb78aea946",
         "app/linux/runner/CMakeLists.txt": "8cdcfd911e77",
         "app/linux/runner/main.cc": "ea23f7cdf740",
@@ -73,6 +73,10 @@
         {
           "date": "2026-10-19",
           "reason": "O main.dart só passou a criar o RustBackend da UI; nada muda na instalação, no atalho nem na abertura."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O main.dart só lê o layout de botões salvo antes de ligar o controle; conferido na seção botoes-sons. Nada muda na instalação."
         }
       ]
     },
@@ -110,10 +114,10 @@
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
-        "app/lib/input/input_router.dart": "1d679b5caca1",
-        "app/lib/state/gamepad_status.dart": "45985707455b",
-        "app/rust/src/api/input.rs": "9ef46fbf7429",
-        "core/src/gamepad.rs": "453db342dddc",
+        "app/lib/input/input_router.dart": "07fd35156395",
+        "app/lib/state/gamepad_status.dart": "043915da5add",
+        "app/rust/src/api/input.rs": "18c1d38b076f",
+        "core/src/gamepad.rs": "552cda4a685a",
         "core/src/input.rs": "5c4ce90df3f5"
       },
       "itemsHash": "3e6a8b2510d1",
@@ -121,6 +125,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O leitor passou a guardar o fabricante do último controle usado para as dicas na tela; os testes de layout estão na seção botoes-sons."
         }
       ]
     },
@@ -143,9 +151,58 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/input_router.dart": "1d679b5caca1"
+        "app/lib/input/input_router.dart": "07fd35156395"
       },
       "itemsHash": "4d9bba16a13f",
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter só observa setas, Enter e Esc para os sons, sem mudar a navegação; os sons estão na seção botoes-sons."
+        }
+      ]
+    },
+    {
+      "id": "botoes-sons",
+      "title": "Botões, sons e animações",
+      "sub": "Layout Xbox ou Nintendo, dicas na tela, sons e animações reduzidas",
+      "items": [
+        "Em Configurações > \"Botões do controle\", confira as três opções: Automático, Xbox e Nintendo, com Automático marcado no começo.",
+        "Com o Pro Controller e Automático, abra o menu Energia. Na dica embaixo do título, confira se o losango ao lado de \"A escolhe\" acende o botão da direita e o ao lado de \"B fecha\" acende o de baixo. Faça o mesmo no seletor de favoritos.",
+        "Com um controle Xbox (ou o controle virtual, tools/virtual_pad.py) e Automático, confira se o losango acende o botão de baixo para o A e o da direita para o B.",
+        "Com o Pro Controller conectado, escolha Xbox. Confira se, na hora e sem reiniciar, o botão de baixo passa a confirmar e a dica passa a mostrar o A embaixo. Volte para Automático e confira se o A da direita volta a confirmar.",
+        "Escolha Nintendo, feche e abra o launcher. Confira se o controle já começa no layout escolhido.",
+        "Ligue \"Sons\" em Configurações > \"Sons e animações\". Confira se mover o foco, confirmar e voltar tocam sons curtos, pelo controle e pelo teclado (setas, Enter e Esc). Desligue e confira se fica em silêncio.",
+        "Com \"Sons\" ligado, se aparecer \"Não foi possível tocar os sons\", anote a mensagem. Ela deve aparecer uma vez só, não a cada movimento.",
+        "Ligue \"Reduzir animações\". Confira se o destaque do foco, a rolagem e a abertura do controle rápido (Start) e do menu Energia passam a acontecer na hora, sem animação. Desligue e confira se as animações voltam.",
+        "Feche e abra o launcher. Confira se layout, sons e animações continuam como você deixou."
+      ],
+      "covers": [
+        "app/lib/input/button_names.dart",
+        "app/lib/state/ui_sounds.dart",
+        "app/lib/ui/settings/input_settings.dart",
+        "app/lib/ui/widgets/button_hints.dart",
+        "app/lib/input/input_router.dart",
+        "app/lib/state/gamepad_status.dart",
+        "core/src/gamepad.rs",
+        "app/rust/src/api/input.rs",
+        "app/rust/src/api/sound.rs",
+        "core/src/sound.rs",
+        "app/lib/main.dart"
+      ],
+      "reviewed": {
+        "app/lib/input/button_names.dart": "6b8f775c7f08",
+        "app/lib/input/input_router.dart": "07fd35156395",
+        "app/lib/main.dart": "0149ccf9c36f",
+        "app/lib/state/gamepad_status.dart": "043915da5add",
+        "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
+        "app/lib/ui/settings/input_settings.dart": "2e5b8af5964d",
+        "app/lib/ui/widgets/button_hints.dart": "9b141eee9b88",
+        "app/rust/src/api/input.rs": "18c1d38b076f",
+        "app/rust/src/api/sound.rs": "63bf56a9b28a",
+        "core/src/gamepad.rs": "552cda4a685a",
+        "core/src/sound.rs": "b3f4fbc249cf"
+      },
+      "itemsHash": "1d8861d63050",
       "reviews": []
     },
     {
@@ -183,10 +240,10 @@
         "app/lib/state/settings_edit.dart": "862a5e4782ea",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
         "app/lib/ui/settings/settings_controls.dart": "bfcd1edfc839",
-        "app/lib/ui/settings/settings_page.dart": "1dda31d3ea96",
+        "app/lib/ui/settings/settings_page.dart": "6c5815d0cc82",
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
-        "app/lib/ui/widgets/focus_tile.dart": "2422fe86f6b5",
+        "app/lib/ui/widgets/focus_tile.dart": "ed78bfe07dfd",
         "app/lib/ui/widgets/menu_row.dart": "ccd55ca4f55d",
         "app/lib/ui/widgets/overlay_card.dart": "14d31f6cbdbf",
         "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
@@ -203,6 +260,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Configurações ganhou as seções de botões e sons (seção botoes-sons) e o foco respeita Reduzir animações; o tema e o wallpaper não mudaram."
         }
       ]
     },
@@ -225,7 +286,7 @@
       ],
       "reviewed": {
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/settings/settings_page.dart": "1dda31d3ea96",
+        "app/lib/ui/settings/settings_page.dart": "6c5815d0cc82",
         "app/rust/src/api/settings.rs": "2a6a73f25fa8",
         "core/src/settings.rs": "144b0e0a81e3"
       },
@@ -242,6 +303,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Configurações ganhou seções novas abaixo dos painéis (testadas em botoes-sons); mostrar e ocultar painéis não mudou."
         }
       ]
     },
@@ -274,9 +339,9 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "b7c3702fea80",
+        "app/lib/launcher_app.dart": "062d8627773e",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
-        "app/lib/state/launcher_controller.dart": "7751c85c8a24",
+        "app/lib/state/launcher_controller.dart": "0fc7e7e6f800",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
@@ -287,7 +352,12 @@
         "core/src/user.rs": "891e6dec580a"
       },
       "itemsHash": "67d9e5ca4b40",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O controlador aplica o layout de botões ao carregar e ao mudar, e o app toca os sons; tudo testado na seção botoes-sons."
+        }
+      ]
     },
     {
       "id": "apps",
@@ -314,7 +384,7 @@
       ],
       "reviewed": {
         "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
-        "app/lib/ui/home/favorites_picker.dart": "0ea2818a6b1a",
+        "app/lib/ui/home/favorites_picker.dart": "4a76984bcc79",
         "app/lib/ui/pages/apps_page.dart": "20850355065c",
         "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
         "core/src/apps.rs": "e1c1bc2ec028",
@@ -325,6 +395,10 @@
         {
           "date": "2026-10-19",
           "reason": "O seletor de favoritos só passou a usar a moldura comum dos diálogos; o item novo da seção visual confere a aparência."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O seletor de favoritos só trocou a dica de texto pela dica com o losango do botão; conferida na seção botoes-sons."
         }
       ]
     },
@@ -388,7 +462,7 @@
       "reviewed": {
         "app/lib/state/quick_controls_controller.dart": "c6673ecd3ff6",
         "app/lib/state/quick_controls_edit.dart": "9f752b41b06a",
-        "app/lib/ui/quick/overlays.dart": "16cd7a2e9ab8",
+        "app/lib/ui/quick/overlays.dart": "730d8913cb65",
         "app/lib/ui/quick/quick_controls_panel.dart": "9941ae119a34",
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
         "app/rust/src/api/system.rs": "198436bcfac8",
@@ -412,6 +486,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só registrou a rota do menu Energia em overlays.dart (testado na seção energia); o controle rápido não mudou."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Os painéis sobrepostos só passaram a abrir sem animação com Reduzir animações; conferido na seção botoes-sons."
         }
       ]
     },
@@ -439,13 +517,17 @@
       ],
       "reviewed": {
         "app/lib/state/power_controller.dart": "d213e49debd5",
-        "app/lib/ui/power/power_menu.dart": "1da377f8f976"
+        "app/lib/ui/power/power_menu.dart": "75b26a031754"
       },
       "itemsHash": "10397ed097c6",
       "reviews": [
         {
           "date": "2026-10-19",
           "reason": "O menu Energia só passou a usar a moldura e as linhas comuns; o comportamento é o mesmo e a aparência é conferida na seção visual."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O menu Energia só trocou a dica de texto pela dica com o losango do botão; conferida na seção botoes-sons."
         }
       ]
     },

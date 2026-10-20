@@ -5,6 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:gamer_launcher/input/adjust_intent.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 
+final _keyActions = {
+  LogicalKeyboardKey.arrowUp: GamepadAction.up,
+  LogicalKeyboardKey.arrowDown: GamepadAction.down,
+  LogicalKeyboardKey.arrowLeft: GamepadAction.left,
+  LogicalKeyboardKey.arrowRight: GamepadAction.right,
+  LogicalKeyboardKey.enter: GamepadAction.confirm,
+  LogicalKeyboardKey.numpadEnter: GamepadAction.confirm,
+  LogicalKeyboardKey.escape: GamepadAction.back,
+};
+
 class _CloseIntent extends Intent {
   const _CloseIntent();
 }
@@ -25,6 +35,7 @@ class InputRouter extends StatefulWidget {
     this.onQuickControls,
     this.onTabChange,
     this.onError,
+    this.onFeedback,
   });
 
   final Stream<GamepadAction> actions;
@@ -37,6 +48,10 @@ class InputRouter extends StatefulWidget {
 
   /// Falha da leitura do controle (ex.: [GamepadUnavailable]).
   final ValueChanged<Object>? onError;
+
+  /// Cada ação do controle, e as teclas equivalentes (setas, Enter, Esc)
+  /// fora de campos de texto, para o retorno sonoro.
+  final ValueChanged<GamepadAction>? onFeedback;
   final Widget child;
 
   @override
@@ -80,6 +95,7 @@ class _InputRouterState extends State<InputRouter> {
   }
 
   void _handle(GamepadAction action) {
+    widget.onFeedback?.call(action);
     switch (action) {
       case GamepadAction.up:
         _move(TraversalDirection.up);
@@ -168,6 +184,17 @@ class _InputRouterState extends State<InputRouter> {
     Navigator.maybeOf(primaryContext)?.maybePop();
   }
 
+  /// Só observa: a tecla segue para quem a trata (a travessia do Flutter).
+  KeyEventResult _observeKey(FocusNode _, KeyEvent event) {
+    final action = event is KeyUpEvent ? null : _keyActions[event.logicalKey];
+    if (action != null && !_isTyping) widget.onFeedback?.call(action);
+    return KeyEventResult.ignored;
+  }
+
+  /// Num campo de texto as setas e o Enter editam, não navegam.
+  bool get _isTyping =>
+      _primary?.context?.findAncestorWidgetOfExactType<EditableText>() != null;
+
   @override
   Widget build(BuildContext context) {
     return Shortcuts(
@@ -183,7 +210,12 @@ class _InputRouterState extends State<InputRouter> {
             },
           ),
         },
-        child: Focus(focusNode: _landing, autofocus: true, child: widget.child),
+        child: Focus(
+          focusNode: _landing,
+          autofocus: true,
+          onKeyEvent: _observeKey,
+          child: widget.child,
+        ),
       ),
     );
   }

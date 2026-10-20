@@ -180,6 +180,7 @@ void main() {
 
     testWidgets('shows the core version', (tester) async {
       await _openSection(tester, 4);
+      await tester.scrollUntilVisible(find.text('Núcleo 0.1.0'), 200);
 
       expect(find.text('Núcleo 0.1.0'), findsOneWidget);
     });

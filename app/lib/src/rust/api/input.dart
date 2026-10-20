@@ -27,6 +27,12 @@ bool gamepadConnected() => RustLib.instance.api.crateApiInputGamepadConnected();
 void gamepadSetLayout({required LauncherButtonLayout layout}) =>
     RustLib.instance.api.crateApiInputGamepadSetLayout(layout: layout);
 
+/// Layout que o modo automático escolhe para o último controle usado (Xbox
+/// ou Nintendo), para a tela mostrar os nomes certos dos botões. Sem leitura
+/// ativa, Xbox.
+LauncherButtonLayout gamepadDetectedLayout() =>
+    RustLib.instance.api.crateApiInputGamepadDetectedLayout();
+
 enum GamepadAction {
   up,
   down,

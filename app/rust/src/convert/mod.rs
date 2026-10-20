@@ -14,7 +14,7 @@ use launcher_core::apps::{find_app, AppEntry};
 use launcher_core::featured::{game_launchers, music_player};
 use launcher_core::history::LaunchHistory;
 use launcher_core::icons::resolve_icon;
-use launcher_core::input::ButtonLayoutSetting;
+use launcher_core::input::{ButtonLayout, ButtonLayoutSetting};
 use launcher_core::recents::RecentItem;
 use launcher_core::search::{ItemKind, SearchItem};
 use launcher_core::settings::{Panel, Settings, ThemeMode};
@@ -59,6 +59,14 @@ pub fn button_layout_from_dto(layout: LauncherButtonLayout) -> ButtonLayoutSetti
         LauncherButtonLayout::Auto => ButtonLayoutSetting::Auto,
         LauncherButtonLayout::Xbox => ButtonLayoutSetting::Xbox,
         LauncherButtonLayout::Nintendo => ButtonLayoutSetting::Nintendo,
+    }
+}
+
+/// Layout que o modo automático detectou, como a escolha forçada equivalente.
+pub fn detected_layout_to_dto(layout: ButtonLayout) -> LauncherButtonLayout {
+    match layout {
+        ButtonLayout::Xbox => LauncherButtonLayout::Xbox,
+        ButtonLayout::Nintendo => LauncherButtonLayout::Nintendo,
     }
 }
 

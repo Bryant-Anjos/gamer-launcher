@@ -8,6 +8,7 @@ import 'package:gamer_launcher/state/messages.dart';
 import 'package:gamer_launcher/state/power_controller.dart';
 import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
+import 'package:gamer_launcher/state/ui_sounds.dart';
 
 /// Focos que o app move por fora da árvore (LB/RB e o botão Y).
 class LauncherFocus {
@@ -47,6 +48,7 @@ class LauncherServices {
     required this.autostart,
     required this.openPowerMenu,
     required this.closeLauncher,
+    required this.sounds,
   });
 
   final LauncherBackend backend;
@@ -63,6 +65,7 @@ class LauncherServices {
   final AutostartController autostart;
   final VoidCallback openPowerMenu;
   final VoidCallback closeLauncher;
+  final UiSounds sounds;
 }
 
 class LauncherScope extends InheritedWidget {

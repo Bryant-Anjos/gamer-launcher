@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gamer_launcher/input/button_names.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
+import 'package:gamer_launcher/ui/widgets/button_hints.dart';
 import 'package:gamer_launcher/ui/widgets/menu_row.dart';
 import 'package:gamer_launcher/ui/widgets/overlay_card.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
@@ -85,7 +87,10 @@ class _PowerMenuState extends State<PowerMenu> {
           ? OverlayCard(
               title: 'Energia',
               width: Dimens.menuWidth,
-              hint: const MutedText('A escolhe · B fecha'),
+              hint: const ButtonHints([
+                ButtonHint(PadRole.confirm, 'escolhe'),
+                ButtonHint(PadRole.back, 'fecha'),
+              ]),
               child: _OptionList(onChoose: _choose),
             )
           : OverlayCard(

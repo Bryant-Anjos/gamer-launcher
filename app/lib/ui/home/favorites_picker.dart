@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gamer_launcher/input/button_names.dart';
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/widgets/app_icon.dart';
+import 'package:gamer_launcher/ui/widgets/button_hints.dart';
 import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 import 'package:gamer_launcher/ui/widgets/overlay_card.dart';
-import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 
 const _pickerWidthFactor = 0.7;
 const _pickerHeightFactor = 0.8;
@@ -23,7 +24,10 @@ class FavoritesPicker extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     return OverlayCard(
       title: 'Escolha os favoritos',
-      hint: const MutedText('A marca ou desmarca · B fecha'),
+      hint: const ButtonHints([
+        ButtonHint(PadRole.confirm, 'marca ou desmarca'),
+        ButtonHint(PadRole.back, 'fecha'),
+      ]),
       width: size.width * _pickerWidthFactor,
       height: size.height * _pickerHeightFactor,
       child: ValueListenableBuilder(

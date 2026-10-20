@@ -111,3 +111,63 @@ mod layout {
         assert_eq!(handle.layout_setting(), ButtonLayoutSetting::Auto);
     }
 }
+
+mod last_vendor {
+    use super::*;
+    use launcher_core::gamepad::LastVendor;
+    use launcher_core::input::ButtonLayout;
+
+    const NINTENDO: u16 = 0x057e;
+    const MICROSOFT: u16 = 0x045e;
+
+    #[test]
+    fn starts_unknown_and_looks_like_xbox() {
+        let last = LastVendor::default();
+
+        assert_eq!(last.get(), None);
+        assert_eq!(last.detected_layout(), ButtonLayout::Xbox);
+    }
+
+    #[test]
+    fn a_nintendo_controller_is_detected_as_nintendo() {
+        let last = LastVendor::default();
+
+        last.set(Some(NINTENDO));
+
+        assert_eq!(last.get(), Some(NINTENDO));
+        assert_eq!(last.detected_layout(), ButtonLayout::Nintendo);
+    }
+
+    #[test]
+    fn the_last_controller_used_wins() {
+        let last = LastVendor::default();
+        last.set(Some(NINTENDO));
+
+        last.set(Some(MICROSOFT));
+
+        assert_eq!(last.detected_layout(), ButtonLayout::Xbox);
+    }
+
+    #[test]
+    fn a_controller_without_vendor_keeps_the_previous_one() {
+        let last = LastVendor::default();
+        last.set(Some(NINTENDO));
+
+        last.set(None);
+
+        assert_eq!(last.get(), Some(NINTENDO));
+    }
+
+    #[test]
+    fn the_listener_reports_a_detected_layout() {
+        let handle = spawn_listener(|_| ControlFlow::Continue(())).expect("udev disponível");
+
+        // sem hardware garantido, só a coerência: algum dos dois layouts
+        let detected = handle.detected_layout();
+
+        assert!(matches!(
+            detected,
+            ButtonLayout::Xbox | ButtonLayout::Nintendo
+        ));
+    }
+}

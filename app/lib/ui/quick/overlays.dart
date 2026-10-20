@@ -5,7 +5,6 @@ import 'package:gamer_launcher/ui/power/power_menu.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
 
 const _barrierColor = Color(0x8C000000);
-const _overlayMotion = Duration(milliseconds: 160);
 const quickControlsRouteName = 'quick-controls';
 const favoritesRouteName = 'favorites-picker';
 const powerMenuRouteName = 'power-menu';
@@ -20,7 +19,7 @@ Future<void> _showOverlay(
     barrierDismissible: true,
     barrierLabel: 'Fechar',
     barrierColor: _barrierColor,
-    transitionDuration: _overlayMotion,
+    transitionDuration: Motion.of(navigator.context, Motion.overlay),
     pageBuilder: (context, _, _) => builder(context),
   ),
 );

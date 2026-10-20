@@ -4,10 +4,11 @@
 
 use crate::api::catalog::{launch_app, load_catalog};
 use crate::api::files::{list_recents, list_wallpapers, open_path};
-use crate::api::input::gamepad_connected;
+use crate::api::input::{gamepad_connected, gamepad_detected_layout};
 use crate::api::meta::{core_version, user_first_name};
 use crate::api::settings::{
-    default_settings, resolve_theme, LauncherSettings, LauncherThemeMode, ResolvedTheme,
+    default_settings, resolve_theme, LauncherButtonLayout, LauncherSettings, LauncherThemeMode,
+    ResolvedTheme,
 };
 use crate::api::system::{autostart_enabled, read_battery, sample_stats};
 
@@ -55,6 +56,11 @@ fn opening_a_missing_path_is_an_error() {
 #[test]
 fn without_a_listener_no_gamepad_is_connected() {
     assert!(!gamepad_connected());
+}
+
+#[test]
+fn without_a_listener_the_detected_layout_is_xbox() {
+    assert_eq!(gamepad_detected_layout(), LauncherButtonLayout::Xbox);
 }
 
 #[test]

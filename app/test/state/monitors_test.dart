@@ -1,5 +1,6 @@
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/state/clock.dart';
 import 'package:gamer_launcher/state/gamepad_status.dart';
@@ -58,6 +59,25 @@ void main() {
 
       expect(monitor.value.cpu, [10, 20, 30]);
       monitor.dispose();
+    });
+  });
+
+  test('gamepad status also follows the detected button layout', () {
+    fakeAsync((async) {
+      var detected = LauncherButtonLayout.xbox;
+      final status = GamepadStatus(
+        () => true,
+        detectLayout: () => detected,
+      );
+
+      status.poller.attach();
+      async.flushMicrotasks();
+      expect(status.detectedLayout.value, LauncherButtonLayout.xbox);
+
+      detected = LauncherButtonLayout.nintendo;
+      async.elapse(const Duration(seconds: 1));
+      expect(status.detectedLayout.value, LauncherButtonLayout.nintendo);
+      status.dispose();
     });
   });
 

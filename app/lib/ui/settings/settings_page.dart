@@ -5,6 +5,7 @@ import 'package:gamer_launcher/state/settings_edit.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/pages/page_header.dart';
+import 'package:gamer_launcher/ui/settings/input_settings.dart';
 import 'package:gamer_launcher/ui/settings/settings_controls.dart';
 import 'package:gamer_launcher/ui/settings/wallpaper_picker.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
@@ -67,6 +68,12 @@ class SettingsPage extends StatelessWidget {
                 ],
               ),
               box(const SizedBox(height: Dimens.gutter)),
+              box(const SectionTitle('Botões do controle')),
+              box(ButtonLayoutChoices(settings: settings, onEdit: edit)),
+              box(const SizedBox(height: Dimens.gutter)),
+              box(const SectionTitle('Sons e animações')),
+              box(FeedbackSwitches(settings: settings, onEdit: edit)),
+              box(const SizedBox(height: Dimens.gutter)),
               box(const SectionTitle('Ao ligar o computador')),
               box(
                 Align(
@@ -97,15 +104,11 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-typedef _SettingsEdit = void Function(
-  LauncherSettings Function(LauncherSettings current) change,
-);
-
 class _ThemeChoices extends StatelessWidget {
   const _ThemeChoices({required this.settings, required this.onEdit});
 
   final LauncherSettings settings;
-  final _SettingsEdit onEdit;
+  final SettingsEdit onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +136,7 @@ class _Schedule extends StatelessWidget {
   const _Schedule({required this.settings, required this.onEdit});
 
   final LauncherSettings settings;
-  final _SettingsEdit onEdit;
+  final SettingsEdit onEdit;
 
   @override
   Widget build(BuildContext context) => Column(

@@ -13,6 +13,8 @@ import 'package:gamer_launcher/state/messages.dart';
 import 'package:gamer_launcher/state/power_controller.dart';
 import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
+import 'package:gamer_launcher/state/ui_sounds.dart';
+import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/quick/overlays.dart';
@@ -59,12 +61,16 @@ class _LauncherAppState extends State<LauncherApp> {
     super.initState();
     final messages = LauncherMessages();
     final backend = widget.backend;
+    final controller = LauncherController(backend, messages);
     _services = LauncherServices(
       backend: backend,
-      controller: LauncherController(backend, messages),
+      controller: controller,
       quickControls: QuickControlsController(backend, messages),
       monitor: SystemMonitor(backend.sampleStats, onError: messages.show),
-      gamepad: GamepadStatus(backend.gamepadConnected),
+      gamepad: GamepadStatus(
+        backend.gamepadConnected,
+        detectLayout: backend.detectedButtonLayout,
+      ),
       clock: Clock(now: widget.now),
       focus: LauncherFocus(),
       messages: messages,
@@ -74,6 +80,11 @@ class _LauncherAppState extends State<LauncherApp> {
       autostart: AutostartController(backend, messages),
       openPowerMenu: _openPowerMenu,
       closeLauncher: widget.onClose,
+      sounds: UiSounds(
+        backend,
+        messages,
+        isEnabled: () => controller.value.settings.sounds,
+      ),
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
@@ -175,6 +186,25 @@ class _LauncherAppState extends State<LauncherApp> {
     }
   }
 
+  void _playFeedback(GamepadAction action) {
+    final sound = soundFor(action);
+    if (sound != null) _services.sounds.play(sound);
+  }
+
+  /// "Reduzir animações" vale como o pedido do sistema: as telas leem
+  /// `MediaQuery.disableAnimations` (veja [Motion.of]). O `MediaQuery` fica
+  /// sempre na árvore, para ligar e desligar não recriar o `Navigator`.
+  Widget _withMotion(BuildContext context, Widget child) {
+    final media = MediaQuery.of(context);
+    final reduce = _services.controller.value.settings.reduceAnimations;
+    return MediaQuery(
+      data: media.copyWith(
+        disableAnimations: media.disableAnimations || reduce,
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -190,16 +220,24 @@ class _LauncherAppState extends State<LauncherApp> {
           _services.controller.value.settings,
           _services.clock.value,
         ),
-        builder: (context, child) => LauncherScope(
-          services: _services,
-          child: InputRouter(
-            actions: widget.actions,
-            onClose: widget.onClose,
-            onSearch: _focusSearch,
-            onQuickControls: _toggleQuickControls,
-            onTabChange: _changeTab,
-            onError: (error) => _services.messages.show(error.toString()),
-            child: child ?? const SizedBox.shrink(),
+        themeAnimationDuration:
+            _services.controller.value.settings.reduceAnimations
+            ? Duration.zero
+            : kThemeAnimationDuration,
+        builder: (context, child) => _withMotion(
+          context,
+          LauncherScope(
+            services: _services,
+            child: InputRouter(
+              actions: widget.actions,
+              onClose: widget.onClose,
+              onSearch: _focusSearch,
+              onQuickControls: _toggleQuickControls,
+              onTabChange: _changeTab,
+              onError: (error) => _services.messages.show(error.toString()),
+              onFeedback: _playFeedback,
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         ),
         home: const LauncherShell(),

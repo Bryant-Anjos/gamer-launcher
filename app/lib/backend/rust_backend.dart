@@ -4,6 +4,7 @@ import 'package:gamer_launcher/src/rust/api/files.dart' as files;
 import 'package:gamer_launcher/src/rust/api/input.dart' as input;
 import 'package:gamer_launcher/src/rust/api/meta.dart' as meta;
 import 'package:gamer_launcher/src/rust/api/settings.dart' as settings;
+import 'package:gamer_launcher/src/rust/api/sound.dart' as sound;
 import 'package:gamer_launcher/src/rust/api/system.dart' as system;
 
 /// A ponte devolve o erro do Rust como `String`; aqui ele vira
@@ -125,4 +126,16 @@ class RustBackend implements LauncherBackend {
 
   @override
   bool gamepadConnected() => _translate(input.gamepadConnected);
+
+  @override
+  settings.LauncherButtonLayout detectedButtonLayout() =>
+      _translate(input.gamepadDetectedLayout);
+
+  @override
+  void setButtonLayout(settings.LauncherButtonLayout layout) =>
+      _translate(() => input.gamepadSetLayout(layout: layout));
+
+  @override
+  void playUiSound(sound.LauncherSound value) =>
+      _translate(() => sound.playUiSound(sound: value));
 }
