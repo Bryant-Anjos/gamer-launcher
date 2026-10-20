@@ -3,6 +3,7 @@ import 'package:gamer_launcher/input/button_names.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
+import 'package:gamer_launcher/ui/power/power_icons.dart';
 import 'package:gamer_launcher/ui/widgets/button_hints.dart';
 import 'package:gamer_launcher/ui/widgets/menu_row.dart';
 import 'package:gamer_launcher/ui/widgets/overlay_card.dart';
@@ -10,10 +11,10 @@ import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 
 /// Uma opção do menu; [action] vazio é "fechar o launcher".
 class _Option {
-  const _Option(this.label, this.icon, this.action, {this.confirmTitle});
+  const _Option(this.label, this.glyph, this.action, {this.confirmTitle});
 
   final String label;
-  final IconData icon;
+  final PowerGlyph glyph;
   final PowerAction? action;
 
   /// Pergunta antes de executar; vazio executa na hora.
@@ -21,26 +22,26 @@ class _Option {
 }
 
 const _options = [
-  _Option('Suspender', Icons.bedtime_rounded, PowerAction.suspend),
+  _Option('Suspender', PowerGlyph.suspend, PowerAction.suspend),
   _Option(
     'Reiniciar',
-    Icons.restart_alt_rounded,
+    PowerGlyph.restart,
     PowerAction.reboot,
     confirmTitle: 'Reiniciar o computador?',
   ),
   _Option(
     'Desligar',
-    Icons.power_settings_new_rounded,
+    PowerGlyph.shutdown,
     PowerAction.shutdown,
     confirmTitle: 'Desligar o computador?',
   ),
   _Option(
     'Encerrar sessão',
-    Icons.logout_rounded,
+    PowerGlyph.logOut,
     PowerAction.logOut,
     confirmTitle: 'Encerrar a sessão?',
   ),
-  _Option('Fechar o launcher', Icons.close_rounded, null),
+  _Option('Fechar o launcher', PowerGlyph.closeLauncher, null),
 ];
 
 /// Energia e saída: suspender, reiniciar, desligar, encerrar a sessão e
@@ -123,7 +124,7 @@ class _OptionList extends StatelessWidget {
         if (index > 0) const SizedBox(height: Dimens.smallGap),
         MenuRow(
           label: option.label,
-          icon: option.icon,
+          leading: PowerIcon(option.glyph),
           autofocus: index == 0,
           onActivate: () => onChoose(option),
         ),
@@ -158,7 +159,7 @@ class _Confirmation extends StatelessWidget {
       const SizedBox(height: Dimens.smallGap),
       MenuRow(
         label: option.label,
-        icon: option.icon,
+        leading: PowerIcon(option.glyph),
         onActivate: onConfirm,
         emphasized: true,
       ),

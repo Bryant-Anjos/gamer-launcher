@@ -123,7 +123,7 @@
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
         "app/lib/input/input_router.dart": "42fd3b91403e",
         "app/lib/state/gamepad_status.dart": "043915da5add",
-        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b",
+        "app/lib/ui/shell/side_nav.dart": "659577b91ad3",
         "app/rust/src/api/input.rs": "18c1d38b076f",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/input.rs": "5c4ce90df3f5"
@@ -141,6 +141,10 @@
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só passou a usar o detector de digitação comum (typing.dart); o controle não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "side_nav.dart só trocou o ícone do Energia; a navegação não muda."
         }
       ]
     },
@@ -166,7 +170,7 @@
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/input_router.dart": "42fd3b91403e",
-        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b"
+        "app/lib/ui/shell/side_nav.dart": "659577b91ad3"
       },
       "itemsHash": "94efe33a2d72",
       "reviews": [
@@ -177,6 +181,10 @@
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só passou a usar o detector de digitação comum; as teclas da pesquisa estão na seção pesquisa."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "side_nav.dart só trocou o ícone do Energia; a navegação não muda."
         }
       ]
     },
@@ -272,7 +280,7 @@
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
         "app/lib/ui/widgets/focus_tile.dart": "ed78bfe07dfd",
-        "app/lib/ui/widgets/menu_row.dart": "f9ece899aba9",
+        "app/lib/ui/widgets/menu_row.dart": "8d09a3716fae",
         "app/lib/ui/widgets/overlay_card.dart": "14d31f6cbdbf",
         "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
         "core/src/theme.rs": "2dba34e92256",
@@ -296,6 +304,10 @@
         {
           "date": "2026-10-19",
           "reason": "O MenuRow só ganhou a opção de cor de fundo dos blocos, usada na lista de dispositivos (conferida na seção controle-rapido)."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O MenuRow só passou a aceitar um desenho próprio no lugar do ícone (usado no menu Energia, conferido na seção energia)."
         }
       ]
     },
@@ -379,7 +391,7 @@
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
         "app/lib/ui/shell/launcher_shell.dart": "83d5e3c467cd",
-        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b",
+        "app/lib/ui/shell/side_nav.dart": "659577b91ad3",
         "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
@@ -397,6 +409,10 @@
         {
           "date": "2026-10-19",
           "reason": "A barra de pesquisa da tela inicial e o Y agora abrem a pesquisa; testado na seção pesquisa."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O botão Energia da navegação só trocou o ícone pelo desenho próprio; conferido na seção energia."
         }
       ]
     },
@@ -565,17 +581,20 @@
         "Escolha Desligar e repita o teste da pergunta: Cancelar selecionado, B volta um passo, confirmar desliga.",
         "Escolha Encerrar sessão. Confira se pergunta, se confirmar leva à tela de login e se, com \"Iniciar com o sistema\" ligado, o launcher abre ao entrar de novo.",
         "Escolha Fechar o launcher. Confira se fecha na hora, sem perguntar, e por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
-        "Se alguma ação for recusada pelo sistema, anote a mensagem que aparece na tela."
+        "Se alguma ação for recusada pelo sistema, anote a mensagem que aparece na tela.",
+        "Confira os ícones do menu Energia e do botão Energia: lua (suspender), seta circular (reiniciar), o símbolo de liga/desliga (desligar), porta com seta saindo (encerrar sessão) e uma janela com X (fechar o launcher). Devem ter o mesmo peso dos outros ícones e ficar legíveis nos dois temas."
       ],
       "covers": [
         "app/lib/ui/power/power_menu.dart",
-        "app/lib/state/power_controller.dart"
+        "app/lib/state/power_controller.dart",
+        "app/lib/ui/power/power_icons.dart"
       ],
       "reviewed": {
         "app/lib/state/power_controller.dart": "d213e49debd5",
-        "app/lib/ui/power/power_menu.dart": "75b26a031754"
+        "app/lib/ui/power/power_icons.dart": "19df19b9c438",
+        "app/lib/ui/power/power_menu.dart": "4101878db914"
       },
-      "itemsHash": "10397ed097c6",
+      "itemsHash": "4aa97cf0f2e4",
       "reviews": [
         {
           "date": "2026-10-19",

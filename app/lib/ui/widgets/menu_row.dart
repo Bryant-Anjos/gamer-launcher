@@ -10,7 +10,7 @@ import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 class MenuRow extends StatelessWidget {
   const MenuRow({
     super.key,
-    required this.icon,
+    this.icon,
     required this.label,
     this.subtitle,
     this.trailing,
@@ -23,7 +23,8 @@ class MenuRow extends StatelessWidget {
     this.background,
   });
 
-  final IconData icon;
+  /// Ícone do Material; [leading] tem prioridade (ícone de app, SVG).
+  final IconData? icon;
   final String label;
   final String? subtitle;
   final Widget? trailing;
@@ -59,7 +60,10 @@ class MenuRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            leading ?? Icon(icon, color: foreground),
+            IconTheme.merge(
+              data: IconThemeData(color: foreground),
+              child: leading ?? Icon(icon),
+            ),
             const SizedBox(width: Dimens.iconGap),
             Expanded(child: _Texts(label, subtitle, foreground)),
             if (extra != null) ...[

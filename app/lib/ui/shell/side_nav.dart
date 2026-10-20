@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamer_launcher/state/launcher_state.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
+import 'package:gamer_launcher/ui/power/power_icons.dart';
 import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 
 IconData sectionIcon(Section section) => switch (section) {
@@ -116,7 +117,7 @@ class _PowerItem extends StatelessWidget {
           borderRadius: Dimens.smallRadius,
           semanticLabel: 'Energia',
           child: _NavRow(
-            icon: Icons.power_settings_new_rounded,
+            icon: const PowerIcon(PowerGlyph.shutdown),
             label: 'Energia',
             color: palette.textPrimary,
           ),
@@ -153,7 +154,7 @@ class _NavItem extends StatelessWidget {
       borderRadius: Dimens.smallRadius,
       semanticLabel: section.label,
       child: _NavRow(
-        icon: sectionIcon(section),
+        icon: Icon(sectionIcon(section)),
         label: section.label,
         color: isSelected ? palette.accent : palette.textPrimary,
         isSelected: isSelected,
@@ -171,7 +172,7 @@ class _NavRow extends StatelessWidget {
     this.isSelected = false,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String label;
   final Color color;
   final bool isSelected;
@@ -189,7 +190,10 @@ class _NavRow extends StatelessWidget {
           : Colors.transparent,
       child: Row(
         children: [
-          Icon(icon, color: color),
+          IconTheme.merge(
+            data: IconThemeData(color: color),
+            child: icon,
+          ),
           const SizedBox(width: Dimens.iconGap),
           Expanded(
             child: Text(
