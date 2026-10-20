@@ -155,10 +155,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
 
-      expect(_played(backend), [
-        'playUiSound(navigate)',
-        'playUiSound(back)',
-      ]);
+      expect(_played(backend), ['playUiSound(navigate)', 'playUiSound(back)']);
     });
 
     testWidgets('nothing plays when sounds are off', (tester) async {

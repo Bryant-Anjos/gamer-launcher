@@ -65,10 +65,7 @@ void main() {
   test('gamepad status also follows the detected button layout', () {
     fakeAsync((async) {
       var detected = LauncherButtonLayout.xbox;
-      final status = GamepadStatus(
-        () => true,
-        detectLayout: () => detected,
-      );
+      final status = GamepadStatus(() => true, detectLayout: () => detected);
 
       status.poller.attach();
       async.flushMicrotasks();

@@ -153,6 +153,14 @@ class LauncherController extends ValueNotifier<LauncherState> {
     }
   }
 
+  /// [label] diz qual página falhou no aviso ("de Bluetooth").
+  Future<void> openSettingsPage(String page, String label) async {
+    await _attempt(
+      () => _backend.openSettingsPage(page),
+      'Não foi possível abrir as configurações $label',
+    );
+  }
+
   Future<void> openRecent(RecentFile file) async {
     await _attempt(
       () => _backend.openPath(file.path),

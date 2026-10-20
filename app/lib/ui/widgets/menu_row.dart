@@ -20,6 +20,7 @@ class MenuRow extends StatelessWidget {
     this.focusNode,
     this.semanticLabel,
     this.leading,
+    this.background,
   });
 
   final IconData icon;
@@ -35,6 +36,10 @@ class MenuRow extends StatelessWidget {
   /// No lugar do ícone (o ícone de um app, por exemplo).
   final Widget? leading;
 
+  /// Dentro de um painel, a linha usa a cor dos blocos (`tile`) para não
+  /// sumir na superfície translúcida.
+  final Color? background;
+
   @override
   Widget build(BuildContext context) {
     final palette = LauncherPalette.of(context);
@@ -47,7 +52,7 @@ class MenuRow extends StatelessWidget {
       borderRadius: Dimens.smallRadius,
       onActivate: onActivate,
       child: Container(
-        color: emphasized ? palette.accent : palette.panel,
+        color: emphasized ? palette.accent : (background ?? palette.panel),
         padding: const EdgeInsets.symmetric(
           horizontal: Dimens.rowPaddingX,
           vertical: Dimens.rowPaddingY,

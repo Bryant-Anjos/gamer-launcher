@@ -7,6 +7,7 @@ import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/state/clock.dart';
 import 'package:gamer_launcher/state/autostart_controller.dart';
+import 'package:gamer_launcher/state/bluetooth_devices_controller.dart';
 import 'package:gamer_launcher/state/gamepad_status.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/state/messages.dart';
@@ -85,6 +86,7 @@ class _LauncherAppState extends State<LauncherApp> {
         messages,
         isEnabled: () => controller.value.settings.sounds,
       ),
+      bluetoothDevices: BluetoothDevicesController(backend, messages),
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
@@ -100,6 +102,7 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.quickControls.dispose();
     _services.power.dispose();
     _services.autostart.dispose();
+    _services.bluetoothDevices.dispose();
     _services.monitor.dispose();
     _services.gamepad.dispose();
     _services.clock.dispose();
@@ -115,6 +118,7 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.monitor.poller.visible = visible;
     _services.gamepad.poller.visible = visible;
     _services.power.poller.visible = visible;
+    _services.bluetoothDevices.poller.visible = visible;
     if (visible) unawaited(_services.controller.refreshRecents());
   }
 

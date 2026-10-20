@@ -50,6 +50,9 @@ abstract interface class LauncherBackend {
   Future<void> connectBluetoothDevice(String address);
   Future<void> disconnectBluetoothDevice(String address);
 
+  /// Abre uma página das configurações do sistema (`bluetooth`, `wireless`).
+  Future<void> openSettingsPage(String page);
+
   Future<StatsSample> sampleStats();
   Future<String?> userFirstName();
   bool gamepadConnected();

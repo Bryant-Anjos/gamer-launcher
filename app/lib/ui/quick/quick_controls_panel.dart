@@ -3,6 +3,7 @@ import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
+import 'package:gamer_launcher/ui/quick/bluetooth_devices.dart';
 import 'package:gamer_launcher/ui/shell/top_bar.dart';
 import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 import 'package:gamer_launcher/ui/widgets/level_slider.dart';
@@ -15,10 +16,18 @@ const unavailableLabel = 'Indisponível';
 /// volume e brilho. A luz noturna fica de fora (sem API estável no
 /// COSMIC). Item que não pôde ser lido aparece como indisponível.
 class QuickControlsPanel extends StatelessWidget {
-  const QuickControlsPanel({super.key, this.autofocus = false});
+  const QuickControlsPanel({
+    super.key,
+    this.autofocus = false,
+    this.showDevices = false,
+  });
 
   /// No painel sobreposto (botão Start) o primeiro item já vem focado.
   final bool autofocus;
+
+  /// Dispositivos Bluetooth e atalhos: só no painel sobreposto, para o da
+  /// tela inicial continuar do tamanho dos cartões.
+  final bool showDevices;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +84,12 @@ class QuickControlsPanel extends StatelessWidget {
                 value: controls?.brightness.percent,
                 onChanged: quick.setBrightness,
               ),
+              if (showDevices) ...[
+                const SizedBox(height: Dimens.gap),
+                BluetoothDevicesSection(
+                  bluetoothOn: controls?.bluetooth.enabled,
+                ),
+              ],
             ],
           ),
         ),

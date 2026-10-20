@@ -168,6 +168,10 @@ class FakeBackend implements LauncherBackend {
       _answer('disconnectBluetoothDevice($address)', () {});
 
   @override
+  Future<void> openSettingsPage(String page) =>
+      _answer('openSettingsPage($page)', () {});
+
+  @override
   Future<StatsSample> sampleStats() => _answer('sampleStats', () => stats);
 
   @override

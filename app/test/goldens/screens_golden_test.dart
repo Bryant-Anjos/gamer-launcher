@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
+import 'package:gamer_launcher/src/rust/api/system.dart';
 
+import '../support/fake_backend.dart';
 import '../support/harness.dart';
 
 /// Capturas das telas sobrepostas e de Configurações, para conferir que
@@ -9,10 +11,8 @@ import '../support/harness.dart';
 void main() {
   setUpAll(loadLauncherFonts);
 
-  Future<void> expectScreen(String name) => expectLater(
-    find.byType(MaterialApp),
-    matchesGoldenFile('$name.png'),
-  );
+  Future<void> expectScreen(String name) =>
+      expectLater(find.byType(MaterialApp), matchesGoldenFile('$name.png'));
 
   testWidgets('power menu', (tester) async {
     await pumpLauncher(tester);
@@ -33,7 +33,19 @@ void main() {
   });
 
   testWidgets('quick controls overlay', (tester) async {
-    final h = await pumpLauncher(tester);
+    final h = await pumpLauncher(
+      tester,
+      backend: FakeBackend(
+        pairedDevices: const [
+          PairedDevice(
+            address: 'AA:01',
+            name: 'Pro Controller',
+            connected: true,
+          ),
+          PairedDevice(address: 'AA:02', name: 'Fone JBL', connected: false),
+        ],
+      ),
+    );
     await h.pressAndSettle(tester, GamepadAction.quickControls);
 
     await expectScreen('quick_controls');

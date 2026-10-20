@@ -256,9 +256,7 @@ void main() {
     test('the loaded layout is applied to the gamepad reader', () async {
       final s = _Setup(
         FakeBackend(
-          settings: sampleSettings(
-            buttonLayout: LauncherButtonLayout.nintendo,
-          ),
+          settings: sampleSettings(buttonLayout: LauncherButtonLayout.nintendo),
         ),
       );
 

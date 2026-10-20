@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
+import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/home/favorites_picker.dart';
 import 'package:gamer_launcher/ui/power/power_menu.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
@@ -28,11 +29,11 @@ Future<void> _showOverlay(
 Future<void> showQuickControls(NavigatorState navigator) => _showOverlay(
   navigator,
   quickControlsRouteName,
-  (context) => const SafeArea(
+  (context) => SafeArea(
     child: Align(
       alignment: Alignment.topRight,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
+        padding: const EdgeInsets.fromLTRB(
           Dimens.gutter,
           Dimens.topBarHeight + Dimens.smallGap,
           Dimens.gutter,
@@ -40,9 +41,18 @@ Future<void> showQuickControls(NavigatorState navigator) => _showOverlay(
         ),
         child: SizedBox(
           width: Dimens.sidePanelWidth,
-          child: Material(
-            type: MaterialType.transparency,
-            child: QuickControlsPanel(autofocus: true),
+          // com muitos dispositivos pareados o painel rola
+          child: SingleChildScrollView(
+            // fundo opaco por baixo do painel translúcido: a tela inicial
+            // não aparece através dele (como nos outros diálogos)
+            child: Material(
+              color: LauncherPalette.of(context).background,
+              borderRadius: BorderRadius.circular(Dimens.radius),
+              child: const QuickControlsPanel(
+                autofocus: true,
+                showDevices: true,
+              ),
+            ),
           ),
         ),
       ),

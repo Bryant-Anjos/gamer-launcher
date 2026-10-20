@@ -3,6 +3,7 @@ import 'package:gamer_launcher/src/rust/api/catalog.dart' as catalog;
 import 'package:gamer_launcher/src/rust/api/files.dart' as files;
 import 'package:gamer_launcher/src/rust/api/input.dart' as input;
 import 'package:gamer_launcher/src/rust/api/meta.dart' as meta;
+import 'package:gamer_launcher/src/rust/api/search.dart' as search;
 import 'package:gamer_launcher/src/rust/api/settings.dart' as settings;
 import 'package:gamer_launcher/src/rust/api/sound.dart' as sound;
 import 'package:gamer_launcher/src/rust/api/system.dart' as system;
@@ -117,6 +118,12 @@ class RustBackend implements LauncherBackend {
   @override
   Future<void> disconnectBluetoothDevice(String address) =>
       _guard(() => system.disconnectBluetoothDevice(address: address));
+
+  /// As páginas de configurações são resultados da pesquisa (`setting:`):
+  /// o núcleo só abre as que conhece.
+  @override
+  Future<void> openSettingsPage(String page) =>
+      _guard(() => search.openSearchResult(id: 'setting:$page'));
 
   @override
   Future<system.StatsSample> sampleStats() => _guard(system.sampleStats);

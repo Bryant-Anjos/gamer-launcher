@@ -244,7 +244,7 @@
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
         "app/lib/ui/widgets/focus_tile.dart": "ed78bfe07dfd",
-        "app/lib/ui/widgets/menu_row.dart": "ccd55ca4f55d",
+        "app/lib/ui/widgets/menu_row.dart": "f9ece899aba9",
         "app/lib/ui/widgets/overlay_card.dart": "14d31f6cbdbf",
         "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
         "core/src/theme.rs": "2dba34e92256",
@@ -264,6 +264,10 @@
         {
           "date": "2026-10-19",
           "reason": "Configurações ganhou as seções de botões e sons (seção botoes-sons) e o foco respeita Reduzir animações; o tema e o wallpaper não mudaram."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O MenuRow só ganhou a opção de cor de fundo dos blocos, usada na lista de dispositivos (conferida na seção controle-rapido)."
         }
       ]
     },
@@ -339,9 +343,9 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "062d8627773e",
+        "app/lib/launcher_app.dart": "45437ce17ff7",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
-        "app/lib/state/launcher_controller.dart": "0fc7e7e6f800",
+        "app/lib/state/launcher_controller.dart": "634cf0b92925",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
@@ -356,6 +360,10 @@
         {
           "date": "2026-10-19",
           "reason": "O controlador aplica o layout de botões ao carregar e ao mudar, e o app toca os sons; tudo testado na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O app ganhou o controlador dos dispositivos Bluetooth e o controlador o atalho para as páginas do sistema; testados na seção controle-rapido."
         }
       ]
     },
@@ -449,7 +457,14 @@
         "Confira se cada controle mostra o estado (\"Ativado\", \"Desativado\", \"Indisponível\" ou \"Lendo...\") e se Volume e Brilho se ajustam com esquerda e direita.",
         "Ajuste o volume segurando a direção. Confira se o valor final mostrado bate com o do sistema.",
         "Em Configurações, oculte o painel de controle rápido e aperte Start. Anote o que acontece (dúvida em aberto: deveria abrir mesmo oculto?).",
-        "No Bluetooth e no Wi-Fi, anote o que falta para conectar sem sair do launcher. Hoje o painel só liga e desliga; a lista de dispositivos e de redes não existe."
+        "No Wi-Fi, anote se faz falta escolher a rede sem sair do launcher. Hoje o Wi-Fi só liga e desliga (há o atalho para as configurações de rede); no Bluetooth já dá para conectar os pareados.",
+        "Abra o controle rápido pelo Start. Confira se aparece \"Dispositivos Bluetooth\" com os seus pareados (os conectados primeiro) e o estado de cada um (Conectado ou Desconectado), e se o painel continua opaco, sem a tela inicial aparecendo através dele.",
+        "Escolha um dispositivo desconectado e aperte A. Confira se mostra \"Conectando...\" com um indicador e, em até 15 segundos, \"Conectado\". Aperte A de novo para desconectar.",
+        "Enquanto um dispositivo conecta, aperte A nele outra vez. Confira se nada se repete nem trava.",
+        "Tente conectar um dispositivo desligado ou longe. Confira se aparece uma mensagem com o nome dele e o motivo.",
+        "Desligue o Bluetooth no próprio painel. Confira se a lista dá lugar a \"Ligue o Bluetooth para ver os dispositivos.\"",
+        "Escolha \"Configurações de Bluetooth\" e depois \"Configurações de rede\". Confira se abrem as páginas de Bluetooth e de Wi-Fi das configurações do COSMIC.",
+        "Na tela inicial, confira se o painel de controle rápido continua do tamanho dos cartões, sem a lista de dispositivos (ela fica só no painel do Start)."
       ],
       "covers": [
         "core/src/system/*.rs",
@@ -457,13 +472,16 @@
         "app/lib/ui/quick/*.dart",
         "app/lib/ui/widgets/level_slider.dart",
         "app/lib/state/quick_controls_controller.dart",
-        "app/lib/state/quick_controls_edit.dart"
+        "app/lib/state/quick_controls_edit.dart",
+        "app/lib/state/bluetooth_devices_controller.dart"
       ],
       "reviewed": {
+        "app/lib/state/bluetooth_devices_controller.dart": "c5cde2bab5a0",
         "app/lib/state/quick_controls_controller.dart": "c6673ecd3ff6",
         "app/lib/state/quick_controls_edit.dart": "9f752b41b06a",
-        "app/lib/ui/quick/overlays.dart": "730d8913cb65",
-        "app/lib/ui/quick/quick_controls_panel.dart": "9941ae119a34",
+        "app/lib/ui/quick/bluetooth_devices.dart": "d6a0c30d0bbf",
+        "app/lib/ui/quick/overlays.dart": "816de9087e1e",
+        "app/lib/ui/quick/quick_controls_panel.dart": "9f80503acc1e",
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
         "app/rust/src/api/system.rs": "198436bcfac8",
         "core/src/system/error.rs": "a214856a4ee9",
@@ -473,7 +491,7 @@
         "core/src/system/power.rs": "51e071639273",
         "core/src/system/runner.rs": "10ffd75acefb"
       },
-      "itemsHash": "dee24fbea0d2",
+      "itemsHash": "90bb817ed63b",
       "reviews": [
         {
           "date": "2026-10-19",
