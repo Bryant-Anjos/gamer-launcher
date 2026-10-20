@@ -40,7 +40,7 @@
         "Abra também pelo terminal com o comando gamer-launcher.",
         "Confira se ocupa a tela inteira, sem barra de título nem bordas, e se abre em poucos segundos.",
         "Confira se a primeira tela aparece sem mensagem de erro.",
-        "Feche com o botão Guide do controle. Abra de novo e feche com Ctrl+Q. Confira se fecha por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
+        "Feche pelo botão \"Fechar o launcher\" do menu de energia. Abra de novo e feche com Ctrl+Q. Confira se fecha por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
         "Abra o launcher duas vezes seguidas. Anote o que acontece (duas janelas? a segunda fecha? dá erro?).",
         "Desinstale (sudo apt remove gamer-launcher). Confira se o atalho do menu some.",
         "Depois de compilar com make app-release (ou instalar o pacote), confira se todos os ícones aparecem certos, inclusive em Configurações > Botões do controle e nos painéis novos; nenhum deve virar caractere estranho."
@@ -69,7 +69,7 @@
         "packaging/linux/gamer-launcher.desktop": "88a91850f503",
         "packaging/linux/gamer-launcher.svg": "332eb1294f07"
       },
-      "itemsHash": "02aa70f5a8b2",
+      "itemsHash": "3f61ad6a520e",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -95,7 +95,7 @@
         "Aperte A para abrir o item em foco e B para voltar. Na tela inicial, o B não deve fechar o launcher.",
         "Aperte LB e RB. Confira se trocam de seção.",
         "Aperte Y (pesquisa) e Start (controle rápido).",
-        "Aperte o botão Guide (o botão central). Confira se o launcher fecha.",
+        "Aperte o botão Home (o botão central do controle). Confira se volta para o Início, fecha qualquer painel aberto e NÃO fecha o launcher.",
         "Segure uma direção e, com ela apertada, desconecte o controle (tire o cabo ou desligue). Confira se o foco para de correr sozinho.",
         "Reconecte o controle. Confira se volta a responder.",
         "Repita os testes com outro modelo de controle (Xbox, PlayStation, 8BitDo...). Anote em qual algo não funcionou ou veio com botões trocados.",
@@ -123,14 +123,14 @@
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/content_focus.dart": "ca6674ce766b",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
-        "app/lib/input/input_router.dart": "b621bde977ba",
+        "app/lib/input/input_router.dart": "59f92a792f01",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/ui/shell/side_nav.dart": "4193bdde664c",
-        "app/rust/src/api/input.rs": "a36818a990cc",
+        "app/rust/src/api/input.rs": "53275079aa30",
         "core/src/gamepad.rs": "552cda4a685a",
-        "core/src/input.rs": "defbb34c90f8"
+        "core/src/input.rs": "4f698b9e51ad"
       },
-      "itemsHash": "168d934c9291",
+      "itemsHash": "e78f4177513b",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -175,15 +175,11 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/input_router.dart": "b621bde977ba",
+        "app/lib/input/input_router.dart": "59f92a792f01",
         "app/lib/ui/shell/side_nav.dart": "4193bdde664c"
       },
       "itemsHash": "94efe33a2d72",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "O InputRouter só passou a usar o detector de digitação comum; as teclas da pesquisa estão na seção pesquisa."
-        },
         {
           "date": "2026-10-19",
           "reason": "side_nav.dart só trocou o ícone do Energia; a navegação não muda."
@@ -199,6 +195,10 @@
         {
           "date": "2026-10-19",
           "reason": "A navegação só passou a listar as seções desta máquina; testado na seção claude."
+        },
+        {
+          "date": "2026-10-20",
+          "reason": "O roteador só trocou a ação do botão Home do controle; teclado, Ctrl+Q e foco seguem iguais (coberto por teste automático)."
         }
       ]
     },
@@ -233,13 +233,13 @@
       ],
       "reviewed": {
         "app/lib/input/button_names.dart": "c128ebbd0919",
-        "app/lib/input/input_router.dart": "b621bde977ba",
+        "app/lib/input/input_router.dart": "59f92a792f01",
         "app/lib/main.dart": "0149ccf9c36f",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
         "app/lib/ui/settings/input_settings.dart": "e9e9a8f4b907",
         "app/lib/ui/widgets/button_hints.dart": "9b141eee9b88",
-        "app/rust/src/api/input.rs": "a36818a990cc",
+        "app/rust/src/api/input.rs": "53275079aa30",
         "app/rust/src/api/sound.rs": "63bf56a9b28a",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/sound.rs": "b3f4fbc249cf"
@@ -257,6 +257,10 @@
         {
           "date": "2026-10-19",
           "reason": "Entrou o botão X (ação secundária) nas dicas e na ponte; a dica X move está na seção apps."
+        },
+        {
+          "date": "2026-10-20",
+          "reason": "A ação Close virou Home; nenhum som nem o layout dos botões mudou (o Home não toca som, coberto por teste automático)."
         }
       ]
     },
@@ -396,7 +400,8 @@
         "Na barra superior, confira se a bateria aparece deitada, do mesmo tamanho dos ícones de Wi-Fi e volume, com a porcentagem ao lado.",
         "Saindo do menu para a direita na tela inicial, confira se o primeiro item focado é o cartão Continuar.",
         "Confira a nova disposição da tela inicial: à esquerda os quatro cartões e, embaixo, os favoritos em blocos grandes do mesmo tamanho dos cartões; à direita, um embaixo do outro, o controle rápido, Sistema e Recentes.",
-        "Repita no monitor ultrawide (2560×1080) e no de 1920×1080. Confira se os blocos de favoritos continuam do tamanho dos cartões e se nada fica cortado ou sobreposto."
+        "Repita no monitor ultrawide (2560×1080) e no de 1920×1080. Confira se os blocos de favoritos continuam do tamanho dos cartões e se nada fica cortado ou sobreposto.",
+        "Em outra seção, ou com um painel aberto (controle rápido, pesquisa), aperte o botão Home do controle. Confira se o painel fecha e se volta para o Início, com o foco no item Início da navegação."
       ],
       "covers": [
         "app/lib/launcher_app.dart",
@@ -412,7 +417,7 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "53562c01bebe",
+        "app/lib/launcher_app.dart": "e3afa4312b6a",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
         "app/lib/state/launcher_controller.dart": "6d294b457570",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
@@ -424,7 +429,7 @@
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
-      "itemsHash": "16a0a14d9a8f",
+      "itemsHash": "3f078c316c73",
       "reviews": [
         {
           "date": "2026-10-19",

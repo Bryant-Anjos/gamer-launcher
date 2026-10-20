@@ -48,12 +48,46 @@ void main() {
     expect(find.bySemanticsLabel('Controle conectado'), findsOneWidget);
   });
 
-  testWidgets('the gamepad close action closes the launcher', (tester) async {
+  testWidgets('the Home button never closes the launcher', (tester) async {
     final h = await pumpLauncher(tester);
 
-    await h.press(tester, GamepadAction.close);
+    await h.press(tester, GamepadAction.home);
 
-    expect(h.closes, 1);
+    expect(h.closes, 0);
+    expect(find.text('Boa noite, Bryant'), findsOneWidget);
+  });
+
+  testWidgets('the Home button brings you back to the start section', (
+    tester,
+  ) async {
+    final h = await pumpLauncher(tester);
+    await h.press(tester, GamepadAction.tabNext);
+    expect(find.text('Boa noite, Bryant'), findsNothing);
+
+    await h.press(tester, GamepadAction.home);
+
+    expect(find.text('Boa noite, Bryant'), findsOneWidget);
+    expect(h.closes, 0);
+  });
+
+  testWidgets('the Home button closes an open panel and goes home', (
+    tester,
+  ) async {
+    final h = await pumpLauncher(tester);
+    // fora do Início só existe o painel flutuante (o Início também embute um)
+    await h.pressAndSettle(tester, GamepadAction.tabNext);
+    await h.pressAndSettle(tester, GamepadAction.quickControls);
+    expect(find.byType(QuickControlsPanel), findsOneWidget);
+
+    await h.pressAndSettle(tester, GamepadAction.home);
+
+    expect(find.text('Boa noite, Bryant'), findsOneWidget);
+    expect(
+      find.byType(QuickControlsPanel),
+      findsOneWidget,
+      reason: 'só o painel embutido do Início; o flutuante fechou',
+    );
+    expect(find.byType(ModalBarrier).hitTestable(), findsNothing);
   });
 
   testWidgets('Ctrl+Q closes from the keyboard', (tester) async {

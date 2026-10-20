@@ -32,6 +32,7 @@ class InputRouter extends StatefulWidget {
     super.key,
     required this.actions,
     required this.onClose,
+    this.onHome,
     required this.child,
     this.onSearch,
     this.onQuickControls,
@@ -43,6 +44,9 @@ class InputRouter extends StatefulWidget {
 
   final Stream<GamepadAction> actions;
   final VoidCallback onClose;
+
+  /// Botão Home do controle (nunca fecha o app; fechar é Ctrl+Q ou o menu de energia).
+  final VoidCallback? onHome;
   final VoidCallback? onSearch;
   final VoidCallback? onQuickControls;
 
@@ -125,8 +129,8 @@ class _InputRouterState extends State<InputRouter> {
         widget.onTabChange?.call(-1);
       case GamepadAction.tabNext:
         widget.onTabChange?.call(1);
-      case GamepadAction.close:
-        widget.onClose();
+      case GamepadAction.home:
+        widget.onHome?.call();
     }
   }
 

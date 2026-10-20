@@ -196,6 +196,14 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.focus.nav[section.index].requestFocus();
   }
 
+  /// Botão Home do controle: fecha o painel aberto (se houver), vai para o
+  /// Início e leva o foco ao item dele na navegação. Não fecha o app.
+  void _goHome() {
+    _navigator?.popUntil((route) => route.isFirst);
+    _services.controller.selectSection(Section.home);
+    _afterFrame(() => _services.focus.nav[Section.home.index].requestFocus());
+  }
+
   /// LB/RB trocam de seção e levam o foco para o item dela na navegação.
   void _changeTab(int delta) {
     if (_overlayOpen) return;
@@ -272,6 +280,7 @@ class _LauncherAppState extends State<LauncherApp> {
             child: InputRouter(
               actions: widget.actions,
               onClose: widget.onClose,
+              onHome: _goHome,
               onSearch: _openSearch,
               onQuickControls: _toggleQuickControls,
               onTabChange: _changeTab,

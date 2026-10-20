@@ -27,6 +27,7 @@ class _Harness {
   final StreamController<GamepadAction> controller;
   final taps = <String>[];
   int closes = 0;
+  int homes = 0;
 
   Widget build() {
     final buttons = [
@@ -37,6 +38,7 @@ class _Harness {
       builder: (context, child) => InputRouter(
         actions: controller.stream,
         onClose: () => closes++,
+        onHome: () => homes++,
         onSearch: onSearch,
         onQuickControls: onQuickControls,
         onTabChange: onTabChange,
@@ -153,13 +155,33 @@ void main() {
     expect(find.text('A'), findsOneWidget);
   });
 
-  testWidgets('close action asks the app to close', (tester) async {
+  testWidgets('the home button goes home and never closes the app', (
+    tester,
+  ) async {
     final h = _Harness();
     await tester.pumpWidget(h.build());
 
-    await h.send(tester, GamepadAction.close);
+    await h.send(tester, GamepadAction.home);
 
-    expect(h.closes, 1);
+    expect(h.homes, 1);
+    expect(h.closes, 0);
+  });
+
+  testWidgets('a missing onHome is simply ignored', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => InputRouter(
+          actions: Stream.value(GamepadAction.home),
+          onClose: () => fail('o Home não pode fechar o app'),
+          child: child!,
+        ),
+        home: const Scaffold(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Ctrl+Q closes from the keyboard', (tester) async {
@@ -231,9 +253,9 @@ void main() {
     await tester.pumpWidget(const SizedBox());
 
     expect(h.controller.hasListener, isFalse);
-    h.controller.add(GamepadAction.close);
+    h.controller.add(GamepadAction.home);
     await tester.pump();
-    expect(h.closes, 0);
+    expect(h.homes, 0);
   });
 
   testWidgets('switches to a new stream when the widget is rebuilt', (
@@ -241,24 +263,25 @@ void main() {
   ) async {
     final first = StreamController<GamepadAction>.broadcast();
     final second = StreamController<GamepadAction>.broadcast();
-    var closes = 0;
+    var homes = 0;
     Widget build(Stream<GamepadAction> stream) => MaterialApp(
       home: InputRouter(
         actions: stream,
-        onClose: () => closes++,
+        onClose: () {},
+        onHome: () => homes++,
         child: const Scaffold(),
       ),
     );
 
     await tester.pumpWidget(build(first.stream));
     await tester.pumpWidget(build(second.stream));
-    first.add(GamepadAction.close);
+    first.add(GamepadAction.home);
     await tester.pump();
-    expect(closes, 0);
-    second.add(GamepadAction.close);
+    expect(homes, 0);
+    second.add(GamepadAction.home);
     await tester.pump();
 
-    expect(closes, 1);
+    expect(homes, 1);
     expect(first.hasListener, isFalse);
   });
 }

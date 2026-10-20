@@ -21,7 +21,7 @@ pub enum _GamepadAction {
     QuickControls,
     TabPrevious,
     TabNext,
-    Close,
+    Home,
 }
 
 /// A leitura fica viva enquanto o handle estiver aqui.

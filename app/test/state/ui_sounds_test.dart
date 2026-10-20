@@ -58,6 +58,6 @@ void main() {
     expect(soundFor(GamepadAction.confirm), LauncherSound.confirm);
     expect(soundFor(GamepadAction.back), LauncherSound.back);
     expect(soundFor(GamepadAction.search), isNull);
-    expect(soundFor(GamepadAction.close), isNull);
+    expect(soundFor(GamepadAction.home), isNull);
   });
 }

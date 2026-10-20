@@ -25,7 +25,7 @@ fn face_and_system_buttons_have_fixed_meanings() {
         (PadButton::Start, Some(Action::QuickControls)),
         (PadButton::LeftBumper, Some(Action::TabPrevious)),
         (PadButton::RightBumper, Some(Action::TabNext)),
-        (PadButton::Mode, Some(Action::Close)),
+        (PadButton::Mode, Some(Action::Home)),
         (PadButton::West, Some(Action::Secondary)),
         (PadButton::Select, None),
         (PadButton::Other, None),

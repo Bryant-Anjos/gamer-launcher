@@ -29,7 +29,9 @@ pub enum GamepadAction {
     QuickControls,
     TabPrevious,
     TabNext,
-    Close,
+    /// Botão Home/Guide: volta ao Início. Nunca fecha o app (fechar é Ctrl+Q
+    /// ou "Fechar o launcher" no menu de energia).
+    Home,
 }
 
 impl GamepadAction {
@@ -134,7 +136,7 @@ pub fn action_for_button(button: PadButton) -> Option<GamepadAction> {
         PadButton::Start => Some(A::QuickControls),
         PadButton::LeftBumper => Some(A::TabPrevious),
         PadButton::RightBumper => Some(A::TabNext),
-        PadButton::Mode => Some(A::Close),
+        PadButton::Mode => Some(A::Home),
         PadButton::DPadUp => Some(A::Up),
         PadButton::DPadDown => Some(A::Down),
         PadButton::DPadLeft => Some(A::Left),

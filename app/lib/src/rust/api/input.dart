@@ -45,5 +45,5 @@ enum GamepadAction {
   quickControls,
   tabPrevious,
   tabNext,
-  close,
+  home,
 }

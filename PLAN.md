@@ -60,7 +60,7 @@ gamer-launcher/
 
 - Gamepad via `gilrs` no Rust, enviado à UI como eventos.
 - Navegação por **foco direcional** (D-pad/analógico), com `Focus`/`FocusTraversalGroup` do Flutter.
-- Mapeamento (implementado): A confirma, B volta, Y pesquisa, Start abre o controle rápido, LB/RB trocam de aba, **Guide fecha o app** (Ctrl+Q no teclado). D-pad e analógico esquerdo movem o foco; segurar uma direção repete (400 ms de espera, depois a cada 120 ms).
+- Mapeamento (implementado): A confirma, B volta, Y pesquisa, Start abre o controle rápido, LB/RB trocam de aba, **Home/Guide volta ao Início** e nunca fecha o app (desde 2026-10-20; fechar é Ctrl+Q ou "Fechar o launcher" no menu de energia). D-pad e analógico esquerdo movem o foco; segurar uma direção repete (400 ms de espera, depois a cada 120 ms).
 - A lógica é pura (`core/src/input.rs`, tempo como parâmetro) e só a casca fina (`gamepad.rs`) lê o `gilrs`. No Flutter, o `InputRouter` traduz as ações em foco/ativação, como se fossem teclas.
 - (Fase 5) O `InputRouter` fica em `MaterialApp.builder`, **acima do `Navigator`**: o Ctrl+Q vale com diálogos abertos e a travessia parte sempre do foco primário (a camada de cima). Esquerda/direita primeiro tentam um `AdjustIntent` no item focado (volume, brilho, horários); se ninguém aceitar, movem o foco.
 
@@ -137,7 +137,7 @@ Dentro da faixa esperada do Flutter (150-250 MB). Meta definitiva: ver "Em abert
 `tools/virtual_pad.py` cria um controle virtual (imita um Xbox 360) via `/dev/uinput` e aperta botões em sequência:
 
 ```
-python3 tools/virtual_pad.py 1.5 DPAD_DOWN SOUTH EAST MODE   # MODE = Guide: o app fecha
+python3 tools/virtual_pad.py 1.5 DPAD_DOWN SOUTH EAST MODE   # MODE = Home/Guide: volta ao Início, o app NÃO fecha (nos testes, encerre pelo PID com kill)
 ```
 
 - Precisa de acesso de escrita a `/dev/uinput` (no Pop!_OS o usuário da sessão já tem por ACL). O `gilrs` só aceita dispositivos com **pelo menos 1 botão e 2 eixos**, e só aplica o mapeamento SDL (D-pad como botão, Guide reconhecido) se o dispositivo for um modelo conhecido; por isso o script imita um Xbox 360 de verdade.
@@ -266,3 +266,8 @@ Pedido do usuário: em máquinas com o Claude Code, acompanhar sessões, agentes
 **Tela:** só com o Claude instalado (`claude_installed` confere a pasta ou o programa no PATH; sem ele não há item na navegação, painel, opção em Configurações nem nenhuma leitura). Painel **Claude Code** na coluna da direita da tela inicial (ocultável, `panels.claude`, visível por padrão): sessões abertas e quantas trabalhando, a primeira sessão, agentes trabalhando e o uso de hoje, com "Ver detalhes". Seção **Claude** (entre Arquivos e Configurações, também no LB/RB): blocos focáveis "Agora" (cada sessão com estado, projeto, título, modelo, branch, há quanto tempo foi aberta e os subagentes), "Hoje", "Últimos 7 dias" (com barras de respostas por dia) e "Histórico" (do cache, com o período). Escolhi seção + painel em vez de abas: o controle desce bloco a bloco sem trocar de aba, e o painel dá o resumo sem sair da tela inicial. Leitura pelo `Poller` só com o painel ou a seção na tela e o launcher visível: sessões a cada 5 s, uso a cada 1 min; falha de leitura mantém o último valor, sem aviso.
 
 **Dúvidas para o usuário (não implementadas):** mostrar custo em dinheiro (o cache tem `costUSD`, mas num plano por assinatura isso não é o que se paga); limites de uso do plano (não existem localmente); mostrar o nome da sessão (é derivado das mensagens).
+
+## Decisão de 2026-10-20: o botão Home
+
+O Home/Guide do controle fechava o app (mapeamento da Fase 4) e foi lido pelo usuário como um travamento. Agora ele **volta ao Início**: fecha o painel aberto, seleciona a seção Início e leva o foco ao item dela. `GamepadAction::Close` virou `Home`. Fechar o launcher fica no Ctrl+Q e no botão "Fechar o launcher" do menu de energia; o controle rápido (Bluetooth, Wi-Fi...) continua no Start (o "+" do Pro Controller). **Isso substitui** a decisão antiga de que o Guide alternaria esconder/mostrar o launcher.
+
