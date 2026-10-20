@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/catalog.dart';
+import 'api/claude.dart';
 import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
@@ -58,10 +59,46 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_box_autoadd_bool(dynamic raw);
 
   @protected
+  ClaudeHistory dco_decode_box_autoadd_claude_history(dynamic raw);
+
+  @protected
+  double dco_decode_box_autoadd_f_64(dynamic raw);
+
+  @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+
+  @protected
   LauncherSettings dco_decode_box_autoadd_launcher_settings(dynamic raw);
 
   @protected
   int dco_decode_box_autoadd_u_8(dynamic raw);
+
+  @protected
+  ClaudeAgent dco_decode_claude_agent(dynamic raw);
+
+  @protected
+  ClaudeDayPoint dco_decode_claude_day_point(dynamic raw);
+
+  @protected
+  ClaudeHistory dco_decode_claude_history(dynamic raw);
+
+  @protected
+  ClaudeModelTokens dco_decode_claude_model_tokens(dynamic raw);
+
+  @protected
+  ClaudeNow dco_decode_claude_now(dynamic raw);
+
+  @protected
+  ClaudeSession dco_decode_claude_session(dynamic raw);
+
+  @protected
+  ClaudeSessionStatus dco_decode_claude_session_status(dynamic raw);
+
+  @protected
+  ClaudeStats dco_decode_claude_stats(dynamic raw);
+
+  @protected
+  ClaudeTotals dco_decode_claude_totals(dynamic raw);
 
   @protected
   double dco_decode_f_32(dynamic raw);
@@ -74,6 +111,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int dco_decode_i_32(dynamic raw);
+
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
   LauncherButtonLayout dco_decode_launcher_button_layout(dynamic raw);
@@ -97,6 +137,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AppInfo> dco_decode_list_app_info(dynamic raw);
 
   @protected
+  List<ClaudeAgent> dco_decode_list_claude_agent(dynamic raw);
+
+  @protected
+  List<ClaudeDayPoint> dco_decode_list_claude_day_point(dynamic raw);
+
+  @protected
+  List<ClaudeModelTokens> dco_decode_list_claude_model_tokens(dynamic raw);
+
+  @protected
+  List<ClaudeSession> dco_decode_list_claude_session(dynamic raw);
+
+  @protected
   List<PairedDevice> dco_decode_list_paired_device(dynamic raw);
 
   @protected
@@ -116,6 +168,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+
+  @protected
+  ClaudeHistory? dco_decode_opt_box_autoadd_claude_history(dynamic raw);
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
+
+  @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
   @protected
   int? dco_decode_opt_box_autoadd_u_8(dynamic raw);
@@ -194,12 +255,54 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
+  ClaudeHistory sse_decode_box_autoadd_claude_history(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
   LauncherSettings sse_decode_box_autoadd_launcher_settings(
     SseDeserializer deserializer,
   );
 
   @protected
   int sse_decode_box_autoadd_u_8(SseDeserializer deserializer);
+
+  @protected
+  ClaudeAgent sse_decode_claude_agent(SseDeserializer deserializer);
+
+  @protected
+  ClaudeDayPoint sse_decode_claude_day_point(SseDeserializer deserializer);
+
+  @protected
+  ClaudeHistory sse_decode_claude_history(SseDeserializer deserializer);
+
+  @protected
+  ClaudeModelTokens sse_decode_claude_model_tokens(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ClaudeNow sse_decode_claude_now(SseDeserializer deserializer);
+
+  @protected
+  ClaudeSession sse_decode_claude_session(SseDeserializer deserializer);
+
+  @protected
+  ClaudeSessionStatus sse_decode_claude_session_status(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ClaudeStats sse_decode_claude_stats(SseDeserializer deserializer);
+
+  @protected
+  ClaudeTotals sse_decode_claude_totals(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_32(SseDeserializer deserializer);
@@ -212,6 +315,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
   LauncherButtonLayout sse_decode_launcher_button_layout(
@@ -239,6 +345,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AppInfo> sse_decode_list_app_info(SseDeserializer deserializer);
 
   @protected
+  List<ClaudeAgent> sse_decode_list_claude_agent(SseDeserializer deserializer);
+
+  @protected
+  List<ClaudeDayPoint> sse_decode_list_claude_day_point(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ClaudeModelTokens> sse_decode_list_claude_model_tokens(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ClaudeSession> sse_decode_list_claude_session(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<PairedDevice> sse_decode_list_paired_device(
     SseDeserializer deserializer,
   );
@@ -264,6 +388,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
+  ClaudeHistory? sse_decode_opt_box_autoadd_claude_history(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
   int? sse_decode_opt_box_autoadd_u_8(SseDeserializer deserializer);
@@ -350,6 +485,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_claude_history(
+    ClaudeHistory self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_i_64(
+    PlatformInt64 self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_launcher_settings(
     LauncherSettings self,
     SseSerializer serializer,
@@ -357,6 +507,42 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_u_8(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_agent(ClaudeAgent self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_day_point(
+    ClaudeDayPoint self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_claude_history(ClaudeHistory self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_model_tokens(
+    ClaudeModelTokens self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_claude_now(ClaudeNow self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_session(ClaudeSession self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_session_status(
+    ClaudeSessionStatus self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_claude_stats(ClaudeStats self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_claude_totals(ClaudeTotals self, SseSerializer serializer);
 
   @protected
   void sse_encode_f_32(double self, SseSerializer serializer);
@@ -369,6 +555,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
   void sse_encode_launcher_button_layout(
@@ -399,6 +588,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_app_info(List<AppInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_claude_agent(
+    List<ClaudeAgent> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_claude_day_point(
+    List<ClaudeDayPoint> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_claude_model_tokens(
+    List<ClaudeModelTokens> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_claude_session(
+    List<ClaudeSession> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_paired_device(
@@ -435,6 +648,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_claude_history(
+    ClaudeHistory? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_i_64(
+    PlatformInt64? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_u_8(int? self, SseSerializer serializer);

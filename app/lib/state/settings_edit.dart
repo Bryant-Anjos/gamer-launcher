@@ -7,7 +7,8 @@ enum PanelKind {
   quickControls('Controle rápido'),
   favorites('Aplicativos favoritos'),
   recents('Recentes'),
-  system('Sistema');
+  system('Sistema'),
+  claude('Claude Code');
 
   const PanelKind(this.label);
 
@@ -22,6 +23,7 @@ enum PanelKind {
       PanelKind.favorites => panels.favorites,
       PanelKind.recents => panels.recents,
       PanelKind.system => panels.system,
+      PanelKind.claude => panels.claude,
     };
   }
 }
@@ -37,6 +39,7 @@ PanelVisibility _withPanel(
   recents: kind == PanelKind.recents ? visible : p.recents,
   favorites: kind == PanelKind.favorites ? visible : p.favorites,
   featuredCards: kind == PanelKind.featuredCards ? visible : p.featuredCards,
+  claude: kind == PanelKind.claude ? visible : p.claude,
 );
 
 /// Edição imutável das configurações: cada método devolve uma cópia.

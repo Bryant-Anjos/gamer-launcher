@@ -90,11 +90,12 @@ class LauncherController extends ValueNotifier<LauncherState> {
     value = value.copyWith(section: section);
   }
 
-  /// LB/RB: anda pelas seções dando a volta nas pontas.
-  void cycleSection(int delta) {
-    const sections = Section.values;
-    final next = (value.section.index + delta) % sections.length;
-    selectSection(sections[next]);
+  /// LB/RB: anda pelas seções dando a volta nas pontas; [among] são as que
+  /// existem nesta máquina (a do Claude só com ele instalado).
+  void cycleSection(int delta, {List<Section> among = Section.values}) {
+    final current = among.indexOf(value.section);
+    final next = (current + delta) % among.length;
+    selectSection(among[next]);
   }
 
   /// Fila das gravações: cada edição parte do resultado da anterior.

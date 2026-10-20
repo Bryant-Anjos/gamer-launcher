@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1104177058;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 819579721;
 
 // Section: executor
 
@@ -73,6 +73,104 @@ fn wire__crate__api__system__autostart_enabled_impl(
             move |context| {
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Ok::<_, ()>(crate::api::system::autostart_enabled())?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__claude__claude_installed_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "claude_installed",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Ok::<_, ()>(crate::api::claude::claude_installed())?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__crate__api__claude__claude_now_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "claude_now",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Ok::<_, ()>(crate::api::claude::claude_now())?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__claude__claude_stats_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "claude_stats",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_now_ms = <i64>::sse_decode(&mut deserializer);
+            let api_utc_offset_minutes = <i32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Ok::<_, ()>(crate::api::claude::claude_stats(
+                        api_now_ms,
+                        api_utc_offset_minutes,
+                    ))?;
                     std::result::Result::Ok(output_ok)
                 })())
             }
@@ -1266,6 +1364,158 @@ impl SseDecode for bool {
     }
 }
 
+impl SseDecode for crate::api::claude::ClaudeAgent {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_agentType = <String>::sse_decode(deserializer);
+        let mut var_description = <String>::sse_decode(deserializer);
+        let mut var_model = <Option<String>>::sse_decode(deserializer);
+        let mut var_running = <bool>::sse_decode(deserializer);
+        let mut var_lastActivityMs = <Option<i64>>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeAgent {
+            agent_type: var_agentType,
+            description: var_description,
+            model: var_model,
+            running: var_running,
+            last_activity_ms: var_lastActivityMs,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeDayPoint {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_date = <String>::sse_decode(deserializer);
+        let mut var_sessions = <u32>::sse_decode(deserializer);
+        let mut var_replies = <u32>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeDayPoint {
+            date: var_date,
+            sessions: var_sessions,
+            replies: var_replies,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeHistory {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_since = <Option<String>>::sse_decode(deserializer);
+        let mut var_until = <Option<String>>::sse_decode(deserializer);
+        let mut var_sessions = <Option<f64>>::sse_decode(deserializer);
+        let mut var_messages = <Option<f64>>::sse_decode(deserializer);
+        let mut var_models = <Vec<crate::api::claude::ClaudeModelTokens>>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeHistory {
+            since: var_since,
+            until: var_until,
+            sessions: var_sessions,
+            messages: var_messages,
+            models: var_models,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeModelTokens {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_model = <String>::sse_decode(deserializer);
+        let mut var_inputTokens = <f64>::sse_decode(deserializer);
+        let mut var_outputTokens = <f64>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeModelTokens {
+            model: var_model,
+            input_tokens: var_inputTokens,
+            output_tokens: var_outputTokens,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeNow {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_sessions = <Vec<crate::api::claude::ClaudeSession>>::sse_decode(deserializer);
+        let mut var_version = <Option<String>>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeNow {
+            sessions: var_sessions,
+            version: var_version,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeSession {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_sessionId = <String>::sse_decode(deserializer);
+        let mut var_project = <String>::sse_decode(deserializer);
+        let mut var_title = <Option<String>>::sse_decode(deserializer);
+        let mut var_status = <crate::api::claude::ClaudeSessionStatus>::sse_decode(deserializer);
+        let mut var_startedMs = <Option<i64>>::sse_decode(deserializer);
+        let mut var_updatedMs = <Option<i64>>::sse_decode(deserializer);
+        let mut var_model = <Option<String>>::sse_decode(deserializer);
+        let mut var_branch = <Option<String>>::sse_decode(deserializer);
+        let mut var_agents = <Vec<crate::api::claude::ClaudeAgent>>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeSession {
+            session_id: var_sessionId,
+            project: var_project,
+            title: var_title,
+            status: var_status,
+            started_ms: var_startedMs,
+            updated_ms: var_updatedMs,
+            model: var_model,
+            branch: var_branch,
+            agents: var_agents,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeSessionStatus {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::claude::ClaudeSessionStatus::Busy,
+            1 => crate::api::claude::ClaudeSessionStatus::Idle,
+            2 => crate::api::claude::ClaudeSessionStatus::Other,
+            _ => unreachable!("Invalid variant for ClaudeSessionStatus: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeStats {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_today = <crate::api::claude::ClaudeTotals>::sse_decode(deserializer);
+        let mut var_week = <crate::api::claude::ClaudeTotals>::sse_decode(deserializer);
+        let mut var_todayModels =
+            <Vec<crate::api::claude::ClaudeModelTokens>>::sse_decode(deserializer);
+        let mut var_days = <Vec<crate::api::claude::ClaudeDayPoint>>::sse_decode(deserializer);
+        let mut var_history = <Option<crate::api::claude::ClaudeHistory>>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeStats {
+            today: var_today,
+            week: var_week,
+            today_models: var_todayModels,
+            days: var_days,
+            history: var_history,
+        };
+    }
+}
+
+impl SseDecode for crate::api::claude::ClaudeTotals {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_replies = <f64>::sse_decode(deserializer);
+        let mut var_toolCalls = <f64>::sse_decode(deserializer);
+        let mut var_sessions = <f64>::sse_decode(deserializer);
+        let mut var_inputTokens = <f64>::sse_decode(deserializer);
+        let mut var_outputTokens = <f64>::sse_decode(deserializer);
+        return crate::api::claude::ClaudeTotals {
+            replies: var_replies,
+            tool_calls: var_toolCalls,
+            sessions: var_sessions,
+            input_tokens: var_inputTokens,
+            output_tokens: var_outputTokens,
+        };
+    }
+}
+
 impl SseDecode for f32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1306,6 +1556,13 @@ impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
+impl SseDecode for i64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_i64::<NativeEndian>().unwrap()
     }
 }
 
@@ -1413,6 +1670,60 @@ impl SseDecode for Vec<crate::api::catalog::AppInfo> {
     }
 }
 
+impl SseDecode for Vec<crate::api::claude::ClaudeAgent> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::claude::ClaudeAgent>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::claude::ClaudeDayPoint> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::claude::ClaudeDayPoint>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::claude::ClaudeModelTokens> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::claude::ClaudeModelTokens>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::claude::ClaudeSession> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::claude::ClaudeSession>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::system::PairedDevice> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1496,6 +1807,41 @@ impl SseDecode for Option<bool> {
     }
 }
 
+impl SseDecode for Option<crate::api::claude::ClaudeHistory> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::claude::ClaudeHistory>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<f64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<f64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<i64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<i64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1530,6 +1876,7 @@ impl SseDecode for crate::api::settings::PanelVisibility {
         let mut var_recents = <bool>::sse_decode(deserializer);
         let mut var_favorites = <bool>::sse_decode(deserializer);
         let mut var_featuredCards = <bool>::sse_decode(deserializer);
+        let mut var_claude = <bool>::sse_decode(deserializer);
         return crate::api::settings::PanelVisibility {
             search: var_search,
             quick_controls: var_quickControls,
@@ -1537,6 +1884,7 @@ impl SseDecode for crate::api::settings::PanelVisibility {
             recents: var_recents,
             favorites: var_favorites,
             featured_cards: var_featuredCards,
+            claude: var_claude,
         };
     }
 }
@@ -1702,51 +2050,53 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         1 => wire__crate__api__system__autostart_enabled_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__system__connect_bluetooth_device_impl(
+        3 => wire__crate__api__claude__claude_now_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__claude__claude_stats_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__system__connect_bluetooth_device_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        5 => wire__crate__api__system__disconnect_bluetooth_device_impl(
+        8 => wire__crate__api__system__disconnect_bluetooth_device_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        6 => wire__crate__api__input__gamepad_actions_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__api__input__gamepad_stop_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__meta__init_app_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__catalog__launch_app_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__system__list_paired_devices_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__files__list_recents_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__files__list_wallpapers_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__catalog__load_catalog_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__settings__load_settings_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__files__open_path_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__search__open_search_result_impl(port, ptr, rust_vec_len, data_len),
-        20 => {
+        9 => wire__crate__api__input__gamepad_actions_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__input__gamepad_stop_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__meta__init_app_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__catalog__launch_app_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__system__list_paired_devices_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__files__list_recents_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__files__list_wallpapers_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__catalog__load_catalog_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__settings__load_settings_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__files__open_path_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__api__search__open_search_result_impl(port, ptr, rust_vec_len, data_len),
+        23 => {
             wire__crate__api__system__perform_power_action_impl(port, ptr, rust_vec_len, data_len)
         }
-        22 => wire__crate__api__search__prepare_search_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__system__read_battery_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__system__read_quick_controls_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__system__sample_stats_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__settings__save_settings_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__api__search__search_all_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__api__system__set_autostart_impl(port, ptr, rust_vec_len, data_len),
-        30 => {
+        25 => wire__crate__api__search__prepare_search_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__system__read_battery_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__system__read_quick_controls_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__system__sample_stats_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__settings__save_settings_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__search__search_all_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__system__set_autostart_impl(port, ptr, rust_vec_len, data_len),
+        33 => {
             wire__crate__api__system__set_bluetooth_enabled_impl(port, ptr, rust_vec_len, data_len)
         }
-        31 => {
+        34 => {
             wire__crate__api__system__set_brightness_percent_impl(port, ptr, rust_vec_len, data_len)
         }
-        32 => {
+        35 => {
             wire__crate__api__system__set_system_dark_mode_impl(port, ptr, rust_vec_len, data_len)
         }
-        33 => wire__crate__api__system__set_volume_percent_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__system__set_wifi_enabled_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__meta__user_first_name_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__system__set_volume_percent_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__system__set_wifi_enabled_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__meta__user_first_name_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1759,13 +2109,14 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        3 => wire__crate__api__meta__core_version_impl(ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__settings__default_settings_impl(ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__input__gamepad_connected_impl(ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__input__gamepad_detected_layout_impl(ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__input__gamepad_set_layout_impl(ptr, rust_vec_len, data_len),
-        21 => wire__crate__api__sound__play_ui_sound_impl(ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__settings__resolve_theme_impl(ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__claude__claude_installed_impl(ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__meta__core_version_impl(ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__settings__default_settings_impl(ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__input__gamepad_connected_impl(ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__input__gamepad_detected_layout_impl(ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__input__gamepad_set_layout_impl(ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__sound__play_ui_sound_impl(ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__settings__resolve_theme_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1834,6 +2185,214 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::system::BatteryReading>
     for crate::api::system::BatteryReading
 {
     fn into_into_dart(self) -> crate::api::system::BatteryReading {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeAgent {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.agent_type.into_into_dart().into_dart(),
+            self.description.into_into_dart().into_dart(),
+            self.model.into_into_dart().into_dart(),
+            self.running.into_into_dart().into_dart(),
+            self.last_activity_ms.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeAgent
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeAgent>
+    for crate::api::claude::ClaudeAgent
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeAgent {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeDayPoint {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.date.into_into_dart().into_dart(),
+            self.sessions.into_into_dart().into_dart(),
+            self.replies.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeDayPoint
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeDayPoint>
+    for crate::api::claude::ClaudeDayPoint
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeDayPoint {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeHistory {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.since.into_into_dart().into_dart(),
+            self.until.into_into_dart().into_dart(),
+            self.sessions.into_into_dart().into_dart(),
+            self.messages.into_into_dart().into_dart(),
+            self.models.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeHistory
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeHistory>
+    for crate::api::claude::ClaudeHistory
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeHistory {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeModelTokens {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.model.into_into_dart().into_dart(),
+            self.input_tokens.into_into_dart().into_dart(),
+            self.output_tokens.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeModelTokens
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeModelTokens>
+    for crate::api::claude::ClaudeModelTokens
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeModelTokens {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeNow {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.sessions.into_into_dart().into_dart(),
+            self.version.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::claude::ClaudeNow {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeNow>
+    for crate::api::claude::ClaudeNow
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeNow {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeSession {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.session_id.into_into_dart().into_dart(),
+            self.project.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.status.into_into_dart().into_dart(),
+            self.started_ms.into_into_dart().into_dart(),
+            self.updated_ms.into_into_dart().into_dart(),
+            self.model.into_into_dart().into_dart(),
+            self.branch.into_into_dart().into_dart(),
+            self.agents.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeSession
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeSession>
+    for crate::api::claude::ClaudeSession
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeSession {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeSessionStatus {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Busy => 0.into_dart(),
+            Self::Idle => 1.into_dart(),
+            Self::Other => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeSessionStatus
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeSessionStatus>
+    for crate::api::claude::ClaudeSessionStatus
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeSessionStatus {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeStats {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.today.into_into_dart().into_dart(),
+            self.week.into_into_dart().into_dart(),
+            self.today_models.into_into_dart().into_dart(),
+            self.days.into_into_dart().into_dart(),
+            self.history.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeStats
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeStats>
+    for crate::api::claude::ClaudeStats
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeStats {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::claude::ClaudeTotals {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.replies.into_into_dart().into_dart(),
+            self.tool_calls.into_into_dart().into_dart(),
+            self.sessions.into_into_dart().into_dart(),
+            self.input_tokens.into_into_dart().into_dart(),
+            self.output_tokens.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::claude::ClaudeTotals
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::claude::ClaudeTotals>
+    for crate::api::claude::ClaudeTotals
+{
+    fn into_into_dart(self) -> crate::api::claude::ClaudeTotals {
         self
     }
 }
@@ -2016,6 +2575,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::settings::PanelVisibility {
             self.recents.into_into_dart().into_dart(),
             self.favorites.into_into_dart().into_dart(),
             self.featured_cards.into_into_dart().into_dart(),
+            self.claude.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2272,6 +2832,108 @@ impl SseEncode for bool {
     }
 }
 
+impl SseEncode for crate::api::claude::ClaudeAgent {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.agent_type, serializer);
+        <String>::sse_encode(self.description, serializer);
+        <Option<String>>::sse_encode(self.model, serializer);
+        <bool>::sse_encode(self.running, serializer);
+        <Option<i64>>::sse_encode(self.last_activity_ms, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeDayPoint {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.date, serializer);
+        <u32>::sse_encode(self.sessions, serializer);
+        <u32>::sse_encode(self.replies, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeHistory {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.since, serializer);
+        <Option<String>>::sse_encode(self.until, serializer);
+        <Option<f64>>::sse_encode(self.sessions, serializer);
+        <Option<f64>>::sse_encode(self.messages, serializer);
+        <Vec<crate::api::claude::ClaudeModelTokens>>::sse_encode(self.models, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeModelTokens {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.model, serializer);
+        <f64>::sse_encode(self.input_tokens, serializer);
+        <f64>::sse_encode(self.output_tokens, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeNow {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::api::claude::ClaudeSession>>::sse_encode(self.sessions, serializer);
+        <Option<String>>::sse_encode(self.version, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeSession {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.session_id, serializer);
+        <String>::sse_encode(self.project, serializer);
+        <Option<String>>::sse_encode(self.title, serializer);
+        <crate::api::claude::ClaudeSessionStatus>::sse_encode(self.status, serializer);
+        <Option<i64>>::sse_encode(self.started_ms, serializer);
+        <Option<i64>>::sse_encode(self.updated_ms, serializer);
+        <Option<String>>::sse_encode(self.model, serializer);
+        <Option<String>>::sse_encode(self.branch, serializer);
+        <Vec<crate::api::claude::ClaudeAgent>>::sse_encode(self.agents, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeSessionStatus {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::claude::ClaudeSessionStatus::Busy => 0,
+                crate::api::claude::ClaudeSessionStatus::Idle => 1,
+                crate::api::claude::ClaudeSessionStatus::Other => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeStats {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::claude::ClaudeTotals>::sse_encode(self.today, serializer);
+        <crate::api::claude::ClaudeTotals>::sse_encode(self.week, serializer);
+        <Vec<crate::api::claude::ClaudeModelTokens>>::sse_encode(self.today_models, serializer);
+        <Vec<crate::api::claude::ClaudeDayPoint>>::sse_encode(self.days, serializer);
+        <Option<crate::api::claude::ClaudeHistory>>::sse_encode(self.history, serializer);
+    }
+}
+
+impl SseEncode for crate::api::claude::ClaudeTotals {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <f64>::sse_encode(self.replies, serializer);
+        <f64>::sse_encode(self.tool_calls, serializer);
+        <f64>::sse_encode(self.sessions, serializer);
+        <f64>::sse_encode(self.input_tokens, serializer);
+        <f64>::sse_encode(self.output_tokens, serializer);
+    }
+}
+
 impl SseEncode for f32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2316,6 +2978,13 @@ impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
+impl SseEncode for i64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_i64::<NativeEndian>(self).unwrap();
     }
 }
 
@@ -2414,6 +3083,46 @@ impl SseEncode for Vec<crate::api::catalog::AppInfo> {
     }
 }
 
+impl SseEncode for Vec<crate::api::claude::ClaudeAgent> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::claude::ClaudeAgent>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::claude::ClaudeDayPoint> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::claude::ClaudeDayPoint>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::claude::ClaudeModelTokens> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::claude::ClaudeModelTokens>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::claude::ClaudeSession> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::claude::ClaudeSession>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::system::PairedDevice> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2484,6 +3193,36 @@ impl SseEncode for Option<bool> {
     }
 }
 
+impl SseEncode for Option<crate::api::claude::ClaudeHistory> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::claude::ClaudeHistory>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<f64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <f64>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<i64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <i64>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2512,6 +3251,7 @@ impl SseEncode for crate::api::settings::PanelVisibility {
         <bool>::sse_encode(self.recents, serializer);
         <bool>::sse_encode(self.favorites, serializer);
         <bool>::sse_encode(self.featured_cards, serializer);
+        <bool>::sse_encode(self.claude, serializer);
     }
 }
 

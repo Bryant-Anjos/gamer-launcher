@@ -18,6 +18,7 @@ PanelVisibility _onlyNavigation() => const PanelVisibility(
   recents: false,
   favorites: false,
   featuredCards: false,
+  claude: false,
 );
 
 void main() {

@@ -5,6 +5,7 @@ import 'package:gamer_launcher/state/gamepad_status.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/state/autostart_controller.dart';
 import 'package:gamer_launcher/state/bluetooth_devices_controller.dart';
+import 'package:gamer_launcher/state/claude_controller.dart';
 import 'package:gamer_launcher/state/messages.dart';
 import 'package:gamer_launcher/state/power_controller.dart';
 import 'package:gamer_launcher/state/quick_controls_controller.dart';
@@ -59,6 +60,7 @@ class LauncherServices {
     required this.bluetoothDevices,
     required this.openSearch,
     required this.enterContent,
+    this.claude,
   });
 
   final LauncherBackend backend;
@@ -83,6 +85,15 @@ class LauncherServices {
 
   /// Leva o foco ao primeiro item da página da seção atual.
   final VoidCallback enterContent;
+
+  /// Acompanhamento do Claude Code; vazio quando ele não está instalado
+  /// (aí nada dele aparece nem é lido).
+  final ClaudeController? claude;
+
+  List<Section> get sections => [
+    for (final section in Section.values)
+      if (section != Section.claude || claude != null) section,
+  ];
 }
 
 class LauncherScope extends InheritedWidget {

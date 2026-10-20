@@ -1,5 +1,6 @@
 import 'package:gamer_launcher/backend/launcher_backend.dart';
 import 'package:gamer_launcher/src/rust/api/catalog.dart' as catalog;
+import 'package:gamer_launcher/src/rust/api/claude.dart' as claude;
 import 'package:gamer_launcher/src/rust/api/files.dart' as files;
 import 'package:gamer_launcher/src/rust/api/input.dart' as input;
 import 'package:gamer_launcher/src/rust/api/meta.dart' as meta;
@@ -135,6 +136,21 @@ class RustBackend implements LauncherBackend {
   @override
   Future<void> openSettingsPage(String page) =>
       _guard(() => finder.openSearchResult(id: 'setting:$page'));
+
+  @override
+  bool claudeInstalled() => _translate(claude.claudeInstalled);
+
+  @override
+  Future<claude.ClaudeNow> readClaudeNow() => _guard(claude.claudeNow);
+
+  @override
+  Future<claude.ClaudeStats> readClaudeStats(int nowMs, int utcOffsetMinutes) =>
+      _guard(
+        () => claude.claudeStats(
+          nowMs: nowMs,
+          utcOffsetMinutes: utcOffsetMinutes,
+        ),
+      );
 
   @override
   Future<system.StatsSample> sampleStats() => _guard(system.sampleStats);

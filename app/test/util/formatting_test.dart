@@ -72,4 +72,30 @@ void main() {
       expect(formatMinuteOfDay(19 * 60 + 30), '19:30');
     });
   });
+
+  group('compact counts', () {
+    test('small numbers stay whole', () {
+      expect(formatCompact(0), '0');
+      expect(formatCompact(999), '999');
+    });
+
+    test('thousands, millions and billions are shortened', () {
+      expect(formatCompact(1500), '1,5 mil');
+      expect(formatCompact(34000), '34 mil');
+      expect(formatCompact(1200000), '1,2 mi');
+      expect(formatCompact(2500000000), '2,5 bi');
+    });
+  });
+
+  group('time since', () {
+    final now = DateTime.utc(2026, 10, 19, 12);
+    int ago(Duration d) => now.subtract(d).millisecondsSinceEpoch;
+
+    test('reads epoch milliseconds like the recents do', () {
+      expect(formatSince(ago(const Duration(seconds: 20)), now), 'agora');
+      expect(formatSince(ago(const Duration(minutes: 12)), now), 'há 12 min');
+      expect(formatSince(ago(const Duration(hours: 3)), now), 'há 3h');
+      expect(formatSince(null, now), '');
+    });
+  });
 }

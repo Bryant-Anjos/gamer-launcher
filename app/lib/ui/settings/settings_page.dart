@@ -55,19 +55,20 @@ class SettingsPage extends StatelessWidget {
               SliverList.list(
                 children: [
                   for (final kind in PanelKind.values)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: Dimens.smallGap),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: SwitchRow(
-                          label: kind.label,
-                          value: kind.isVisibleIn(settings),
-                          onChanged: (visible) => edit(
-                            (current) => current.withPanel(kind, visible),
+                    if (kind != PanelKind.claude || services.claude != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: Dimens.smallGap),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: SwitchRow(
+                            label: kind.label,
+                            value: kind.isVisibleIn(settings),
+                            onChanged: (visible) => edit(
+                              (current) => current.withPanel(kind, visible),
+                            ),
                           ),
                         ),
                       ),
-                    ),
                 ],
               ),
               box(const SizedBox(height: Dimens.gutter)),

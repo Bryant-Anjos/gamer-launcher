@@ -25,6 +25,9 @@ use launcher_core::time_of_day::TimeOfDay;
 use std::io;
 use std::path::{Path, PathBuf};
 
+pub mod claude;
+#[cfg(test)]
+mod claude_tests;
 #[cfg(test)]
 mod tests;
 
@@ -95,6 +98,7 @@ pub fn settings_to_dto(settings: &Settings) -> LauncherSettings {
             recents: visible(Panel::Recents),
             favorites: visible(Panel::Favorites),
             featured_cards: visible(Panel::FeaturedCards),
+            claude: visible(Panel::Claude),
         },
         button_layout: button_layout_to_dto(settings.button_layout),
         sounds: settings.sounds,
@@ -102,7 +106,7 @@ pub fn settings_to_dto(settings: &Settings) -> LauncherSettings {
     }
 }
 
-fn panel_flags(panels: &PanelVisibility) -> [(Panel, bool); 6] {
+fn panel_flags(panels: &PanelVisibility) -> [(Panel, bool); 7] {
     [
         (Panel::Search, panels.search),
         (Panel::QuickControls, panels.quick_controls),
@@ -110,6 +114,7 @@ fn panel_flags(panels: &PanelVisibility) -> [(Panel, bool); 6] {
         (Panel::Recents, panels.recents),
         (Panel::Favorites, panels.favorites),
         (Panel::FeaturedCards, panels.featured_cards),
+        (Panel::Claude, panels.claude),
     ]
 }
 

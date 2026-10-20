@@ -12,10 +12,8 @@ Finder get _field => find.descendant(
   matching: find.byType(EditableText),
 );
 
-Finder _tileIn(String name) => find.descendant(
-  of: find.byType(AppGrid),
-  matching: find.text(name),
-);
+Finder _tileIn(String name) =>
+    find.descendant(of: find.byType(AppGrid), matching: find.text(name));
 
 Future<LauncherHarness> _openApps(WidgetTester tester) async {
   final h = await pumpLauncher(tester);
@@ -40,9 +38,7 @@ void main() {
     expect(_tileIn('Chrome'), findsOneWidget);
   });
 
-  testWidgets('typing with an app focused goes to the filter', (
-    tester,
-  ) async {
+  testWidgets('typing with an app focused goes to the filter', (tester) async {
     final h = await _openApps(tester);
     await h.pressAndSettle(tester, GamepadAction.confirm);
     expect(hasFocus(tester, _tileIn('Chrome')), isTrue);

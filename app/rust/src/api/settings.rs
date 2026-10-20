@@ -37,6 +37,7 @@ pub struct PanelVisibility {
     pub recents: bool,
     pub favorites: bool,
     pub featured_cards: bool,
+    pub claude: bool,
 }
 
 /// Configurações como a UI as vê. Horários em minutos desde a meia-noite.

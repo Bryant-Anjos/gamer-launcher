@@ -1,4 +1,5 @@
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
+import 'package:gamer_launcher/src/rust/api/claude.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
 import 'package:gamer_launcher/src/rust/api/search.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
@@ -65,6 +66,16 @@ abstract interface class LauncherBackend {
   Future<void> openSettingsPage(String page);
 
   Future<StatsSample> sampleStats();
+
+  /// Há Claude Code nesta máquina? Sem ele nada do Claude é lido nem
+  /// mostrado.
+  bool claudeInstalled();
+
+  /// Sessões do Claude Code abertas agora (só metadados).
+  Future<ClaudeNow> readClaudeNow();
+
+  /// Uso de hoje e da semana; [utcOffsetMinutes] define o "hoje" local.
+  Future<ClaudeStats> readClaudeStats(int nowMs, int utcOffsetMinutes);
   Future<String?> userFirstName();
   bool gamepadConnected();
 

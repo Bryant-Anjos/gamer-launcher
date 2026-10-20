@@ -1,4 +1,5 @@
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
+import 'package:gamer_launcher/src/rust/api/claude.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
@@ -12,6 +13,7 @@ const allPanelsVisible = PanelVisibility(
   recents: true,
   favorites: true,
   featuredCards: true,
+  claude: true,
 );
 
 LauncherSettings sampleSettings({
@@ -123,4 +125,91 @@ const offlineQuickControls = QuickControls(
   darkMode: ToggleReading(error: 'o COSMIC ainda não gravou o tema'),
   volume: LevelReading(muted: false, error: 'wpctl falhou'),
   brightness: LevelReading(muted: false, error: 'sem controle de brilho'),
+);
+
+const _noTotals = ClaudeTotals(
+  replies: 0,
+  toolCalls: 0,
+  sessions: 0,
+  inputTokens: 0,
+  outputTokens: 0,
+);
+
+const emptyClaudeStats = ClaudeStats(
+  today: _noTotals,
+  week: _noTotals,
+  todayModels: [],
+  days: [],
+);
+
+const sampleClaudeNow = ClaudeNow(
+  version: '2.1.304',
+  sessions: [
+    ClaudeSession(
+      sessionId: 's1',
+      project: 'gamer-launcher',
+      title: 'Painel do Claude',
+      status: ClaudeSessionStatus.busy,
+      model: 'claude-opus-5',
+      branch: 'main',
+      agents: [
+        ClaudeAgent(
+          agentType: 'Explore',
+          description: 'Achar o leitor de sessões',
+          running: true,
+        ),
+        ClaudeAgent(
+          agentType: 'general-purpose',
+          description: 'Revisar o código',
+          running: false,
+        ),
+      ],
+    ),
+    ClaudeSession(
+      sessionId: 's2',
+      project: 'homeflix',
+      status: ClaudeSessionStatus.idle,
+      agents: [],
+    ),
+  ],
+);
+
+const sampleClaudeStats = ClaudeStats(
+  today: ClaudeTotals(
+    replies: 298,
+    toolCalls: 311,
+    sessions: 2,
+    inputTokens: 1200000,
+    outputTokens: 34000,
+  ),
+  week: ClaudeTotals(
+    replies: 601,
+    toolCalls: 700,
+    sessions: 5,
+    inputTokens: 5600000,
+    outputTokens: 90000,
+  ),
+  todayModels: [
+    ClaudeModelTokens(
+      model: 'claude-opus-5',
+      inputTokens: 1200000,
+      outputTokens: 34000,
+    ),
+  ],
+  days: [
+    ClaudeDayPoint(date: '2026-10-13', sessions: 1, replies: 10),
+    ClaudeDayPoint(date: '2026-10-14', sessions: 0, replies: 0),
+    ClaudeDayPoint(date: '2026-10-15', sessions: 2, replies: 80),
+    ClaudeDayPoint(date: '2026-10-16', sessions: 1, replies: 40),
+    ClaudeDayPoint(date: '2026-10-17', sessions: 3, replies: 120),
+    ClaudeDayPoint(date: '2026-10-18', sessions: 1, replies: 53),
+    ClaudeDayPoint(date: '2026-10-19', sessions: 2, replies: 298),
+  ],
+  history: ClaudeHistory(
+    since: '2026-06-01',
+    until: '2026-10-13',
+    sessions: 40,
+    messages: 900,
+    models: [],
+  ),
 );

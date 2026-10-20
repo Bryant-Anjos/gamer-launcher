@@ -1,4 +1,5 @@
 pub mod catalog;
+pub mod claude;
 pub mod files;
 pub mod input;
 pub mod meta;

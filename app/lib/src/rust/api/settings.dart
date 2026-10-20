@@ -98,6 +98,7 @@ class PanelVisibility {
   final bool recents;
   final bool favorites;
   final bool featuredCards;
+  final bool claude;
 
   const PanelVisibility({
     required this.search,
@@ -106,6 +107,7 @@ class PanelVisibility {
     required this.recents,
     required this.favorites,
     required this.featuredCards,
+    required this.claude,
   });
 
   @override
@@ -115,7 +117,8 @@ class PanelVisibility {
       system.hashCode ^
       recents.hashCode ^
       favorites.hashCode ^
-      featuredCards.hashCode;
+      featuredCards.hashCode ^
+      claude.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -127,7 +130,8 @@ class PanelVisibility {
           system == other.system &&
           recents == other.recents &&
           favorites == other.favorites &&
-          featuredCards == other.featuredCards;
+          featuredCards == other.featuredCards &&
+          claude == other.claude;
 }
 
 /// Tema efetivo depois de aplicar o horário.

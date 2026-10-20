@@ -79,3 +79,30 @@ String formatGigabytes(double bytes) {
 /// Ex.: "4.2 / 16 GB".
 String formatUsage(double usedBytes, double totalBytes) =>
     '${formatGigabytes(usedBytes)} / ${formatGigabytes(totalBytes)} GB';
+
+const _thousand = 1000;
+const _million = 1000000;
+const _billion = 1000000000;
+
+String _oneDecimal(double value) {
+  final text = value < 10 ? value.toStringAsFixed(1) : value.round().toString();
+  return text.endsWith('.0')
+      ? text.substring(0, text.length - 2)
+      : text.replaceAll('.', ',');
+}
+
+/// Contagens grandes curtas, em português: "1,5 mil", "1,2 mi", "2,5 bi".
+String formatCompact(num value) {
+  final number = value.toDouble();
+  if (number < _thousand) return number.round().toString();
+  if (number < _million) return '${_oneDecimal(number / _thousand)} mil';
+  if (number < _billion) return '${_oneDecimal(number / _million)} mi';
+  return '${_oneDecimal(number / _billion)} bi';
+}
+
+/// Como [formatRelative], a partir de milissegundos desde 1970.
+String formatSince(int? epochMs, DateTime now) {
+  if (epochMs == null) return '';
+  final date = DateTime.fromMillisecondsSinceEpoch(epochMs, isUtc: true);
+  return formatRelative(date.toIso8601String(), now);
+}

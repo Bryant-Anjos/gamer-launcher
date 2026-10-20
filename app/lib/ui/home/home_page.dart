@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/state/settings_edit.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
+import 'package:gamer_launcher/ui/claude/claude_panel.dart';
 import 'package:gamer_launcher/ui/home/favorites_panel.dart';
+import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/home/featured_cards.dart';
 import 'package:gamer_launcher/ui/home/greeting_header.dart';
 import 'package:gamer_launcher/ui/home/recents_panel.dart';
@@ -22,7 +24,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final body = _body();
+    final hasClaude = LauncherScope.of(context).claude != null;
+    final body = _body(hasClaude: hasClaude);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         Dimens.focusInset,
@@ -49,7 +52,7 @@ class HomePage extends StatelessWidget {
     ],
   );
 
-  Widget? _body() {
+  Widget? _body({required bool hasClaude}) {
     final left = _stack([
       if (_shows(PanelKind.featuredCards)) FeaturedCards(state: state),
       if (_shows(PanelKind.favorites))
@@ -58,6 +61,7 @@ class HomePage extends StatelessWidget {
     final right = _stack([
       if (_shows(PanelKind.quickControls)) const QuickControlsPanel(),
       if (_shows(PanelKind.system)) const SystemPanel(),
+      if (hasClaude && _shows(PanelKind.claude)) const ClaudePanel(),
       if (_shows(PanelKind.recents)) RecentsPanel(recents: state.recents),
     ]);
     if (left == null && right == null) return null;

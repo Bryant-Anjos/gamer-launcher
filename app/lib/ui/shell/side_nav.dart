@@ -10,6 +10,7 @@ IconData sectionIcon(Section section) => switch (section) {
   Section.apps => Icons.grid_view_rounded,
   Section.games => Icons.sports_esports_rounded,
   Section.files => Icons.folder_rounded,
+  Section.claude => Icons.terminal_rounded,
   Section.settings => Icons.settings_rounded,
 };
 
@@ -24,6 +25,7 @@ class SideNav extends StatelessWidget {
     required this.focusNodes,
     required this.onPower,
     required this.onEnterContent,
+    this.sections = Section.values,
   });
 
   final Section selected;
@@ -31,6 +33,9 @@ class SideNav extends StatelessWidget {
   final List<FocusNode> focusNodes;
   final VoidCallback onPower;
   final VoidCallback onEnterContent;
+
+  /// As seções desta máquina (a do Claude só com ele instalado).
+  final List<Section> sections;
 
   /// A direita sai do menu para o primeiro item da página (e não para o
   /// item mais perto na mesma altura, que na tela inicial é a pesquisa).
@@ -69,7 +74,7 @@ class SideNav extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final section in Section.values)
+            for (final section in sections)
               Padding(
                 padding: const EdgeInsets.only(bottom: Dimens.smallGap),
                 child: _NavItem(

@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/catalog.dart';
+import 'api/claude.dart';
 import 'api/files.dart';
 import 'api/input.dart';
 import 'api/meta.dart';
@@ -76,7 +77,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 1104177058;
+  int get rustContentHash => 819579721;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -89,6 +90,15 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
 abstract class RustLibApi extends BaseApi {
   Future<bool> crateApiSystemAutostartEnabled();
+
+  bool crateApiClaudeClaudeInstalled();
+
+  Future<ClaudeNow> crateApiClaudeClaudeNow();
+
+  Future<ClaudeStats> crateApiClaudeClaudeStats({
+    required PlatformInt64 nowMs,
+    required int utcOffsetMinutes,
+  });
 
   Future<void> crateApiSystemConnectBluetoothDevice({required String address});
 
@@ -207,6 +217,89 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "autostart_enabled", argNames: []);
 
   @override
+  bool crateApiClaudeClaudeInstalled() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiClaudeClaudeInstalledConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClaudeClaudeInstalledConstMeta =>
+      const TaskConstMeta(debugName: "claude_installed", argNames: []);
+
+  @override
+  Future<ClaudeNow> crateApiClaudeClaudeNow() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_claude_now,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiClaudeClaudeNowConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClaudeClaudeNowConstMeta =>
+      const TaskConstMeta(debugName: "claude_now", argNames: []);
+
+  @override
+  Future<ClaudeStats> crateApiClaudeClaudeStats({
+    required PlatformInt64 nowMs,
+    required int utcOffsetMinutes,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(nowMs, serializer);
+          sse_encode_i_32(utcOffsetMinutes, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_claude_stats,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiClaudeClaudeStatsConstMeta,
+        argValues: [nowMs, utcOffsetMinutes],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClaudeClaudeStatsConstMeta => const TaskConstMeta(
+    debugName: "claude_stats",
+    argNames: ["nowMs", "utcOffsetMinutes"],
+  );
+
+  @override
   Future<void> crateApiSystemConnectBluetoothDevice({required String address}) {
     return handler.executeNormal(
       NormalTask(
@@ -216,7 +309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 5,
             port: port_,
           );
         },
@@ -243,7 +336,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -265,7 +358,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_launcher_settings,
@@ -293,7 +386,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 8,
             port: port_,
           );
         },
@@ -329,7 +422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 6,
+              funcId: 9,
               port: port_,
             );
           },
@@ -358,7 +451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -380,7 +473,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_launcher_button_layout,
@@ -403,7 +496,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_launcher_button_layout(layout, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -431,7 +524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 13,
             port: port_,
           );
         },
@@ -458,7 +551,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 14,
             port: port_,
           );
         },
@@ -486,7 +579,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 15,
             port: port_,
           );
         },
@@ -513,7 +606,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 16,
             port: port_,
           );
         },
@@ -541,7 +634,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 17,
             port: port_,
           );
         },
@@ -569,7 +662,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 18,
             port: port_,
           );
         },
@@ -596,7 +689,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 19,
             port: port_,
           );
         },
@@ -623,7 +716,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 20,
             port: port_,
           );
         },
@@ -651,7 +744,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 21,
             port: port_,
           );
         },
@@ -679,7 +772,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 22,
             port: port_,
           );
         },
@@ -707,7 +800,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 23,
             port: port_,
           );
         },
@@ -735,7 +828,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_launcher_sound(sound, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -760,7 +853,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 22,
+            funcId: 25,
             port: port_,
           );
         },
@@ -787,7 +880,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 23,
+            funcId: 26,
             port: port_,
           );
         },
@@ -814,7 +907,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 27,
             port: port_,
           );
         },
@@ -843,7 +936,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_launcher_settings(settings, serializer);
           sse_encode_u_16(minuteOfDay, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_resolved_theme,
@@ -871,7 +964,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 29,
             port: port_,
           );
         },
@@ -901,7 +994,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 27,
+            funcId: 30,
             port: port_,
           );
         },
@@ -933,7 +1026,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 28,
+            funcId: 31,
             port: port_,
           );
         },
@@ -963,7 +1056,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 29,
+            funcId: 32,
             port: port_,
           );
         },
@@ -991,7 +1084,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 30,
+            funcId: 33,
             port: port_,
           );
         },
@@ -1022,7 +1115,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 31,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1053,7 +1146,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 32,
+            funcId: 35,
             port: port_,
           );
         },
@@ -1084,7 +1177,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 33,
+            funcId: 36,
             port: port_,
           );
         },
@@ -1115,7 +1208,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 34,
+            funcId: 37,
             port: port_,
           );
         },
@@ -1142,7 +1235,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 35,
+            funcId: 38,
             port: port_,
           );
         },
@@ -1240,6 +1333,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClaudeHistory dco_decode_box_autoadd_claude_history(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_claude_history(raw);
+  }
+
+  @protected
+  double dco_decode_box_autoadd_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_i_64(raw);
+  }
+
+  @protected
   LauncherSettings dco_decode_box_autoadd_launcher_settings(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_launcher_settings(raw);
@@ -1249,6 +1360,129 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_box_autoadd_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  ClaudeAgent dco_decode_claude_agent(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ClaudeAgent(
+      agentType: dco_decode_String(arr[0]),
+      description: dco_decode_String(arr[1]),
+      model: dco_decode_opt_String(arr[2]),
+      running: dco_decode_bool(arr[3]),
+      lastActivityMs: dco_decode_opt_box_autoadd_i_64(arr[4]),
+    );
+  }
+
+  @protected
+  ClaudeDayPoint dco_decode_claude_day_point(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ClaudeDayPoint(
+      date: dco_decode_String(arr[0]),
+      sessions: dco_decode_u_32(arr[1]),
+      replies: dco_decode_u_32(arr[2]),
+    );
+  }
+
+  @protected
+  ClaudeHistory dco_decode_claude_history(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ClaudeHistory(
+      since: dco_decode_opt_String(arr[0]),
+      until: dco_decode_opt_String(arr[1]),
+      sessions: dco_decode_opt_box_autoadd_f_64(arr[2]),
+      messages: dco_decode_opt_box_autoadd_f_64(arr[3]),
+      models: dco_decode_list_claude_model_tokens(arr[4]),
+    );
+  }
+
+  @protected
+  ClaudeModelTokens dco_decode_claude_model_tokens(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ClaudeModelTokens(
+      model: dco_decode_String(arr[0]),
+      inputTokens: dco_decode_f_64(arr[1]),
+      outputTokens: dco_decode_f_64(arr[2]),
+    );
+  }
+
+  @protected
+  ClaudeNow dco_decode_claude_now(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ClaudeNow(
+      sessions: dco_decode_list_claude_session(arr[0]),
+      version: dco_decode_opt_String(arr[1]),
+    );
+  }
+
+  @protected
+  ClaudeSession dco_decode_claude_session(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return ClaudeSession(
+      sessionId: dco_decode_String(arr[0]),
+      project: dco_decode_String(arr[1]),
+      title: dco_decode_opt_String(arr[2]),
+      status: dco_decode_claude_session_status(arr[3]),
+      startedMs: dco_decode_opt_box_autoadd_i_64(arr[4]),
+      updatedMs: dco_decode_opt_box_autoadd_i_64(arr[5]),
+      model: dco_decode_opt_String(arr[6]),
+      branch: dco_decode_opt_String(arr[7]),
+      agents: dco_decode_list_claude_agent(arr[8]),
+    );
+  }
+
+  @protected
+  ClaudeSessionStatus dco_decode_claude_session_status(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ClaudeSessionStatus.values[raw as int];
+  }
+
+  @protected
+  ClaudeStats dco_decode_claude_stats(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ClaudeStats(
+      today: dco_decode_claude_totals(arr[0]),
+      week: dco_decode_claude_totals(arr[1]),
+      todayModels: dco_decode_list_claude_model_tokens(arr[2]),
+      days: dco_decode_list_claude_day_point(arr[3]),
+      history: dco_decode_opt_box_autoadd_claude_history(arr[4]),
+    );
+  }
+
+  @protected
+  ClaudeTotals dco_decode_claude_totals(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ClaudeTotals(
+      replies: dco_decode_f_64(arr[0]),
+      toolCalls: dco_decode_f_64(arr[1]),
+      sessions: dco_decode_f_64(arr[2]),
+      inputTokens: dco_decode_f_64(arr[3]),
+      outputTokens: dco_decode_f_64(arr[4]),
+    );
   }
 
   @protected
@@ -1273,6 +1507,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeI64(raw);
   }
 
   @protected
@@ -1338,6 +1578,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ClaudeAgent> dco_decode_list_claude_agent(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_claude_agent).toList();
+  }
+
+  @protected
+  List<ClaudeDayPoint> dco_decode_list_claude_day_point(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_claude_day_point).toList();
+  }
+
+  @protected
+  List<ClaudeModelTokens> dco_decode_list_claude_model_tokens(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_claude_model_tokens).toList();
+  }
+
+  @protected
+  List<ClaudeSession> dco_decode_list_claude_session(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_claude_session).toList();
+  }
+
+  @protected
   List<PairedDevice> dco_decode_list_paired_device(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_paired_device).toList();
@@ -1380,6 +1644,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClaudeHistory? dco_decode_opt_box_autoadd_claude_history(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_claude_history(raw);
+  }
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_64(raw);
+  }
+
+  @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
+  }
+
+  @protected
   int? dco_decode_opt_box_autoadd_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_8(raw);
@@ -1402,8 +1684,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PanelVisibility dco_decode_panel_visibility(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return PanelVisibility(
       search: dco_decode_bool(arr[0]),
       quickControls: dco_decode_bool(arr[1]),
@@ -1411,6 +1693,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       recents: dco_decode_bool(arr[3]),
       favorites: dco_decode_bool(arr[4]),
       featuredCards: dco_decode_bool(arr[5]),
+      claude: dco_decode_bool(arr[6]),
     );
   }
 
@@ -1612,6 +1895,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClaudeHistory sse_decode_box_autoadd_claude_history(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_claude_history(deserializer));
+  }
+
+  @protected
+  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_64(deserializer));
+  }
+
+  @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_i_64(deserializer));
+  }
+
+  @protected
   LauncherSettings sse_decode_box_autoadd_launcher_settings(
     SseDeserializer deserializer,
   ) {
@@ -1623,6 +1926,144 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int sse_decode_box_autoadd_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_8(deserializer));
+  }
+
+  @protected
+  ClaudeAgent sse_decode_claude_agent(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_agentType = sse_decode_String(deserializer);
+    var var_description = sse_decode_String(deserializer);
+    var var_model = sse_decode_opt_String(deserializer);
+    var var_running = sse_decode_bool(deserializer);
+    var var_lastActivityMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+    return ClaudeAgent(
+      agentType: var_agentType,
+      description: var_description,
+      model: var_model,
+      running: var_running,
+      lastActivityMs: var_lastActivityMs,
+    );
+  }
+
+  @protected
+  ClaudeDayPoint sse_decode_claude_day_point(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_date = sse_decode_String(deserializer);
+    var var_sessions = sse_decode_u_32(deserializer);
+    var var_replies = sse_decode_u_32(deserializer);
+    return ClaudeDayPoint(
+      date: var_date,
+      sessions: var_sessions,
+      replies: var_replies,
+    );
+  }
+
+  @protected
+  ClaudeHistory sse_decode_claude_history(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_since = sse_decode_opt_String(deserializer);
+    var var_until = sse_decode_opt_String(deserializer);
+    var var_sessions = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_messages = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_models = sse_decode_list_claude_model_tokens(deserializer);
+    return ClaudeHistory(
+      since: var_since,
+      until: var_until,
+      sessions: var_sessions,
+      messages: var_messages,
+      models: var_models,
+    );
+  }
+
+  @protected
+  ClaudeModelTokens sse_decode_claude_model_tokens(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_model = sse_decode_String(deserializer);
+    var var_inputTokens = sse_decode_f_64(deserializer);
+    var var_outputTokens = sse_decode_f_64(deserializer);
+    return ClaudeModelTokens(
+      model: var_model,
+      inputTokens: var_inputTokens,
+      outputTokens: var_outputTokens,
+    );
+  }
+
+  @protected
+  ClaudeNow sse_decode_claude_now(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sessions = sse_decode_list_claude_session(deserializer);
+    var var_version = sse_decode_opt_String(deserializer);
+    return ClaudeNow(sessions: var_sessions, version: var_version);
+  }
+
+  @protected
+  ClaudeSession sse_decode_claude_session(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sessionId = sse_decode_String(deserializer);
+    var var_project = sse_decode_String(deserializer);
+    var var_title = sse_decode_opt_String(deserializer);
+    var var_status = sse_decode_claude_session_status(deserializer);
+    var var_startedMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_updatedMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_model = sse_decode_opt_String(deserializer);
+    var var_branch = sse_decode_opt_String(deserializer);
+    var var_agents = sse_decode_list_claude_agent(deserializer);
+    return ClaudeSession(
+      sessionId: var_sessionId,
+      project: var_project,
+      title: var_title,
+      status: var_status,
+      startedMs: var_startedMs,
+      updatedMs: var_updatedMs,
+      model: var_model,
+      branch: var_branch,
+      agents: var_agents,
+    );
+  }
+
+  @protected
+  ClaudeSessionStatus sse_decode_claude_session_status(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ClaudeSessionStatus.values[inner];
+  }
+
+  @protected
+  ClaudeStats sse_decode_claude_stats(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_today = sse_decode_claude_totals(deserializer);
+    var var_week = sse_decode_claude_totals(deserializer);
+    var var_todayModels = sse_decode_list_claude_model_tokens(deserializer);
+    var var_days = sse_decode_list_claude_day_point(deserializer);
+    var var_history = sse_decode_opt_box_autoadd_claude_history(deserializer);
+    return ClaudeStats(
+      today: var_today,
+      week: var_week,
+      todayModels: var_todayModels,
+      days: var_days,
+      history: var_history,
+    );
+  }
+
+  @protected
+  ClaudeTotals sse_decode_claude_totals(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_replies = sse_decode_f_64(deserializer);
+    var var_toolCalls = sse_decode_f_64(deserializer);
+    var var_sessions = sse_decode_f_64(deserializer);
+    var var_inputTokens = sse_decode_f_64(deserializer);
+    var var_outputTokens = sse_decode_f_64(deserializer);
+    return ClaudeTotals(
+      replies: var_replies,
+      toolCalls: var_toolCalls,
+      sessions: var_sessions,
+      inputTokens: var_inputTokens,
+      outputTokens: var_outputTokens,
+    );
   }
 
   @protected
@@ -1648,6 +2089,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getPlatformInt64();
   }
 
   @protected
@@ -1738,6 +2185,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ClaudeAgent> sse_decode_list_claude_agent(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ClaudeAgent>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_claude_agent(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ClaudeDayPoint> sse_decode_list_claude_day_point(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ClaudeDayPoint>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_claude_day_point(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ClaudeModelTokens> sse_decode_list_claude_model_tokens(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ClaudeModelTokens>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_claude_model_tokens(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ClaudeSession> sse_decode_list_claude_session(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ClaudeSession>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_claude_session(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<PairedDevice> sse_decode_list_paired_device(
     SseDeserializer deserializer,
   ) {
@@ -1820,6 +2321,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClaudeHistory? sse_decode_opt_box_autoadd_claude_history(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_claude_history(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_i_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   int? sse_decode_opt_box_autoadd_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1852,6 +2388,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_recents = sse_decode_bool(deserializer);
     var var_favorites = sse_decode_bool(deserializer);
     var var_featuredCards = sse_decode_bool(deserializer);
+    var var_claude = sse_decode_bool(deserializer);
     return PanelVisibility(
       search: var_search,
       quickControls: var_quickControls,
@@ -1859,6 +2396,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       recents: var_recents,
       favorites: var_favorites,
       featuredCards: var_featuredCards,
+      claude: var_claude,
     );
   }
 
@@ -2067,6 +2605,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_claude_history(
+    ClaudeHistory self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_claude_history(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_i_64(
+    PlatformInt64 self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_launcher_settings(
     LauncherSettings self,
     SseSerializer serializer,
@@ -2079,6 +2641,98 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_8(self, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_agent(ClaudeAgent self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.agentType, serializer);
+    sse_encode_String(self.description, serializer);
+    sse_encode_opt_String(self.model, serializer);
+    sse_encode_bool(self.running, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.lastActivityMs, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_day_point(
+    ClaudeDayPoint self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.date, serializer);
+    sse_encode_u_32(self.sessions, serializer);
+    sse_encode_u_32(self.replies, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_history(ClaudeHistory self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.since, serializer);
+    sse_encode_opt_String(self.until, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.sessions, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.messages, serializer);
+    sse_encode_list_claude_model_tokens(self.models, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_model_tokens(
+    ClaudeModelTokens self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.model, serializer);
+    sse_encode_f_64(self.inputTokens, serializer);
+    sse_encode_f_64(self.outputTokens, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_now(ClaudeNow self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_claude_session(self.sessions, serializer);
+    sse_encode_opt_String(self.version, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_session(ClaudeSession self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sessionId, serializer);
+    sse_encode_String(self.project, serializer);
+    sse_encode_opt_String(self.title, serializer);
+    sse_encode_claude_session_status(self.status, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.startedMs, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.updatedMs, serializer);
+    sse_encode_opt_String(self.model, serializer);
+    sse_encode_opt_String(self.branch, serializer);
+    sse_encode_list_claude_agent(self.agents, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_session_status(
+    ClaudeSessionStatus self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_stats(ClaudeStats self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_claude_totals(self.today, serializer);
+    sse_encode_claude_totals(self.week, serializer);
+    sse_encode_list_claude_model_tokens(self.todayModels, serializer);
+    sse_encode_list_claude_day_point(self.days, serializer);
+    sse_encode_opt_box_autoadd_claude_history(self.history, serializer);
+  }
+
+  @protected
+  void sse_encode_claude_totals(ClaudeTotals self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.replies, serializer);
+    sse_encode_f_64(self.toolCalls, serializer);
+    sse_encode_f_64(self.sessions, serializer);
+    sse_encode_f_64(self.inputTokens, serializer);
+    sse_encode_f_64(self.outputTokens, serializer);
   }
 
   @protected
@@ -2103,6 +2757,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putPlatformInt64(self);
   }
 
   @protected
@@ -2169,6 +2829,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_app_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_claude_agent(
+    List<ClaudeAgent> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_claude_agent(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_claude_day_point(
+    List<ClaudeDayPoint> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_claude_day_point(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_claude_model_tokens(
+    List<ClaudeModelTokens> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_claude_model_tokens(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_claude_session(
+    List<ClaudeSession> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_claude_session(item, serializer);
     }
   }
 
@@ -2252,6 +2960,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_claude_history(
+    ClaudeHistory? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_claude_history(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_i_64(
+    PlatformInt64? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_i_64(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_u_8(int? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2281,6 +3025,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.recents, serializer);
     sse_encode_bool(self.favorites, serializer);
     sse_encode_bool(self.featuredCards, serializer);
+    sse_encode_bool(self.claude, serializer);
   }
 
   @protected

@@ -8,6 +8,9 @@ enum Section {
   apps('Aplicativos'),
   games('Jogos'),
   files('Arquivos'),
+
+  /// Só aparece com o Claude Code instalado.
+  claude('Claude'),
   settings('Configurações');
 
   const Section(this.label);

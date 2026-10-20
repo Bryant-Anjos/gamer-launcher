@@ -262,3 +262,17 @@ fn files_without_sounds_or_animation_choices_fall_back_to_off() {
     assert!(!loaded.sounds);
     assert!(!loaded.reduce_animations);
 }
+
+#[test]
+fn the_claude_panel_is_visible_by_default_even_in_old_files() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("settings.json");
+    fs::write(&path, r#"{"panels":{"search":false}}"#).unwrap();
+
+    let loaded = Settings::load(&path).unwrap();
+
+    assert!(loaded.is_panel_visible(Panel::Claude));
+    assert!(!loaded.is_panel_visible(Panel::Search));
+    let hidden = loaded.with_panel_visible(Panel::Claude, false);
+    assert!(!hidden.is_panel_visible(Panel::Claude));
+}

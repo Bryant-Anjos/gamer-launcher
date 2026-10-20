@@ -3,8 +3,9 @@
 //! gerador não expor.
 
 use launcher_core::apps::AppEntry;
+use launcher_core::claude::usage::UsageScanner;
 use launcher_core::recents::RecentItem;
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::{LazyLock, Mutex, MutexGuard, PoisonError};
 
 /// Apps da última leitura do catálogo; abrir por id parte daqui.
 static APPS: Mutex<Vec<AppEntry>> = Mutex::new(Vec::new());
@@ -19,6 +20,13 @@ fn unpoisoned<T>(mutex: &'static Mutex<T>) -> MutexGuard<'static, T> {
 
 pub fn apps() -> MutexGuard<'static, Vec<AppEntry>> {
     unpoisoned(&APPS)
+}
+
+/// Leitura incremental do uso do Claude: guarda até onde leu cada arquivo.
+static CLAUDE_USAGE: LazyLock<Mutex<UsageScanner>> = LazyLock::new(Default::default);
+
+pub fn claude_usage() -> MutexGuard<'static, UsageScanner> {
+    CLAUDE_USAGE.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
 pub fn search_recents() -> MutexGuard<'static, Vec<RecentItem>> {

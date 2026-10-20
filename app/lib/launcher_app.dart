@@ -9,6 +9,7 @@ import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/state/clock.dart';
 import 'package:gamer_launcher/state/autostart_controller.dart';
 import 'package:gamer_launcher/state/bluetooth_devices_controller.dart';
+import 'package:gamer_launcher/state/claude_controller.dart';
 import 'package:gamer_launcher/state/gamepad_status.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/state/messages.dart';
@@ -90,6 +91,7 @@ class _LauncherAppState extends State<LauncherApp> {
       bluetoothDevices: BluetoothDevicesController(backend, messages),
       openSearch: _openSearch,
       enterContent: _enterContent,
+      claude: _claudeIfInstalled(backend),
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
@@ -106,6 +108,7 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.power.dispose();
     _services.autostart.dispose();
     _services.bluetoothDevices.dispose();
+    _services.claude?.dispose();
     _services.monitor.dispose();
     _services.gamepad.dispose();
     _services.clock.dispose();
@@ -122,6 +125,9 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.gamepad.poller.visible = visible;
     _services.power.poller.visible = visible;
     _services.bluetoothDevices.poller.visible = visible;
+    for (final poller in _services.claude?.pollers ?? const []) {
+      poller.visible = visible;
+    }
     if (visible) unawaited(_services.controller.refreshRecents());
   }
 
@@ -162,6 +168,16 @@ class _LauncherAppState extends State<LauncherApp> {
     unawaited(showPowerMenu(navigator));
   }
 
+  /// Só com o Claude Code instalado; na dúvida (a ponte falhou), sem ele.
+  ClaudeController? _claudeIfInstalled(LauncherBackend backend) {
+    try {
+      if (!backend.claudeInstalled()) return null;
+    } on BackendException {
+      return null;
+    }
+    return ClaudeController(backend, now: widget.now);
+  }
+
   /// Depois do próximo quadro: a página da seção pode ter acabado de trocar.
   void _afterFrame(VoidCallback action) {
     WidgetsBinding.instance
@@ -183,7 +199,7 @@ class _LauncherAppState extends State<LauncherApp> {
   /// LB/RB trocam de seção e levam o foco para o item dela na navegação.
   void _changeTab(int delta) {
     if (_overlayOpen) return;
-    _services.controller.cycleSection(delta);
+    _services.controller.cycleSection(delta, among: _services.sections);
     final section = _services.controller.value.section;
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _services.focus.nav[section.index].requestFocus(),

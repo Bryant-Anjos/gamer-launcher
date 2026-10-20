@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:gamer_launcher/backend/launcher_backend.dart';
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
+import 'package:gamer_launcher/src/rust/api/claude.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
 import 'package:gamer_launcher/src/rust/api/search.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
@@ -34,6 +35,9 @@ class FakeBackend implements LauncherBackend {
     this.autostart = false,
     this.pairedDevices = const [],
     this.detectedLayout = LauncherButtonLayout.xbox,
+    this.isClaudeInstalled = false,
+    this.claudeNow = const ClaudeNow(sessions: []),
+    this.claudeStats,
   }) : settings = settings ?? sampleSettings(),
        catalog = catalog ?? sampleCatalog(),
        recents = recents ?? sampleRecents;
@@ -52,6 +56,9 @@ class FakeBackend implements LauncherBackend {
   bool autostart;
   List<PairedDevice> pairedDevices;
   LauncherButtonLayout detectedLayout;
+  bool isClaudeInstalled;
+  ClaudeNow claudeNow;
+  ClaudeStats? claudeStats;
 
   /// Nome do método -> mensagem do erro que ele deve lançar.
   final failures = <String, String>{};
@@ -218,6 +225,20 @@ class FakeBackend implements LauncherBackend {
   @override
   Future<void> openSettingsPage(String page) =>
       _answer('openSettingsPage($page)', () {});
+
+  @override
+  bool claudeInstalled() {
+    calls.add('claudeInstalled');
+    return isClaudeInstalled;
+  }
+
+  @override
+  Future<ClaudeNow> readClaudeNow() =>
+      _answer('readClaudeNow', () => claudeNow);
+
+  @override
+  Future<ClaudeStats> readClaudeStats(int nowMs, int utcOffsetMinutes) =>
+      _answer('readClaudeStats', () => claudeStats ?? emptyClaudeStats);
 
   @override
   Future<StatsSample> sampleStats() => _answer('sampleStats', () => stats);

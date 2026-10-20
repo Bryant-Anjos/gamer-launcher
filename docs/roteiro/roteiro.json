@@ -125,17 +125,13 @@
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
         "app/lib/input/input_router.dart": "b621bde977ba",
         "app/lib/state/gamepad_status.dart": "043915da5add",
-        "app/lib/ui/shell/side_nav.dart": "393919814867",
+        "app/lib/ui/shell/side_nav.dart": "4193bdde664c",
         "app/rust/src/api/input.rs": "a36818a990cc",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/input.rs": "defbb34c90f8"
       },
       "itemsHash": "168d934c9291",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "O leitor passou a guardar o fabricante do último controle usado para as dicas na tela; os testes de layout estão na seção botoes-sons."
-        },
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só passou a usar o detector de digitação comum (typing.dart); o controle não muda."
@@ -151,6 +147,10 @@
         {
           "date": "2026-10-19",
           "reason": "O primeiro item da página deixou de contar campos de texto; o item novo da seção apps confere a entrada em Aplicativos."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A navegação só passou a listar as seções desta máquina (a do Claude só com ele instalado); testado na seção claude."
         }
       ]
     },
@@ -176,14 +176,10 @@
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/input_router.dart": "b621bde977ba",
-        "app/lib/ui/shell/side_nav.dart": "393919814867"
+        "app/lib/ui/shell/side_nav.dart": "4193bdde664c"
       },
       "itemsHash": "94efe33a2d72",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "O InputRouter só observa setas, Enter e Esc para os sons, sem mudar a navegação; os sons estão na seção botoes-sons."
-        },
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só passou a usar o detector de digitação comum; as teclas da pesquisa estão na seção pesquisa."
@@ -199,6 +195,10 @@
         {
           "date": "2026-10-19",
           "reason": "O InputRouter passou a entregar o Esc ao cancelamento do item focado antes de voltar ao menu; o teclado ao mover favoritos está na seção apps."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A navegação só passou a listar as seções desta máquina; testado na seção claude."
         }
       ]
     },
@@ -294,10 +294,10 @@
         "app/lib/ui/widgets/svg_icon.dart"
       ],
       "reviewed": {
-        "app/lib/state/settings_edit.dart": "862a5e4782ea",
+        "app/lib/state/settings_edit.dart": "acd8f51f26bb",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
         "app/lib/ui/settings/settings_controls.dart": "8e8b03c156d6",
-        "app/lib/ui/settings/settings_page.dart": "1b1716f77355",
+        "app/lib/ui/settings/settings_page.dart": "754961dafab8",
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
         "app/lib/ui/widgets/focus_tile.dart": "29cfe21c0999",
@@ -313,10 +313,6 @@
       "reviews": [
         {
           "date": "2026-10-19",
-          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
-        },
-        {
-          "date": "2026-10-19",
           "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
         },
         {
@@ -330,6 +326,10 @@
         {
           "date": "2026-10-19",
           "reason": "O MenuRow só passou a aceitar um desenho próprio no lugar do ícone (usado no menu Energia, conferido na seção energia)."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "PanelKind e Configurações ganharam o painel Claude Code, só com o Claude instalado; testado na seção claude."
         }
       ]
     },
@@ -351,17 +351,13 @@
         "app/rust/src/api/settings.rs"
       ],
       "reviewed": {
-        "app/lib/ui/home/home_page.dart": "6847b319f561",
-        "app/lib/ui/settings/settings_page.dart": "1b1716f77355",
-        "app/rust/src/api/settings.rs": "2a6a73f25fa8",
-        "core/src/settings.rs": "144b0e0a81e3"
+        "app/lib/ui/home/home_page.dart": "6004946872a1",
+        "app/lib/ui/settings/settings_page.dart": "754961dafab8",
+        "app/rust/src/api/settings.rs": "0cdb3d30a576",
+        "core/src/settings.rs": "a98b87cc23f6"
       },
       "itemsHash": "13e6b977f59f",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
-        },
         {
           "date": "2026-10-19",
           "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
@@ -377,6 +373,10 @@
         {
           "date": "2026-10-19",
           "reason": "A tela inicial mudou de disposição (seção inicio); mostrar e ocultar cada painel continua igual."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Entrou o painel Claude Code, visível por padrão inclusive em configurações antigas; ocultar e mostrar está na seção claude."
         }
       ]
     },
@@ -412,24 +412,20 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "b069fc307e33",
+        "app/lib/launcher_app.dart": "53562c01bebe",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
-        "app/lib/state/launcher_controller.dart": "634cf0b92925",
+        "app/lib/state/launcher_controller.dart": "6d294b457570",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
-        "app/lib/ui/home/home_page.dart": "6847b319f561",
-        "app/lib/ui/shell/launcher_shell.dart": "83d5e3c467cd",
-        "app/lib/ui/shell/side_nav.dart": "393919814867",
+        "app/lib/ui/home/home_page.dart": "6004946872a1",
+        "app/lib/ui/shell/launcher_shell.dart": "080d26f2d6b0",
+        "app/lib/ui/shell/side_nav.dart": "4193bdde664c",
         "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
       "itemsHash": "16a0a14d9a8f",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "O controlador aplica o layout de botões ao carregar e ao mudar, e o app toca os sons; tudo testado na seção botoes-sons."
-        },
         {
           "date": "2026-10-19",
           "reason": "O app ganhou o controlador dos dispositivos Bluetooth e o controlador o atalho para as páginas do sistema; testados na seção controle-rapido."
@@ -445,6 +441,10 @@
         {
           "date": "2026-10-19",
           "reason": "A tela inicial e a navegação só trocaram folgas para o foco não ser cortado; conferido na seção visual."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A tela inicial e o app ganharam o painel e a seção do Claude, só com ele instalado; testado na seção claude."
         }
       ]
     },
@@ -745,7 +745,7 @@
         "app/lib/ui/widgets/search_input.dart": "7db1b585773e",
         "app/rust/src/api/catalog.rs": "78c387a14c04",
         "app/rust/src/api/search.rs": "5be36679f0d4",
-        "app/rust/src/store.rs": "630f1072435a",
+        "app/rust/src/store.rs": "492f67d18cfa",
         "core/src/catalog.rs": "969c1987ddcc",
         "core/src/open.rs": "4863c3edfde7",
         "core/src/search.rs": "57d64d75b23d"
@@ -759,6 +759,10 @@
         {
           "date": "2026-10-19",
           "reason": "O seletor de favoritos passou a usar o filtro comum (AppFilter), com o mesmo comportamento; conferido na seção apps."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "store.rs só ganhou o leitor incremental do Claude; a pesquisa não muda."
         }
       ]
     },
@@ -766,14 +770,33 @@
       "id": "claude",
       "title": "Claude Code",
       "sub": "Sessões, agentes e uso do Claude Code (só leitura)",
-      "priority": "Ainda sem tela: só o núcleo está pronto",
       "items": [
-        "Numa máquina com o Claude Code, rode no terminal: cd core && cargo run --release --example claude_scan. Confira se mostra a quantidade de sessões abertas agora e os números de hoje e da semana, e se cada ciclo leva poucos milissegundos."
+        "Numa máquina com o Claude Code, rode no terminal: cd core && cargo run --release --example claude_scan. Confira se mostra a quantidade de sessões abertas agora e os números de hoje e da semana, e se cada ciclo leva poucos milissegundos.",
+        "Com o Claude Code instalado, abra o launcher. Confira se aparece o item \"Claude\" na navegação (entre Arquivos e Configurações) e o painel \"Claude Code\" na coluna da direita da tela inicial.",
+        "Abra o Claude Code num terminal, num projeto qualquer. Em até 5 segundos, confira se o painel mostra a sessão aberta (\"1 sessão aberta\") com o nome do projeto, e se ele marca \"trabalhando\" enquanto o Claude responde e volta a \"Esperando você\" na seção Claude quando ele termina.",
+        "Na seção Claude, confira em cada sessão: o nome da pasta do projeto (nunca o caminho inteiro), o título, o modelo, a branch e há quanto tempo foi aberta. Nenhum trecho das suas mensagens nem das respostas deve aparecer.",
+        "Peça ao Claude algo que use um subagente (por exemplo, uma busca grande no código). Confira se o agente aparece embaixo da sessão com o tipo e a descrição curta, marcado como \"trabalhando\", e se depois passa a \"parado\".",
+        "Feche o Claude Code. Confira se a sessão some da lista em até 5 segundos.",
+        "Confira os números de Hoje e dos Últimos 7 dias (respostas, ferramentas, sessões, tokens de entrada e de saída) e o gráfico de respostas por dia. Use o Claude um pouco e confira se Hoje aumenta em até um minuto.",
+        "Confira o Histórico (totais do próprio Claude Code, com o período). Ele pode estar alguns dias atrasado: é o cache que o Claude atualiza de vez em quando.",
+        "Navegue pela seção com o controle: o foco passa por cada sessão e por cada bloco de números, e a página rola junto. B volta ao menu.",
+        "LB e RB passam pela seção Claude também.",
+        "Em Configurações > \"Painéis da tela inicial\", oculte \"Claude Code\". Confira se o painel some da tela inicial e se a seção continua na navegação.",
+        "Com o launcher parado na tela inicial, meça a CPU (top -p $(pgrep -x gamer_launcher)) com e sem o painel do Claude visível. Deve continuar perto de 0%.",
+        "Numa máquina (ou usuário) sem o Claude Code (sem a pasta ~/.claude e sem o comando claude), confira se nada do Claude aparece: nem o item na navegação, nem o painel, nem a opção em Configurações."
       ],
       "covers": [
-        "core/src/claude/*.rs"
+        "core/src/claude/*.rs",
+        "app/lib/state/claude_controller.dart",
+        "app/lib/ui/claude/*.dart",
+        "app/rust/src/api/claude.rs"
       ],
       "reviewed": {
+        "app/lib/state/claude_controller.dart": "8ef78e0655dc",
+        "app/lib/ui/claude/claude_page.dart": "4a2c14acf9e4",
+        "app/lib/ui/claude/claude_panel.dart": "a73ba80d2ef5",
+        "app/lib/ui/claude/claude_widgets.dart": "92163226ec8c",
+        "app/rust/src/api/claude.rs": "c6431bf642af",
         "core/src/claude/agents.rs": "2d10c3d8a267",
         "core/src/claude/cache.rs": "cc9bac60288f",
         "core/src/claude/fields.rs": "73969198e3e8",
@@ -782,7 +805,7 @@
         "core/src/claude/time.rs": "759eead133c3",
         "core/src/claude/usage.rs": "732fa6a0df7e"
       },
-      "itemsHash": "54e9f9977200",
+      "itemsHash": "d459d4ffd298",
       "reviews": []
     },
     {
@@ -851,11 +874,11 @@
         "app/rust/src/api/sound.rs"
       ],
       "reviewed": {
-        "app/rust/src/api/settings.rs": "2a6a73f25fa8",
+        "app/rust/src/api/settings.rs": "0cdb3d30a576",
         "app/rust/src/api/sound.rs": "63bf56a9b28a",
         "core/src/fs_util.rs": "9e6d1889c09f",
         "core/src/paths.rs": "c4d915aed584",
-        "core/src/settings.rs": "144b0e0a81e3",
+        "core/src/settings.rs": "a98b87cc23f6",
         "core/src/sound.rs": "b3f4fbc249cf"
       },
       "itemsHash": "eb6eb25a0554",
@@ -867,6 +890,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "As configurações ganharam o campo do painel Claude Code (padrão: visível; arquivos antigos continuam válidos)."
         }
       ]
     },

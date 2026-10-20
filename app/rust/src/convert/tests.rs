@@ -23,6 +23,7 @@ fn all_panels(visible: bool) -> PanelVisibility {
         recents: visible,
         favorites: visible,
         featured_cards: visible,
+        claude: visible,
     }
 }
 
@@ -433,4 +434,20 @@ fn detected_layouts_map_to_the_forced_settings() {
         detected_layout_to_dto(ButtonLayout::Nintendo),
         LauncherButtonLayout::Nintendo
     );
+}
+
+#[test]
+fn the_claude_panel_round_trips() {
+    let hidden = LauncherSettings {
+        panels: PanelVisibility {
+            claude: false,
+            ..all_panels(true)
+        },
+        ..dto()
+    };
+
+    let settings = settings_from_dto(&hidden).unwrap();
+
+    assert!(!settings.is_panel_visible(Panel::Claude));
+    assert!(!settings_to_dto(&settings).panels.claude);
 }

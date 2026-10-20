@@ -5,6 +5,13 @@ import 'package:gamer_launcher/src/rust/api/system.dart';
 
 import '../support/fake_backend.dart';
 import '../support/harness.dart';
+import '../support/samples.dart';
+
+FakeBackend _claudeBackend() => FakeBackend(
+  isClaudeInstalled: true,
+  claudeNow: sampleClaudeNow,
+  claudeStats: sampleClaudeStats,
+);
 
 /// Capturas das telas sobrepostas e de Configurações, para conferir que
 /// seguem o mesmo desenho da tela inicial.
@@ -74,6 +81,20 @@ void main() {
     await h.pressAndSettle(tester, GamepadAction.right);
 
     await expectScreen('apps');
+  });
+
+  testWidgets('claude section', (tester) async {
+    await pumpLauncher(tester, backend: _claudeBackend());
+    await tester.tap(find.text('Claude'));
+    await tester.pumpAndSettle();
+
+    await expectScreen('claude');
+  });
+
+  testWidgets('home with the claude panel', (tester) async {
+    await pumpLauncher(tester, backend: _claudeBackend());
+
+    await expectScreen('home_claude');
   });
 
   testWidgets('settings', (tester) async {

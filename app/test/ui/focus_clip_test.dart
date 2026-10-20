@@ -5,6 +5,7 @@ import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 
 import '../support/fake_backend.dart';
 import '../support/harness.dart';
+import '../support/samples.dart';
 
 /// Pequena folga de arredondamento.
 const _epsilon = 0.5;
@@ -96,6 +97,21 @@ void main() {
       await _expectNoClipping(tester);
     });
   }
+
+  testWidgets('no focused item is clipped in Claude', (tester) async {
+    await pumpLauncher(
+      tester,
+      backend: FakeBackend(
+        isClaudeInstalled: true,
+        claudeNow: sampleClaudeNow,
+        claudeStats: sampleClaudeStats,
+      ),
+    );
+    await tester.tap(find.text('Claude'));
+    await tester.pumpAndSettle();
+
+    await _expectNoClipping(tester);
+  });
 
   testWidgets('a very wide row grows only a few pixels when focused', (
     tester,

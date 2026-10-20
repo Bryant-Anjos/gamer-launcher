@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
+import 'package:gamer_launcher/ui/claude/claude_page.dart';
 import 'package:gamer_launcher/ui/home/home_page.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/pages/apps_page.dart';
@@ -35,6 +36,7 @@ class LauncherShell extends StatelessWidget {
                   focusNodes: services.focus.nav,
                   onPower: services.openPowerMenu,
                   onEnterContent: services.enterContent,
+                  sections: services.sections,
                 ),
                 Expanded(
                   child: Column(
@@ -67,6 +69,7 @@ class LauncherShell extends StatelessWidget {
       Section.apps => AppsPage(state: state),
       Section.games => GamesPage(state: state),
       Section.files => FilesPage(state: state),
+      Section.claude => const ClaudePage(),
       Section.settings => SettingsPage(state: state),
     };
     return Padding(

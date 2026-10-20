@@ -23,16 +23,19 @@ pub enum Panel {
     Recents,
     Favorites,
     FeaturedCards,
+    /// Acompanhamento do Claude Code (só aparece com ele instalado).
+    Claude,
 }
 
 impl Panel {
-    pub const ALL: [Panel; 6] = [
+    pub const ALL: [Panel; 7] = [
         Panel::Search,
         Panel::QuickControls,
         Panel::System,
         Panel::Recents,
         Panel::Favorites,
         Panel::FeaturedCards,
+        Panel::Claude,
     ];
 }
 
@@ -46,6 +49,7 @@ struct Panels {
     recents: bool,
     favorites: bool,
     featured_cards: bool,
+    claude: bool,
 }
 
 impl Default for Panels {
@@ -57,6 +61,7 @@ impl Default for Panels {
             recents: true,
             favorites: true,
             featured_cards: true,
+            claude: true,
         }
     }
 }
@@ -70,6 +75,7 @@ impl Panels {
             Panel::Recents => &mut self.recents,
             Panel::Favorites => &mut self.favorites,
             Panel::FeaturedCards => &mut self.featured_cards,
+            Panel::Claude => &mut self.claude,
         }
     }
 
@@ -81,6 +87,7 @@ impl Panels {
             Panel::Recents => self.recents,
             Panel::Favorites => self.favorites,
             Panel::FeaturedCards => self.featured_cards,
+            Panel::Claude => self.claude,
         }
     }
 }
