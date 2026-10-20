@@ -5,10 +5,12 @@ import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/state/favorites_order.dart';
 import 'package:gamer_launcher/state/settings_edit.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
+import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/home/favorite_tile.dart';
 import 'package:gamer_launcher/ui/home/featured_cards.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/widgets/app_icon.dart';
+import 'package:gamer_launcher/ui/widgets/icon_color_cache.dart';
 import 'package:gamer_launcher/ui/home/favorites_hints.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 
@@ -188,7 +190,12 @@ class _FavoritesPanelState extends State<FavoritesPanel> {
               size: size,
               child: FavoriteTile(
                 label: addFavoriteLabel,
-                icon: const Icon(Icons.add_rounded, size: favoriteArtIcon),
+                icon: const Icon(
+                  Icons.add_rounded,
+                  size: favoriteArtIcon,
+                  color: Colors.white,
+                ),
+                color: LauncherPalette.of(context).accent,
                 onActivate: services.openFavoritesPicker,
               ),
             ),
@@ -198,9 +205,16 @@ class _FavoritesPanelState extends State<FavoritesPanel> {
     );
   }
 
-  Widget _draggable(AppInfo app, Size size) {
+  Widget _draggable(AppInfo app, Size size) => IconTint(
+    name: app.name,
+    iconPath: app.iconPath,
+    builder: (context, color) => _dragTarget(app, size, color),
+  );
+
+  Widget _dragTarget(AppInfo app, Size size, Color color) {
     final tile = FavoriteTile(
       label: app.name,
+      color: color,
       isMoving: _moving == app.id,
       icon: AppIcon(
         name: app.name,

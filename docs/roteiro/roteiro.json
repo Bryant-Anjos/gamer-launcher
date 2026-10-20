@@ -476,7 +476,10 @@
         "Movendo, use o direcional: esquerda e direita trocam com o vizinho, cima e baixo mudam de fileira. Aperte A e confira se a nova ordem fica, inclusive depois de fechar e abrir o launcher.",
         "Comece a mover e aperte B. Confira se volta à ordem anterior, sem gravar, e se o foco continua no favorito (o B não vai para o menu nesse caso).",
         "No teclado, com um favorito focado: M começa a mover, as setas mudam o lugar, Enter confirma e Esc cancela.",
-        "Com o mouse, arraste um favorito para cima de outro. Confira se ele vai para aquele lugar e se a ordem fica gravada."
+        "Com o mouse, arraste um favorito para cima de outro. Confira se ele vai para aquele lugar e se a ordem fica gravada.",
+        "Olhe os blocos de favoritos na tela inicial. Confira se cada um tem a cara dos cartões de cima (Continuar, Jogos): fundo em degradê na diagonal, na cor principal do ícone daquele app (Brave alaranjado, um app verde em verde etc.), o ícone grande no meio e o nome em branco numa faixa escura embaixo. Nenhum deve ficar estourado, neon ou com o nome difícil de ler, nos temas claro e escuro.",
+        "Favorito sem ícone (com a inicial) ou com ícone cinza: confira se o bloco tem cor mesmo assim (a do quadrado da inicial) e se ela é a mesma ao fechar e abrir o launcher. O \"Adicionar\" fica no azul do tema.",
+        "Abra o launcher e olhe os favoritos logo que aparecem. Se algum bloco trocar de cor depois de abrir, a troca deve ser suave, sem piscar; com \"Reduzir animações\" ligado, ela é imediata. Parado na tela, a cor não muda mais (e o uso de CPU continua perto de 1%). Foco, selo de mover e arrastar continuam como antes."
       ],
       "covers": [
         "core/src/apps.rs",
@@ -489,22 +492,26 @@
         "app/lib/input/item_intents.dart",
         "app/lib/state/favorites_order.dart",
         "app/lib/ui/home/favorite_tile.dart",
-        "app/lib/ui/home/favorites_hints.dart"
+        "app/lib/ui/home/favorites_hints.dart",
+        "app/lib/ui/widgets/icon_color.dart",
+        "app/lib/ui/widgets/icon_color_cache.dart"
       ],
       "reviewed": {
         "app/lib/input/item_intents.dart": "85acd2b209aa",
         "app/lib/state/favorites_order.dart": "921070e0f225",
-        "app/lib/ui/home/favorite_tile.dart": "a01f6bf021db",
+        "app/lib/ui/home/favorite_tile.dart": "fd45acaa5ae5",
         "app/lib/ui/home/favorites_hints.dart": "af55c437e979",
-        "app/lib/ui/home/favorites_panel.dart": "bfab8b048c47",
+        "app/lib/ui/home/favorites_panel.dart": "6edd17a72543",
         "app/lib/ui/home/favorites_picker.dart": "3d0f69b670d4",
         "app/lib/ui/pages/apps_page.dart": "790d991d5f50",
         "app/lib/ui/widgets/app_filter.dart": "87da121cc362",
-        "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
+        "app/lib/ui/widgets/app_icon.dart": "a97010751938",
+        "app/lib/ui/widgets/icon_color.dart": "61cb85a31e04",
+        "app/lib/ui/widgets/icon_color_cache.dart": "c20f00724627",
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
-      "itemsHash": "fae67b2a995d",
+      "itemsHash": "4b01b0a26222",
       "reviews": [
         {
           "date": "2026-10-19",

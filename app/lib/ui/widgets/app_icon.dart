@@ -14,6 +14,10 @@ const _letterColors = [
 const _letterScale = 0.5;
 const _cornerScale = 0.24;
 
+/// Cor do quadrado com a inicial: sempre a mesma para o mesmo nome.
+Color letterColor(String name) =>
+    _letterColors[name.hashCode.abs() % _letterColors.length];
+
 /// Ícone de um app a partir do arquivo já localizado pelo núcleo. Sem
 /// arquivo (ou se ele não abrir), mostra a inicial num quadrado colorido.
 /// Bitmaps são decodificados no tamanho exibido, para gastar pouca memória.
@@ -66,7 +70,7 @@ class LetterIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final trimmed = name.trim();
     final letter = trimmed.isEmpty ? '?' : trimmed.characters.first;
-    final color = _letterColors[trimmed.hashCode.abs() % _letterColors.length];
+    final color = letterColor(trimmed);
     return Container(
       width: size,
       height: size,

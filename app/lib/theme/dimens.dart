@@ -53,6 +53,9 @@ abstract final class Motion {
   static const scroll = Duration(milliseconds: 160);
   static const overlay = Duration(milliseconds: 160);
 
+  /// Troca suave da cor de um bloco (a do ícone chega depois do 1º frame).
+  static const tint = Duration(milliseconds: 280);
+
   static Duration of(BuildContext context, Duration normal) =>
       MediaQuery.maybeDisableAnimationsOf(context) ?? false
       ? Duration.zero
