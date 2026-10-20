@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
-import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
-import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
+import 'package:gamer_launcher/ui/widgets/menu_row.dart';
+import 'package:gamer_launcher/ui/widgets/overlay_card.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
-
-const _menuWidth = 420.0;
 
 /// Uma opção do menu; [action] vazio é "fechar o launcher".
 class _Option {
@@ -77,32 +75,31 @@ class _PowerMenuState extends State<PowerMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = LauncherPalette.of(context);
     final confirming = _confirming;
     return PopScope(
       canPop: confirming == null,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) setState(() => _confirming = null);
       },
-      child: Center(
-        child: SizedBox(
-          width: _menuWidth,
-          child: Material(
-            color: palette.background,
-            borderRadius: BorderRadius.circular(Dimens.radius),
-            child: Padding(
-              padding: const EdgeInsets.all(Dimens.gutter),
-              child: confirming == null
-                  ? _OptionList(onChoose: _choose)
-                  : _Confirmation(
-                      option: confirming,
-                      onCancel: () => setState(() => _confirming = null),
-                      onConfirm: () => _run(confirming),
-                    ),
+      child: confirming == null
+          ? OverlayCard(
+              title: 'Energia',
+              width: Dimens.menuWidth,
+              hint: const MutedText('A escolhe · B fecha'),
+              child: _OptionList(onChoose: _choose),
+            )
+          : OverlayCard(
+              title: confirming.confirmTitle ?? confirming.label,
+              width: Dimens.menuWidth,
+              hint: const MutedText(
+                'Salve o que estiver aberto antes de continuar.',
+              ),
+              child: _Confirmation(
+                option: confirming,
+                onCancel: () => setState(() => _confirming = null),
+                onConfirm: () => _run(confirming),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -117,19 +114,15 @@ class _OptionList extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const SectionTitle('Energia'),
-      const MutedText('A escolhe · B fecha'),
-      const SizedBox(height: Dimens.gap),
-      for (final (index, option) in _options.indexed)
-        Padding(
-          padding: const EdgeInsets.only(bottom: Dimens.smallGap),
-          child: _OptionTile(
-            label: option.label,
-            icon: option.icon,
-            autofocus: index == 0,
-            onActivate: () => onChoose(option),
-          ),
+      for (final (index, option) in _options.indexed) ...[
+        if (index > 0) const SizedBox(height: Dimens.smallGap),
+        MenuRow(
+          label: option.label,
+          icon: option.icon,
+          autofocus: index == 0,
+          onActivate: () => onChoose(option),
         ),
+      ],
     ],
   );
 }
@@ -150,18 +143,15 @@ class _Confirmation extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      SectionTitle(option.confirmTitle ?? option.label),
-      const MutedText('Salve o que estiver aberto antes de continuar.'),
-      const SizedBox(height: Dimens.gap),
       // Cancelar primeiro e focado: um A distraído não derruba a sessão
-      _OptionTile(
+      MenuRow(
         label: 'Cancelar',
         icon: Icons.arrow_back_rounded,
         autofocus: true,
         onActivate: onCancel,
       ),
       const SizedBox(height: Dimens.smallGap),
-      _OptionTile(
+      MenuRow(
         label: option.label,
         icon: option.icon,
         onActivate: onConfirm,
@@ -169,43 +159,4 @@ class _Confirmation extends StatelessWidget {
       ),
     ],
   );
-}
-
-class _OptionTile extends StatelessWidget {
-  const _OptionTile({
-    required this.label,
-    required this.icon,
-    required this.onActivate,
-    this.autofocus = false,
-    this.emphasized = false,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback onActivate;
-  final bool autofocus;
-  final bool emphasized;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = LauncherPalette.of(context);
-    final foreground = emphasized ? palette.onAccent : palette.textPrimary;
-    return FocusTile(
-      autofocus: autofocus,
-      semanticLabel: label,
-      borderRadius: Dimens.smallRadius,
-      onActivate: onActivate,
-      child: Container(
-        color: emphasized ? palette.accent : palette.panel,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Icon(icon, color: foreground),
-            const SizedBox(width: 14),
-            Text(label, style: TextStyle(color: foreground, fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
 }

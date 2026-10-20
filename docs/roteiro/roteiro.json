@@ -161,7 +161,8 @@
         "Apague do disco a imagem escolhida e reabra o launcher. Confira se abre normalmente, sem erro.",
         "Confira se o destaque do foco é bem visível nos dois temas, com e sem papel de parede.",
         "Feche e abra o launcher. Confira se tema e papel de parede continuam como você deixou.",
-        "Se a lista de imagens falhar, confira se aparece \"Não foi possível listar as imagens\" com o motivo."
+        "Se a lista de imagens falhar, confira se aparece \"Não foi possível listar as imagens\" com o motivo.",
+        "Abra o menu Energia e o seletor de favoritos (Adicionar). Confira se os dois têm a mesma moldura (fundo do tema com borda fina), título e dica embaixo, e se as linhas do menu têm a mesma cara das linhas dos recentes e das chaves de Configurações, nos dois temas."
       ],
       "covers": [
         "core/src/theme.rs",
@@ -174,22 +175,26 @@
         "app/lib/ui/shell/launcher_background.dart",
         "app/lib/ui/widgets/focus_tile.dart",
         "app/lib/ui/widgets/panel_card.dart",
-        "app/lib/state/settings_edit.dart"
+        "app/lib/state/settings_edit.dart",
+        "app/lib/ui/widgets/menu_row.dart",
+        "app/lib/ui/widgets/overlay_card.dart"
       ],
       "reviewed": {
         "app/lib/state/settings_edit.dart": "862a5e4782ea",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
         "app/lib/ui/settings/settings_controls.dart": "bfcd1edfc839",
-        "app/lib/ui/settings/settings_page.dart": "a58abfd6e327",
+        "app/lib/ui/settings/settings_page.dart": "1dda31d3ea96",
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
         "app/lib/ui/widgets/focus_tile.dart": "2422fe86f6b5",
+        "app/lib/ui/widgets/menu_row.dart": "ccd55ca4f55d",
+        "app/lib/ui/widgets/overlay_card.dart": "14d31f6cbdbf",
         "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
         "core/src/theme.rs": "2dba34e92256",
         "core/src/time_of_day.rs": "3648a3ad3dd3",
         "core/src/wallpapers.rs": "0ea70ce54eac"
       },
-      "itemsHash": "60a94224d711",
+      "itemsHash": "c4a16b55f09b",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -209,7 +214,8 @@
         "Em Configurações > \"Painéis da tela inicial\", oculte um painel por vez: pesquisa, controle rápido, sistema, recentes, favoritos e cartões. Confira se o layout se reorganiza sem buracos nem sobreposição.",
         "Oculte todos. Confira se ainda dá para navegar pelo menu principal e para trazer os painéis de volta.",
         "Mostre todos de novo. Confira se voltam no lugar certo.",
-        "Feche e abra o launcher. Confira se a escolha de painéis foi lembrada."
+        "Feche e abra o launcher. Confira se a escolha de painéis foi lembrada.",
+        "Em Configurações, confira se a chave \"Iniciar com o sistema\" tem a mesma largura das chaves dos painéis, e não a tela inteira."
       ],
       "covers": [
         "core/src/settings.rs",
@@ -219,11 +225,11 @@
       ],
       "reviewed": {
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/settings/settings_page.dart": "a58abfd6e327",
+        "app/lib/ui/settings/settings_page.dart": "1dda31d3ea96",
         "app/rust/src/api/settings.rs": "2a6a73f25fa8",
         "core/src/settings.rs": "144b0e0a81e3"
       },
-      "itemsHash": "dc74ddc2780b",
+      "itemsHash": "13e6b977f59f",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -250,7 +256,9 @@
         "Confira o cartão Músicas: sem player instalado ele aparece apagado com \"Nenhum player encontrado\"; com um player instalado, \"Abrir player\" deve abri-lo. Anote qual player abriu se houver vários.",
         "Troque entre Início, Aplicativos, Jogos, Arquivos e Configurações. Confira se cada uma abre a tela certa.",
         "Confira se a hora e a data da barra superior estão certas e se a hora atualiza sozinha.",
-        "Confira se a saudação muda conforme a hora do dia (bom dia, boa tarde, boa noite)."
+        "Confira se a saudação muda conforme a hora do dia (bom dia, boa tarde, boa noite).",
+        "Confira se o botão Energia, no fim da navegação lateral, tem a mesma cara dos outros itens (sem fundo próprio, separado por um fio fino) e só ganha destaque quando focado.",
+        "Na barra superior, confira se a bateria aparece deitada, do mesmo tamanho dos ícones de Wi-Fi e volume, com a porcentagem ao lado."
       ],
       "covers": [
         "app/lib/launcher_app.dart",
@@ -273,12 +281,12 @@
         "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
         "app/lib/ui/shell/launcher_shell.dart": "53be837c3ce4",
-        "app/lib/ui/shell/side_nav.dart": "58f0940eefae",
-        "app/lib/ui/shell/top_bar.dart": "68cbc8495cdf",
+        "app/lib/ui/shell/side_nav.dart": "c2cfa9142400",
+        "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
-      "itemsHash": "4cb51803049e",
+      "itemsHash": "67d9e5ca4b40",
       "reviews": []
     },
     {
@@ -306,14 +314,19 @@
       ],
       "reviewed": {
         "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
-        "app/lib/ui/home/favorites_picker.dart": "26a87f7b65d1",
+        "app/lib/ui/home/favorites_picker.dart": "0ea2818a6b1a",
         "app/lib/ui/pages/apps_page.dart": "20850355065c",
         "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
       "itemsHash": "3db780b400c1",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O seletor de favoritos só passou a usar a moldura comum dos diálogos; o item novo da seção visual confere a aparência."
+        }
+      ]
     },
     {
       "id": "recentes",
@@ -426,10 +439,15 @@
       ],
       "reviewed": {
         "app/lib/state/power_controller.dart": "d213e49debd5",
-        "app/lib/ui/power/power_menu.dart": "7279a7015d5d"
+        "app/lib/ui/power/power_menu.dart": "1da377f8f976"
       },
       "itemsHash": "10397ed097c6",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O menu Energia só passou a usar a moldura e as linhas comuns; o comportamento é o mesmo e a aparência é conferida na seção visual."
+        }
+      ]
     },
     {
       "id": "sistema",

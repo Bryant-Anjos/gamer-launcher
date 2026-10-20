@@ -5,6 +5,7 @@ import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/widgets/app_icon.dart';
 import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
+import 'package:gamer_launcher/ui/widgets/overlay_card.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 
 const _pickerWidthFactor = 0.7;
@@ -19,51 +20,31 @@ class FavoritesPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final services = LauncherScope.of(context);
-    final palette = LauncherPalette.of(context);
     final size = MediaQuery.sizeOf(context);
-    return Center(
-      child: SizedBox(
-        width: size.width * _pickerWidthFactor,
-        height: size.height * _pickerHeightFactor,
-        child: Material(
-          color: palette.background,
-          borderRadius: BorderRadius.circular(Dimens.radius),
-          child: Padding(
-            padding: const EdgeInsets.all(Dimens.gutter),
-            child: ValueListenableBuilder(
-              valueListenable: services.controller,
-              builder: (context, state, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SectionTitle('Escolha os favoritos'),
-                  const MutedText('A marca ou desmarca · B fecha'),
-                  const SizedBox(height: Dimens.gap),
-                  Expanded(
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(Dimens.smallGap),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: Dimens.appGridExtent,
-                            mainAxisSpacing: Dimens.gap,
-                            crossAxisSpacing: Dimens.gap,
-                          ),
-                      itemCount: state.catalog.apps.length,
-                      itemBuilder: (context, index) {
-                        final app = state.catalog.apps[index];
-                        return PickerTile(
-                          app: app,
-                          isFavorite: state.settings.favorites.contains(app.id),
-                          autofocus: index == 0,
-                          onToggle: () =>
-                              services.controller.toggleFavorite(app.id),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return OverlayCard(
+      title: 'Escolha os favoritos',
+      hint: const MutedText('A marca ou desmarca · B fecha'),
+      width: size.width * _pickerWidthFactor,
+      height: size.height * _pickerHeightFactor,
+      child: ValueListenableBuilder(
+        valueListenable: services.controller,
+        builder: (context, state, _) => GridView.builder(
+          padding: const EdgeInsets.all(Dimens.smallGap),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: Dimens.appGridExtent,
+            mainAxisSpacing: Dimens.gap,
+            crossAxisSpacing: Dimens.gap,
           ),
+          itemCount: state.catalog.apps.length,
+          itemBuilder: (context, index) {
+            final app = state.catalog.apps[index];
+            return PickerTile(
+              app: app,
+              isFavorite: state.settings.favorites.contains(app.id),
+              autofocus: index == 0,
+              onToggle: () => services.controller.toggleFavorite(app.id),
+            );
+          },
         ),
       ),
     );

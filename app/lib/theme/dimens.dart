@@ -22,6 +22,17 @@ abstract final class Dimens {
   static const toggleBox = 60.0;
   static const statusIcon = 22.0;
   static const panelPadding = 20.0;
+
+  /// Linhas de lista (navegação, menus, dispositivos): recuo e o espaço
+  /// entre o ícone e o texto.
+  static const rowPaddingX = 14.0;
+  static const rowPaddingY = 12.0;
+  static const iconGap = 14.0;
+  static const tinyGap = 4.0;
+
+  /// Largura dos menus sobrepostos (Energia).
+  static const menuWidth = 440.0;
+  static const divider = 1.0;
 }
 
 abstract final class Motion {

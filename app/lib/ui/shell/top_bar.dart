@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
-import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
+import 'package:gamer_launcher/ui/widgets/panel_card.dart';
 import 'package:gamer_launcher/ui/widgets/poller_attachment.dart';
 import 'package:gamer_launcher/util/formatting.dart';
 
@@ -48,16 +48,25 @@ class BatteryIndicator extends StatelessWidget {
         : isLow
         ? 'Bateria fraca'
         : 'Bateria';
+    final textTheme = Theme.of(context).textTheme;
+    final color = isLow ? Theme.of(context).colorScheme.error : null;
     return Row(
       children: [
-        Icon(
-          batteryIcon(battery),
-          size: Dimens.statusIcon,
-          semanticLabel: label,
-          color: isLow ? Theme.of(context).colorScheme.error : null,
+        // deitada, a bateria ocupa a mesma largura dos outros ícones da barra
+        RotatedBox(
+          quarterTurns: 1,
+          child: Icon(
+            batteryIcon(battery),
+            size: Dimens.statusIcon,
+            semanticLabel: label,
+            color: color,
+          ),
         ),
-        const SizedBox(width: Dimens.smallGap / 2),
-        Text('${battery.percent}%'),
+        const SizedBox(width: Dimens.tinyGap),
+        Text(
+          '${battery.percent}%',
+          style: textTheme.labelLarge?.copyWith(color: color),
+        ),
       ],
     );
   }
@@ -70,7 +79,6 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final services = LauncherScope.of(context);
-    final palette = LauncherPalette.of(context);
     return PollerAttachment(
       pollers: [
         services.quickControls.poller,
@@ -136,10 +144,7 @@ class TopBar extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    Text(
-                      formatShortDate(now),
-                      style: TextStyle(color: palette.textMuted, fontSize: 13),
-                    ),
+                    MutedText(formatShortDate(now)),
                   ],
                 ),
               ),

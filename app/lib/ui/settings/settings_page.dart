@@ -69,14 +69,17 @@ class SettingsPage extends StatelessWidget {
               box(const SizedBox(height: Dimens.gutter)),
               box(const SectionTitle('Ao ligar o computador')),
               box(
-                ValueListenableBuilder(
-                  valueListenable: services.autostart,
-                  builder: (context, enabled, _) => SwitchRow(
-                    label: 'Iniciar com o sistema',
-                    value: enabled ?? false,
-                    onWord: 'ligado',
-                    offWord: 'desligado',
-                    onChanged: services.autostart.set,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ValueListenableBuilder(
+                    valueListenable: services.autostart,
+                    builder: (context, enabled, _) => SwitchRow(
+                      label: 'Iniciar com o sistema',
+                      value: enabled ?? false,
+                      onWord: 'ligado',
+                      offWord: 'desligado',
+                      onChanged: services.autostart.set,
+                    ),
                   ),
                 ),
               ),

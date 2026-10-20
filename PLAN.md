@@ -79,6 +79,7 @@ gamer-launcher/
 - **Favoritos:** escolhidos num diálogo com todos os apps (A marca/desmarca, B fecha). Sem favoritos padrão.
 - **Wallpaper:** imagens da pasta de imagens do usuário (`user-dirs.dirs`) e de `/usr/share/backgrounds`, até 2 níveis e 60 imagens; decodificado na largura da tela, com um véu do tema por cima. Arquivo que não abre volta à cor lisa.
 - **Foco visível:** borda de 3 px na cor de destaque, brilho e leve aumento (1,04×); segue o foco real (não o modo de destaque do Flutter, que só liga com teclado).
+- **Diálogos e listas (revisão de design da Fase 6):** todo diálogo sobreposto (favoritos, Energia, pesquisa) usa a moldura `OverlayCard` (fundo do tema, borda dos painéis, título e dica dos botões) e toda linha de menu/lista usa `MenuRow` (superfície dos painéis, raio pequeno, `Dimens.rowPadding*`). O botão Energia tem a cara de um item da navegação, separado por um fio. A bateria fica deitada na barra, do tamanho dos outros ícones.
 - **Avisos:** falhas (abrir app, salvar configurações, alterar Wi-Fi...) aparecem como SnackBar; nada derruba a tela. Leitura de controle que falha mostra o item como "Indisponível" (com o motivo numa dica).
 
 ## Fases (cada uma termina com testes verdes e commit antes da próxima)

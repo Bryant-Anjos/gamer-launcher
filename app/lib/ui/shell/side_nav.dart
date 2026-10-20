@@ -61,7 +61,8 @@ class SideNav extends StatelessWidget {
   }
 }
 
-/// Energia e saída, separada das seções: abre o menu em vez de trocar de página.
+/// Energia e saída, separada das seções por um fio: abre o menu em vez de
+/// trocar de página, mas tem a mesma cara de um item da navegação.
 class _PowerItem extends StatelessWidget {
   const _PowerItem({required this.onTap});
 
@@ -70,24 +71,28 @@ class _PowerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = LauncherPalette.of(context);
-    return FocusTile(
-      onActivate: onTap,
-      borderRadius: Dimens.smallRadius,
-      semanticLabel: 'Energia',
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        color: palette.panel,
-        child: Row(
-          children: [
-            const Icon(Icons.power_settings_new_rounded),
-            const SizedBox(width: 14),
-            Text(
-              'Energia',
-              style: TextStyle(color: palette.textPrimary, fontSize: 16),
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Divider(
+          height: Dimens.divider,
+          thickness: Dimens.divider,
+          indent: Dimens.focusBorder,
+          endIndent: Dimens.focusBorder,
+          color: palette.panelBorder,
         ),
-      ),
+        const SizedBox(height: Dimens.smallGap),
+        FocusTile(
+          onActivate: onTap,
+          borderRadius: Dimens.smallRadius,
+          semanticLabel: 'Energia',
+          child: _NavRow(
+            icon: Icons.power_settings_new_rounded,
+            label: 'Energia',
+            color: palette.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -108,34 +113,61 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = LauncherPalette.of(context);
-    final color = isSelected ? palette.accent : palette.textPrimary;
     return FocusTile(
       focusNode: focusNode,
       onActivate: onTap,
       borderRadius: Dimens.smallRadius,
       semanticLabel: section.label,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        color: isSelected
-            ? palette.accent.withValues(alpha: Opacities.selected)
-            : Colors.transparent,
-        child: Row(
-          children: [
-            Icon(sectionIcon(section), color: color),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                section.label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
+      child: _NavRow(
+        icon: sectionIcon(section),
+        label: section.label,
+        color: isSelected ? palette.accent : palette.textPrimary,
+        isSelected: isSelected,
+      ),
+    );
+  }
+}
+
+/// Conteúdo de um item da navegação; o selecionado ganha fundo e negrito.
+class _NavRow extends StatelessWidget {
+  const _NavRow({
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.isSelected = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = LauncherPalette.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimens.rowPaddingX,
+        vertical: Dimens.rowPaddingY,
+      ),
+      color: isSelected
+          ? palette.accent.withValues(alpha: Opacities.selected)
+          : Colors.transparent,
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: Dimens.iconGap),
+          Expanded(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: color,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
