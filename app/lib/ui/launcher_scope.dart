@@ -11,7 +11,8 @@ import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
 import 'package:gamer_launcher/state/ui_sounds.dart';
 
-/// Focos que o app move por fora da árvore (LB/RB levam o foco à seção).
+/// Focos que o app move por fora da árvore: LB/RB e o B levam o foco ao
+/// item da seção na navegação; A e a direita entram no conteúdo.
 class LauncherFocus {
   LauncherFocus()
     : nav = List.unmodifiable([
@@ -21,7 +22,15 @@ class LauncherFocus {
 
   final List<FocusNode> nav;
 
+  /// Envolve a página da seção (não recebe foco; só agrupa os itens).
+  final content = FocusNode(
+    debugLabel: 'content',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
   void dispose() {
+    content.dispose();
     for (final node in nav) {
       node.dispose();
     }
@@ -49,6 +58,7 @@ class LauncherServices {
     required this.sounds,
     required this.bluetoothDevices,
     required this.openSearch,
+    required this.enterContent,
   });
 
   final LauncherBackend backend;
@@ -70,6 +80,9 @@ class LauncherServices {
 
   /// Abre a pesquisa global com o texto já digitado (vazio pelo Y).
   final ValueChanged<String> openSearch;
+
+  /// Leva o foco ao primeiro item da página da seção atual.
+  final VoidCallback enterContent;
 }
 
 class LauncherScope extends InheritedWidget {

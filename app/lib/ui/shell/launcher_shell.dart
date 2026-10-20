@@ -34,13 +34,19 @@ class LauncherShell extends StatelessWidget {
                   onSelect: services.controller.selectSection,
                   focusNodes: services.focus.nav,
                   onPower: services.openPowerMenu,
+                  onEnterContent: services.enterContent,
                 ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const TopBar(),
-                      Expanded(child: _page(state)),
+                      Expanded(
+                        child: Focus(
+                          focusNode: services.focus.content,
+                          child: _page(state),
+                        ),
+                      ),
                     ],
                   ),
                 ),

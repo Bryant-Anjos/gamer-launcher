@@ -100,7 +100,11 @@
         "Repita os testes com outro modelo de controle (Xbox, PlayStation, 8BitDo...). Anote em qual algo não funcionou ou veio com botões trocados.",
         "Conecte dois controles ao mesmo tempo. Confira se os dois funcionam e se um não atrapalha o outro.",
         "Com o controle rápido aberto (Start), mova com o direcional. Confira se o foco fica dentro do painel e não vai para itens escondidos atrás dele.",
-        "Com um controle Nintendo (Pro Controller), confira se o A (à direita) confirma, o B (embaixo) volta e o Y (à esquerda) abre a pesquisa: o launcher reconhece controle Nintendo sozinho. Num controle Xbox, o A fica embaixo e o B à direita. Anote se algum botão parecer trocado."
+        "Com um controle Nintendo (Pro Controller), confira se o A (à direita) confirma, o B (embaixo) volta e o Y (à esquerda) abre a pesquisa: o launcher reconhece controle Nintendo sozinho. Num controle Xbox, o A fica embaixo e o B à direita. Anote se algum botão parecer trocado.",
+        "No menu lateral, desça e suba com o direcional. Confira se cada seção (Início, Aplicativos, Jogos, Arquivos, Configurações) abre sozinha só de passar o foco, sem apertar A, e se passar pelo Energia NÃO abre o menu de energia (só com A).",
+        "Com o foco num item do menu, aperte A. Confira se o foco vai para o primeiro item da página aberta (na tela inicial, o cartão Continuar; em Aplicativos, o primeiro app; em Configurações, o tema Claro).",
+        "Com o foco no menu, aperte para a direita. Confira se cai no mesmo primeiro item (na tela inicial, o Continuar, e não a pesquisa). A pesquisa continua acessível pelo Y e subindo a partir dos cartões.",
+        "Dentro de uma página, aperte B. Confira se o foco volta ao item da seção no menu, sem trocar de seção. Com um painel aberto (Start, Energia, pesquisa, favoritos), o B só fecha o painel."
       ],
       "covers": [
         "core/src/input.rs",
@@ -109,18 +113,22 @@
         "app/lib/input/gamepad_stream.dart",
         "app/lib/input/input_router.dart",
         "app/lib/input/adjust_intent.dart",
-        "app/lib/state/gamepad_status.dart"
+        "app/lib/state/gamepad_status.dart",
+        "app/lib/input/content_focus.dart",
+        "app/lib/ui/shell/side_nav.dart"
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
+        "app/lib/input/content_focus.dart": "e2b403f38eb1",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
-        "app/lib/input/input_router.dart": "a7390d8fe9b7",
+        "app/lib/input/input_router.dart": "42fd3b91403e",
         "app/lib/state/gamepad_status.dart": "043915da5add",
+        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b",
         "app/rust/src/api/input.rs": "18c1d38b076f",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/input.rs": "5c4ce90df3f5"
       },
-      "itemsHash": "3e6a8b2510d1",
+      "itemsHash": "91c5c38fe058",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -147,17 +155,20 @@
         "Aperte Tab e Shift+Tab. Confira se o foco percorre os itens em ordem lógica.",
         "Clique com o mouse nos itens e use a rodinha em listas longas.",
         "Alterne entre controle, teclado e mouse na mesma sessão. Confira se um não atrapalha o outro.",
-        "Com o controle rápido aberto, aperte Ctrl+Q. Confira se o launcher fecha mesmo assim."
+        "Com o controle rápido aberto, aperte Ctrl+Q. Confira se o launcher fecha mesmo assim.",
+        "No menu lateral, use as setas para cima e para baixo. Confira se as seções abrem só de passar o foco; a seta para a direita leva ao primeiro item da página, e Esc dentro da página volta ao menu."
       ],
       "covers": [
         "app/lib/input/input_router.dart",
-        "app/lib/input/adjust_intent.dart"
+        "app/lib/input/adjust_intent.dart",
+        "app/lib/ui/shell/side_nav.dart"
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/input_router.dart": "a7390d8fe9b7"
+        "app/lib/input/input_router.dart": "42fd3b91403e",
+        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b"
       },
-      "itemsHash": "4d9bba16a13f",
+      "itemsHash": "94efe33a2d72",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -199,7 +210,7 @@
       ],
       "reviewed": {
         "app/lib/input/button_names.dart": "6b8f775c7f08",
-        "app/lib/input/input_router.dart": "a7390d8fe9b7",
+        "app/lib/input/input_router.dart": "42fd3b91403e",
         "app/lib/main.dart": "0149ccf9c36f",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
@@ -215,6 +226,10 @@
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só passou a usar o detector de digitação comum; o silêncio ao digitar está num item da seção pesquisa."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter passou a mover o foco pelas Actions e a voltar ao menu com B e Esc; os sons das mesmas ações não mudam."
         }
       ]
     },
@@ -340,7 +355,8 @@
         "Confira se a hora e a data da barra superior estão certas e se a hora atualiza sozinha.",
         "Confira se a saudação muda conforme a hora do dia (bom dia, boa tarde, boa noite).",
         "Confira se o botão Energia, no fim da navegação lateral, tem a mesma cara dos outros itens (sem fundo próprio, separado por um fio fino) e só ganha destaque quando focado.",
-        "Na barra superior, confira se a bateria aparece deitada, do mesmo tamanho dos ícones de Wi-Fi e volume, com a porcentagem ao lado."
+        "Na barra superior, confira se a bateria aparece deitada, do mesmo tamanho dos ícones de Wi-Fi e volume, com a porcentagem ao lado.",
+        "Saindo do menu para a direita na tela inicial, confira se o primeiro item focado é o cartão Continuar."
       ],
       "covers": [
         "app/lib/launcher_app.dart",
@@ -356,19 +372,19 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "946f40e6a674",
+        "app/lib/launcher_app.dart": "b069fc307e33",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
         "app/lib/state/launcher_controller.dart": "634cf0b92925",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/shell/launcher_shell.dart": "53be837c3ce4",
-        "app/lib/ui/shell/side_nav.dart": "c2cfa9142400",
+        "app/lib/ui/shell/launcher_shell.dart": "83d5e3c467cd",
+        "app/lib/ui/shell/side_nav.dart": "0e974a855c8b",
         "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
-      "itemsHash": "67d9e5ca4b40",
+      "itemsHash": "4f68560e4fc3",
       "reviews": [
         {
           "date": "2026-10-19",

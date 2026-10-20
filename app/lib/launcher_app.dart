@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/backend/launcher_backend.dart';
+import 'package:gamer_launcher/input/content_focus.dart';
 import 'package:gamer_launcher/input/input_router.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
@@ -88,6 +89,7 @@ class _LauncherAppState extends State<LauncherApp> {
       ),
       bluetoothDevices: BluetoothDevicesController(backend, messages),
       openSearch: _openSearch,
+      enterContent: _enterContent,
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
@@ -158,6 +160,24 @@ class _LauncherAppState extends State<LauncherApp> {
     final navigator = _navigator;
     if (navigator == null || _overlayOpen) return;
     unawaited(showPowerMenu(navigator));
+  }
+
+  /// Depois do próximo quadro: a página da seção pode ter acabado de trocar.
+  void _afterFrame(VoidCallback action) {
+    WidgetsBinding.instance
+      ..addPostFrameCallback((_) => action())
+      ..ensureVisualUpdate();
+  }
+
+  /// A num item da navegação (ou a direita): o primeiro item da página.
+  void _enterContent() =>
+      _afterFrame(() => firstItemIn(_services.focus.content)?.requestFocus());
+
+  /// B no conteúdo: o foco volta ao item da seção atual na navegação.
+  void _backToMenu() {
+    if (_overlayOpen) return;
+    final section = _services.controller.value.section;
+    _services.focus.nav[section.index].requestFocus();
   }
 
   /// LB/RB trocam de seção e levam o foco para o item dela na navegação.
@@ -241,6 +261,7 @@ class _LauncherAppState extends State<LauncherApp> {
               onTabChange: _changeTab,
               onError: (error) => _services.messages.show(error.toString()),
               onFeedback: _playFeedback,
+              onBackToMenu: _backToMenu,
               child: child ?? const SizedBox.shrink(),
             ),
           ),

@@ -12,8 +12,9 @@ IconData sectionIcon(Section section) => switch (section) {
   Section.settings => Icons.settings_rounded,
 };
 
-/// Navegação lateral. A seção atual fica marcada; o foco é independente
-/// (LB/RB mudam a seção e levam o foco junto).
+/// Navegação lateral. Passar o foco por uma seção já a abre (sem A); A ou
+/// a direita levam o foco ao primeiro item da página. O Energia só abre o
+/// menu com A. LB/RB mudam a seção e levam o foco junto.
 class SideNav extends StatelessWidget {
   const SideNav({
     super.key,
@@ -21,15 +22,39 @@ class SideNav extends StatelessWidget {
     required this.onSelect,
     required this.focusNodes,
     required this.onPower,
+    required this.onEnterContent,
   });
 
   final Section selected;
   final ValueChanged<Section> onSelect;
   final List<FocusNode> focusNodes;
   final VoidCallback onPower;
+  final VoidCallback onEnterContent;
+
+  /// A direita sai do menu para o primeiro item da página (e não para o
+  /// item mais perto na mesma altura, que na tela inicial é a pesquisa).
+  Object? _move(DirectionalFocusIntent intent) {
+    if (intent.direction == TraversalDirection.right) {
+      onEnterContent();
+    } else {
+      FocusManager.instance.primaryFocus?.focusInDirection(intent.direction);
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    return Actions(
+      actions: {
+        DirectionalFocusIntent: CallbackAction<DirectionalFocusIntent>(
+          onInvoke: _move,
+        ),
+      },
+      child: _layout(),
+    );
+  }
+
+  Widget _layout() {
     return SizedBox(
       width: Dimens.sideNavWidth,
       child: Padding(
@@ -49,7 +74,11 @@ class SideNav extends StatelessWidget {
                   section: section,
                   isSelected: section == selected,
                   focusNode: focusNodes[section.index],
-                  onTap: () => onSelect(section),
+                  onFocus: () => onSelect(section),
+                  onTap: () {
+                    onSelect(section);
+                    onEnterContent();
+                  },
                 ),
               ),
             const Spacer(),
@@ -102,12 +131,14 @@ class _NavItem extends StatelessWidget {
     required this.section,
     required this.isSelected,
     required this.focusNode,
+    required this.onFocus,
     required this.onTap,
   });
 
   final Section section;
   final bool isSelected;
   final FocusNode focusNode;
+  final VoidCallback onFocus;
   final VoidCallback onTap;
 
   @override
@@ -116,6 +147,9 @@ class _NavItem extends StatelessWidget {
     return FocusTile(
       focusNode: focusNode,
       onActivate: onTap,
+      onFocusChange: (focused) {
+        if (focused) onFocus();
+      },
       borderRadius: Dimens.smallRadius,
       semanticLabel: section.label,
       child: _NavRow(

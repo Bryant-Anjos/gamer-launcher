@@ -37,6 +37,7 @@ class InputRouter extends StatefulWidget {
     this.onTabChange,
     this.onError,
     this.onFeedback,
+    this.onBackToMenu,
   });
 
   final Stream<GamepadAction> actions;
@@ -53,6 +54,9 @@ class InputRouter extends StatefulWidget {
   /// Cada ação do controle, e as teclas equivalentes (setas, Enter, Esc)
   /// fora de campos de texto, para o retorno sonoro.
   final ValueChanged<GamepadAction>? onFeedback;
+
+  /// B (ou Esc) sem diálogo aberto: o foco volta à navegação.
+  final VoidCallback? onBackToMenu;
   final Widget child;
 
   @override
@@ -139,9 +143,23 @@ class _InputRouterState extends State<InputRouter> {
       _focusFirstItem();
       return;
     }
-    if (!_tryAdjust(focused, direction)) {
+    if (!_tryAdjust(focused, direction)) _moveFocus(focused, direction);
+  }
+
+  /// Pelo mesmo caminho das setas do teclado, para quem trata a direção
+  /// (a navegação lateral, um campo de texto) decidir; sem ninguém, a
+  /// travessia direcional do Flutter.
+  void _moveFocus(FocusNode focused, TraversalDirection direction) {
+    final focusedContext = focused.context;
+    final intent = DirectionalFocusIntent(direction, ignoreTextFields: false);
+    final action = focusedContext == null
+        ? null
+        : Actions.maybeFind<DirectionalFocusIntent>(focusedContext);
+    if (action == null || focusedContext == null) {
       focused.focusInDirection(direction);
+      return;
     }
+    Actions.invoke(focusedContext, intent);
   }
 
   /// Sem item focado, entra no primeiro item da camada de cima. Partir do
@@ -178,18 +196,37 @@ class _InputRouterState extends State<InputRouter> {
     }
   }
 
-  /// Volta no Navigator da camada de cima; na tela inicial não há o que fechar.
+  /// Fecha a camada de cima (diálogo, painel); sem nenhuma aberta, leva o
+  /// foco de volta à navegação.
   void _back() {
     final primaryContext = _primary?.context;
-    if (primaryContext == null) return;
-    Navigator.maybeOf(primaryContext)?.maybePop();
+    final navigator = primaryContext == null
+        ? null
+        : Navigator.maybeOf(primaryContext);
+    if (navigator != null && navigator.canPop()) {
+      navigator.maybePop();
+      return;
+    }
+    widget.onBackToMenu?.call();
+  }
+
+  bool get _hasOverlay {
+    final primaryContext = _primary?.context;
+    if (primaryContext == null) return false;
+    return Navigator.maybeOf(primaryContext)?.canPop() ?? false;
   }
 
   /// Só observa: a tecla segue para quem a trata (a travessia do Flutter).
   KeyEventResult _observeKey(FocusNode _, KeyEvent event) {
     final action = event is KeyUpEvent ? null : _keyActions[event.logicalKey];
     // num campo de texto as setas e o Enter editam, não navegam
-    if (action != null && !isTypingInField()) widget.onFeedback?.call(action);
+    if (action == null || isTypingInField()) return KeyEventResult.ignored;
+    widget.onFeedback?.call(action);
+    // Esc sem diálogo aberto volta à navegação, como o B
+    if (action == GamepadAction.back && !_hasOverlay) {
+      widget.onBackToMenu?.call();
+      return KeyEventResult.handled;
+    }
     return KeyEventResult.ignored;
   }
 
