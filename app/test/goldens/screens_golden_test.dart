@@ -59,6 +59,15 @@ void main() {
     await expectScreen('favorites_picker');
   });
 
+  testWidgets('search with results', (tester) async {
+    final h = await pumpLauncher(tester);
+    await h.pressAndSettle(tester, GamepadAction.search);
+    await tester.enterText(find.byType(EditableText), 'a');
+    await tester.pumpAndSettle();
+
+    await expectScreen('search');
+  });
+
   testWidgets('settings', (tester) async {
     await pumpLauncher(tester);
     await tester.tap(find.text('Configurações'));

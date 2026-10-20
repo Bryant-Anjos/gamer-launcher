@@ -11,20 +11,17 @@ import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
 import 'package:gamer_launcher/state/ui_sounds.dart';
 
-/// Focos que o app move por fora da árvore (LB/RB e o botão Y).
+/// Focos que o app move por fora da árvore (LB/RB levam o foco à seção).
 class LauncherFocus {
   LauncherFocus()
-    : search = FocusNode(debugLabel: 'search'),
-      nav = List.unmodifiable([
+    : nav = List.unmodifiable([
         for (final section in Section.values)
           FocusNode(debugLabel: 'nav-${section.name}'),
       ]);
 
-  final FocusNode search;
   final List<FocusNode> nav;
 
   void dispose() {
-    search.dispose();
     for (final node in nav) {
       node.dispose();
     }
@@ -51,6 +48,7 @@ class LauncherServices {
     required this.closeLauncher,
     required this.sounds,
     required this.bluetoothDevices,
+    required this.openSearch,
   });
 
   final LauncherBackend backend;
@@ -69,6 +67,9 @@ class LauncherServices {
   final VoidCallback closeLauncher;
   final UiSounds sounds;
   final BluetoothDevicesController bluetoothDevices;
+
+  /// Abre a pesquisa global com o texto já digitado (vazio pelo Y).
+  final ValueChanged<String> openSearch;
 }
 
 class LauncherScope extends InheritedWidget {

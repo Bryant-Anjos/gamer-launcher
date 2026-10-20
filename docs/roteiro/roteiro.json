@@ -114,7 +114,7 @@
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
-        "app/lib/input/input_router.dart": "07fd35156395",
+        "app/lib/input/input_router.dart": "a7390d8fe9b7",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/rust/src/api/input.rs": "18c1d38b076f",
         "core/src/gamepad.rs": "552cda4a685a",
@@ -129,6 +129,10 @@
         {
           "date": "2026-10-19",
           "reason": "O leitor passou a guardar o fabricante do último controle usado para as dicas na tela; os testes de layout estão na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter só passou a usar o detector de digitação comum (typing.dart); o controle não muda."
         }
       ]
     },
@@ -151,13 +155,17 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/input_router.dart": "07fd35156395"
+        "app/lib/input/input_router.dart": "a7390d8fe9b7"
       },
       "itemsHash": "4d9bba16a13f",
       "reviews": [
         {
           "date": "2026-10-19",
           "reason": "O InputRouter só observa setas, Enter e Esc para os sons, sem mudar a navegação; os sons estão na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter só passou a usar o detector de digitação comum; as teclas da pesquisa estão na seção pesquisa."
         }
       ]
     },
@@ -191,7 +199,7 @@
       ],
       "reviewed": {
         "app/lib/input/button_names.dart": "6b8f775c7f08",
-        "app/lib/input/input_router.dart": "07fd35156395",
+        "app/lib/input/input_router.dart": "a7390d8fe9b7",
         "app/lib/main.dart": "0149ccf9c36f",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
@@ -203,7 +211,12 @@
         "core/src/sound.rs": "b3f4fbc249cf"
       },
       "itemsHash": "1d8861d63050",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter só passou a usar o detector de digitação comum; o silêncio ao digitar está num item da seção pesquisa."
+        }
+      ]
     },
     {
       "id": "visual",
@@ -343,11 +356,11 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "45437ce17ff7",
+        "app/lib/launcher_app.dart": "946f40e6a674",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
         "app/lib/state/launcher_controller.dart": "634cf0b92925",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
-        "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
+        "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
         "app/lib/ui/shell/launcher_shell.dart": "53be837c3ce4",
         "app/lib/ui/shell/side_nav.dart": "c2cfa9142400",
@@ -364,6 +377,10 @@
         {
           "date": "2026-10-19",
           "reason": "O app ganhou o controlador dos dispositivos Bluetooth e o controlador o atalho para as páginas do sistema; testados na seção controle-rapido."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A barra de pesquisa da tela inicial e o Y agora abrem a pesquisa; testado na seção pesquisa."
         }
       ]
     },
@@ -380,7 +397,8 @@
         "Desmarque um favorito no mesmo seletor. Confira se ele some da grade.",
         "Feche e abra o launcher. Confira se os favoritos continuam.",
         "Sem nenhum favorito, confira se a grade mostra só o botão \"Adicionar\" (hoje não há favoritos padrão).",
-        "No seletor \"Escolha os favoritos\", anote se faz falta pesquisar por nome (hoje não há pesquisa ali)."
+        "No seletor \"Escolha os favoritos\", digite parte do nome de um app (no campo \"Filtrar pelo nome\" ou direto, com um app selecionado). Confira se a grade mostra só os que batem, se a sigla funciona (vsc) e se apagar o texto traz todos de volta.",
+        "No seletor de favoritos, filtre por um nome que não existe. Confira se aparece \"Nenhum aplicativo com esse nome.\" e se, com o filtro, Enter (ou A no campo) marca ou desmarca o primeiro app da lista."
       ],
       "covers": [
         "core/src/apps.rs",
@@ -392,13 +410,13 @@
       ],
       "reviewed": {
         "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
-        "app/lib/ui/home/favorites_picker.dart": "4a76984bcc79",
+        "app/lib/ui/home/favorites_picker.dart": "3ffabc34d5fc",
         "app/lib/ui/pages/apps_page.dart": "20850355065c",
         "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
-      "itemsHash": "3db780b400c1",
+      "itemsHash": "12c116360686",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -480,7 +498,7 @@
         "app/lib/state/quick_controls_controller.dart": "c6673ecd3ff6",
         "app/lib/state/quick_controls_edit.dart": "9f752b41b06a",
         "app/lib/ui/quick/bluetooth_devices.dart": "d6a0c30d0bbf",
-        "app/lib/ui/quick/overlays.dart": "816de9087e1e",
+        "app/lib/ui/quick/overlays.dart": "e9d7b407cf8d",
         "app/lib/ui/quick/quick_controls_panel.dart": "9f80503acc1e",
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
         "app/rust/src/api/system.rs": "198436bcfac8",
@@ -508,6 +526,10 @@
         {
           "date": "2026-10-19",
           "reason": "Os painéis sobrepostos só passaram a abrir sem animação com Reduzir animações; conferido na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "overlays.dart só ganhou a rota da pesquisa; o controle rápido não muda."
         }
       ]
     },
@@ -580,10 +602,9 @@
       "id": "pesquisa",
       "title": "Pesquisa global",
       "sub": "Apps, arquivos e configurações",
-      "priority": "Ainda em desenvolvimento",
       "desc": "O núcleo da busca já existe. A tela de pesquisa ainda será ligada, então estes testes valem quando ela estiver pronta.",
       "items": [
-        "Aperte Y (ou vá até a barra \"Pesquisar aplicativos, arquivos, configurações...\"). Confira se o campo recebe o foco. Hoje a busca em si ainda não funciona: confira se aparece \"A pesquisa chega na próxima versão.\"",
+        "Aperte Y em qualquer seção (ou ative a barra \"Pesquisar aplicativos, arquivos, configurações...\" da tela inicial). Confira se a pesquisa abre por cima da tela, com o campo já pronto para digitar e a dica \"A abre · B fecha\".",
         "Digite no teclado físico. Confira se os resultados atualizam a cada letra e se as setas e o Enter escolhem e abrem um resultado.",
         "Pesquise o nome de um aplicativo. Confira se aparece e se abre.",
         "Pesquise por sigla, como vsc para o Visual Studio Code.",
@@ -591,7 +612,14 @@
         "Pesquise wifi, bluetooth e papel de parede. Confira se abrem as páginas certas de configurações.",
         "Pesquise com maiúsculas e sem acentos. Confira se acha do mesmo jeito.",
         "Pesquise algo que não existe. Confira se aparece uma mensagem de nada encontrado.",
-        "Se você costuma usar só o controle (no sofá), anote se faz falta um teclado na tela. Hoje ele não está previsto; a digitação é pelo teclado físico."
+        "Se você costuma usar só o controle (no sofá), anote se faz falta um teclado na tela. Hoje ele não está previsto; a digitação é pelo teclado físico.",
+        "Com o controle: depois de digitar, aperte para baixo. Confira se o foco desce para os resultados e se A abre o resultado selecionado. Para cima volta ao campo.",
+        "Com o campo selecionado, aperte A (ou Enter). Confira se abre o primeiro resultado.",
+        "Aperte B (ou Esc). Confira se a pesquisa fecha e volta para onde você estava.",
+        "Na tela inicial, selecione a barra de pesquisa e já digite uma letra. Confira se a pesquisa abre com a letra escrita.",
+        "Abra um aplicativo pela pesquisa e volte. Confira se o cartão Continuar passa a mostrar esse app.",
+        "Com \"Sons\" ligado, digite na pesquisa. Confira se as letras e as setas dentro do campo não tocam sons.",
+        "Em Configurações, oculte o painel Pesquisa e aperte Y. Anote o que acontece (hoje o Y não abre nada com a pesquisa oculta)."
       ],
       "covers": [
         "core/src/search.rs",
@@ -599,9 +627,23 @@
         "core/src/open.rs",
         "app/rust/src/api/catalog.rs",
         "app/rust/src/api/search.rs",
-        "app/rust/src/store.rs"
+        "app/rust/src/store.rs",
+        "app/lib/input/typing.dart",
+        "app/lib/state/search_model.dart",
+        "app/lib/ui/search/search_overlay.dart",
+        "app/lib/ui/search/search_results.dart",
+        "app/lib/ui/widgets/search_input.dart",
+        "app/lib/ui/home/greeting_header.dart",
+        "app/lib/ui/home/favorites_picker.dart"
       ],
       "reviewed": {
+        "app/lib/input/typing.dart": "fb176c939078",
+        "app/lib/state/search_model.dart": "c419a2773a52",
+        "app/lib/ui/home/favorites_picker.dart": "3ffabc34d5fc",
+        "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
+        "app/lib/ui/search/search_overlay.dart": "64a9dfe5f1db",
+        "app/lib/ui/search/search_results.dart": "108f16ff46d6",
+        "app/lib/ui/widgets/search_input.dart": "7db1b585773e",
         "app/rust/src/api/catalog.rs": "78c387a14c04",
         "app/rust/src/api/search.rs": "5be36679f0d4",
         "app/rust/src/store.rs": "630f1072435a",
@@ -609,7 +651,7 @@
         "core/src/open.rs": "4863c3edfde7",
         "core/src/search.rs": "57d64d75b23d"
       },
-      "itemsHash": "e42b4a2b3250",
+      "itemsHash": "b26267548338",
       "reviews": [
         {
           "date": "2026-10-19",

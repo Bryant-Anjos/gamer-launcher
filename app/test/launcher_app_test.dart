@@ -5,6 +5,7 @@ import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/ui/home/greeting_header.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
+import 'package:gamer_launcher/ui/search/search_overlay.dart';
 
 import 'support/fake_backend.dart';
 import 'support/harness.dart';
@@ -149,15 +150,16 @@ void main() {
     expect(find.byType(QuickControlsPanel), findsNothing);
   });
 
-  testWidgets('Y goes back home and focuses the search field', (tester) async {
+  testWidgets('Y opens the search on top of the current section', (
+    tester,
+  ) async {
     final h = await pumpLauncher(tester);
     await h.pressAndSettle(tester, GamepadAction.tabNext);
 
     await h.pressAndSettle(tester, GamepadAction.search);
 
-    expect(hasFocus(tester, find.text(searchHint)), isTrue);
-    await h.pressAndSettle(tester, GamepadAction.confirm);
-    expect(find.text(searchComingSoon), findsOneWidget);
+    expect(find.byType(SearchOverlay), findsOneWidget);
+    expect(find.text('6 instalados'), findsOneWidget);
   });
 
   testWidgets('a failed launch shows a message on screen', (tester) async {

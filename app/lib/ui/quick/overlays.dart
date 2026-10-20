@@ -4,11 +4,13 @@ import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/home/favorites_picker.dart';
 import 'package:gamer_launcher/ui/power/power_menu.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
+import 'package:gamer_launcher/ui/search/search_overlay.dart';
 
 const _barrierColor = Color(0x8C000000);
 const quickControlsRouteName = 'quick-controls';
 const favoritesRouteName = 'favorites-picker';
 const powerMenuRouteName = 'power-menu';
+const searchRouteName = 'search';
 
 Future<void> _showOverlay(
   NavigatorState navigator,
@@ -68,3 +70,12 @@ Future<void> showFavoritesPicker(NavigatorState navigator) => _showOverlay(
 
 Future<void> showPowerMenu(NavigatorState navigator) =>
     _showOverlay(navigator, powerMenuRouteName, (context) => const PowerMenu());
+
+/// Pesquisa global (Y ou a barra da tela inicial); [initialText] é a letra
+/// já digitada na barra.
+Future<void> showSearchOverlay(NavigatorState navigator, String initialText) =>
+    _showOverlay(
+      navigator,
+      searchRouteName,
+      (context) => SearchOverlay(initialText: initialText),
+    );

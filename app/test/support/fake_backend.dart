@@ -3,11 +3,19 @@ import 'dart:async';
 import 'package:gamer_launcher/backend/launcher_backend.dart';
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
+import 'package:gamer_launcher/src/rust/api/search.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/src/rust/api/sound.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
 
 import 'samples.dart';
+
+/// Páginas de configurações da busca falsa (página, título).
+const fakeSettingsPages = [
+  ('wireless', 'Wi-Fi'),
+  ('bluetooth', 'Bluetooth'),
+  ('wallpaper', 'Papel de parede'),
+];
 
 /// Backend falso: responde com dados combinados, registra as chamadas e
 /// falha quando o teste pede ([failures] por nome do método).
@@ -166,6 +174,46 @@ class FakeBackend implements LauncherBackend {
   @override
   Future<void> disconnectBluetoothDevice(String address) =>
       _answer('disconnectBluetoothDevice($address)', () {});
+
+  @override
+  Future<void> prepareSearch() => _answer('prepareSearch', () {});
+
+  /// Busca simples (trecho do título, sem maiúsculas) sobre os mesmos dados
+  /// que o núcleo usaria: apps, recentes e algumas páginas de configurações.
+  @override
+  Future<List<SearchResult>> search(String query, int limit) =>
+      _answer('search($query)', () {
+        final needle = query.trim().toLowerCase();
+        return [
+              for (final app in catalog.apps)
+                SearchResult(
+                  kind: SearchKind.app,
+                  id: 'app:${app.id}',
+                  title: app.name,
+                  appId: app.id,
+                ),
+              for (final file in recents)
+                SearchResult(
+                  kind: SearchKind.file,
+                  id: 'file:${file.path}',
+                  title: file.name,
+                  subtitle: file.location,
+                ),
+              for (final (page, title) in fakeSettingsPages)
+                SearchResult(
+                  kind: SearchKind.setting,
+                  id: 'setting:$page',
+                  title: title,
+                ),
+            ]
+            .where((r) => r.title.toLowerCase().contains(needle))
+            .take(limit)
+            .toList();
+      });
+
+  @override
+  Future<void> openSearchResult(String id) =>
+      _answer('openSearchResult($id)', () {});
 
   @override
   Future<void> openSettingsPage(String page) =>

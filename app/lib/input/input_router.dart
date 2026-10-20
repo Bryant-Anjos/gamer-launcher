@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamer_launcher/input/adjust_intent.dart';
+import 'package:gamer_launcher/input/typing.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 
 final _keyActions = {
@@ -187,13 +188,10 @@ class _InputRouterState extends State<InputRouter> {
   /// Só observa: a tecla segue para quem a trata (a travessia do Flutter).
   KeyEventResult _observeKey(FocusNode _, KeyEvent event) {
     final action = event is KeyUpEvent ? null : _keyActions[event.logicalKey];
-    if (action != null && !_isTyping) widget.onFeedback?.call(action);
+    // num campo de texto as setas e o Enter editam, não navegam
+    if (action != null && !isTypingInField()) widget.onFeedback?.call(action);
     return KeyEventResult.ignored;
   }
-
-  /// Num campo de texto as setas e o Enter editam, não navegam.
-  bool get _isTyping =>
-      _primary?.context?.findAncestorWidgetOfExactType<EditableText>() != null;
 
   @override
   Widget build(BuildContext context) {

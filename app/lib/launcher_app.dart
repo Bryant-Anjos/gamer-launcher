@@ -87,6 +87,7 @@ class _LauncherAppState extends State<LauncherApp> {
         isEnabled: () => controller.value.settings.sounds,
       ),
       bluetoothDevices: BluetoothDevicesController(backend, messages),
+      openSearch: _openSearch,
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
@@ -169,13 +170,13 @@ class _LauncherAppState extends State<LauncherApp> {
     );
   }
 
-  /// Y leva à pesquisa (na tela inicial); a busca em si é da Fase 6.
-  void _focusSearch() {
-    if (_overlayOpen || !_shows((panels) => panels.search)) return;
-    _services.controller.selectSection(Section.home);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _services.focus.search.requestFocus(),
-    );
+  /// Y abre a pesquisa por cima da seção atual (não com o painel de
+  /// pesquisa oculto nas configurações, nem com outro painel aberto).
+  void _openSearch([String initialText = '']) {
+    final navigator = _navigator;
+    if (navigator == null || _overlayOpen) return;
+    if (!_shows((panels) => panels.search)) return;
+    unawaited(showSearchOverlay(navigator, initialText));
   }
 
   ThemeMode _themeMode(LauncherSettings settings, DateTime now) {
@@ -235,7 +236,7 @@ class _LauncherAppState extends State<LauncherApp> {
             child: InputRouter(
               actions: widget.actions,
               onClose: widget.onClose,
-              onSearch: _focusSearch,
+              onSearch: _openSearch,
               onQuickControls: _toggleQuickControls,
               onTabChange: _changeTab,
               onError: (error) => _services.messages.show(error.toString()),

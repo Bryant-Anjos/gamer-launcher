@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamer_launcher/input/typing.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
@@ -6,7 +7,6 @@ import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 import 'package:gamer_launcher/util/formatting.dart';
 
 const searchHint = 'Pesquisar aplicativos, arquivos, configurações...';
-const searchComingSoon = 'A pesquisa chega na próxima versão.';
 
 /// Saudação pela hora do dia, com o primeiro nome do usuário.
 class GreetingHeader extends StatelessWidget {
@@ -43,8 +43,8 @@ class GreetingHeader extends StatelessWidget {
   }
 }
 
-/// Campo de pesquisa. Nesta versão só recebe foco (botão Y); a busca em si
-/// entra na Fase 6.
+/// Barra de pesquisa da tela inicial: A, Enter ou clique abrem a pesquisa;
+/// digitar com ela focada abre a pesquisa já com a letra.
 class SearchField extends StatelessWidget {
   const SearchField({super.key});
 
@@ -52,31 +52,33 @@ class SearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final services = LauncherScope.of(context);
     final palette = LauncherPalette.of(context);
-    return FocusTile(
-      focusNode: services.focus.search,
-      borderRadius: Dimens.radius + Dimens.focusBorder,
-      semanticLabel: 'Pesquisa',
-      onActivate: () => services.messages.show(searchComingSoon),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        decoration: BoxDecoration(
-          color: palette.panel,
-          borderRadius: BorderRadius.circular(Dimens.radius),
-          border: Border.all(color: palette.panelBorder),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.search_rounded, color: palette.textMuted),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                searchHint,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: palette.textMuted),
+    return TypeToSearch(
+      onCharacter: services.openSearch,
+      child: FocusTile(
+        borderRadius: Dimens.radius + Dimens.focusBorder,
+        semanticLabel: 'Pesquisa',
+        onActivate: () => services.openSearch(''),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          decoration: BoxDecoration(
+            color: palette.panel,
+            borderRadius: BorderRadius.circular(Dimens.radius),
+            border: Border.all(color: palette.panelBorder),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search_rounded, color: palette.textMuted),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  searchHint,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: palette.textMuted),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

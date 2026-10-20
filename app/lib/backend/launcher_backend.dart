@@ -1,5 +1,6 @@
 import 'package:gamer_launcher/src/rust/api/catalog.dart';
 import 'package:gamer_launcher/src/rust/api/files.dart';
+import 'package:gamer_launcher/src/rust/api/search.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/src/rust/api/sound.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
@@ -49,6 +50,16 @@ abstract interface class LauncherBackend {
   Future<List<PairedDevice>> listPairedDevices();
   Future<void> connectBluetoothDevice(String address);
   Future<void> disconnectBluetoothDevice(String address);
+
+  /// Lê os recentes para a pesquisa (uma vez, ao abrir a tela de pesquisa).
+  Future<void> prepareSearch();
+
+  /// Apps, arquivos recentes e páginas de configurações que batem com
+  /// [query], os melhores primeiro.
+  Future<List<SearchResult>> search(String query, int limit);
+
+  /// Abre um resultado pelo id devolvido em [search].
+  Future<void> openSearchResult(String id);
 
   /// Abre uma página das configurações do sistema (`bluetooth`, `wireless`).
   Future<void> openSettingsPage(String page);
