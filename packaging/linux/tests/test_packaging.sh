@@ -67,7 +67,10 @@ check "instala o atalho de menu" contains "$LISTING" "./usr/share/applications/g
 check "instala o ícone" contains "$LISTING" "./usr/share/icons/hicolor/scalable/apps/gamer-launcher.svg"
 check "cria o comando em /usr/bin apontando para o bundle" \
   contains "$LISTING" "./usr/bin/gamer-launcher -> /opt/gamer-launcher/gamer_launcher"
-check "os arquivos pertencem ao root" fails contains "$LISTING" "brilliant"
+# os donos no pacote são sempre root; nunca quem gerou o pacote
+if [ "$(id -un)" != root ]; then
+  check "os arquivos não pertencem a quem gerou o pacote" fails contains "$LISTING" " $(id -un)/"
+fi
 
 EXTRACTED="$WORK/extracted"
 mkdir -p "$EXTRACTED"
