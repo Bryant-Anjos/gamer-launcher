@@ -26,7 +26,7 @@ fn face_and_system_buttons_have_fixed_meanings() {
         (PadButton::LeftBumper, Some(Action::TabPrevious)),
         (PadButton::RightBumper, Some(Action::TabNext)),
         (PadButton::Mode, Some(Action::Close)),
-        (PadButton::West, None),
+        (PadButton::West, Some(Action::Secondary)),
         (PadButton::Select, None),
         (PadButton::Other, None),
     ];
@@ -59,7 +59,7 @@ fn pressing_a_button_emits_its_action_once() {
 fn unmapped_buttons_do_nothing() {
     let mut mapper = InputMapper::new();
 
-    assert_eq!(press(&mut mapper, PadButton::West, 0), None);
+    assert_eq!(press(&mut mapper, PadButton::Select, 0), None);
 }
 
 #[test]
@@ -327,9 +327,11 @@ mod layout {
             action_for_button_with(ButtonLayout::Nintendo, PadButton::West),
             Some(Action::Search)
         );
+        // o X do Nintendo fica em cima: é a ação secundária (mover, por
+        // exemplo), como o X do Xbox, que fica à esquerda
         assert_eq!(
             action_for_button_with(ButtonLayout::Nintendo, PadButton::North),
-            None
+            Some(Action::Secondary)
         );
     }
 

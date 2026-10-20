@@ -17,6 +17,7 @@ pub enum _GamepadAction {
     Confirm,
     Back,
     Search,
+    Secondary,
     QuickControls,
     TabPrevious,
     TabNext,

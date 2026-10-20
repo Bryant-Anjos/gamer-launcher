@@ -1292,10 +1292,11 @@ impl SseDecode for crate::api::input::GamepadAction {
             4 => crate::api::input::GamepadAction::Confirm,
             5 => crate::api::input::GamepadAction::Back,
             6 => crate::api::input::GamepadAction::Search,
-            7 => crate::api::input::GamepadAction::QuickControls,
-            8 => crate::api::input::GamepadAction::TabPrevious,
-            9 => crate::api::input::GamepadAction::TabNext,
-            10 => crate::api::input::GamepadAction::Close,
+            7 => crate::api::input::GamepadAction::Secondary,
+            8 => crate::api::input::GamepadAction::QuickControls,
+            9 => crate::api::input::GamepadAction::TabPrevious,
+            10 => crate::api::input::GamepadAction::TabNext,
+            11 => crate::api::input::GamepadAction::Close,
             _ => unreachable!("Invalid variant for GamepadAction: {}", inner),
         };
     }
@@ -1847,10 +1848,11 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::input::GamepadActi
             crate::api::input::GamepadAction::Confirm => 4.into_dart(),
             crate::api::input::GamepadAction::Back => 5.into_dart(),
             crate::api::input::GamepadAction::Search => 6.into_dart(),
-            crate::api::input::GamepadAction::QuickControls => 7.into_dart(),
-            crate::api::input::GamepadAction::TabPrevious => 8.into_dart(),
-            crate::api::input::GamepadAction::TabNext => 9.into_dart(),
-            crate::api::input::GamepadAction::Close => 10.into_dart(),
+            crate::api::input::GamepadAction::Secondary => 7.into_dart(),
+            crate::api::input::GamepadAction::QuickControls => 8.into_dart(),
+            crate::api::input::GamepadAction::TabPrevious => 9.into_dart(),
+            crate::api::input::GamepadAction::TabNext => 10.into_dart(),
+            crate::api::input::GamepadAction::Close => 11.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -2296,10 +2298,11 @@ impl SseEncode for crate::api::input::GamepadAction {
                 crate::api::input::GamepadAction::Confirm => 4,
                 crate::api::input::GamepadAction::Back => 5,
                 crate::api::input::GamepadAction::Search => 6,
-                crate::api::input::GamepadAction::QuickControls => 7,
-                crate::api::input::GamepadAction::TabPrevious => 8,
-                crate::api::input::GamepadAction::TabNext => 9,
-                crate::api::input::GamepadAction::Close => 10,
+                crate::api::input::GamepadAction::Secondary => 7,
+                crate::api::input::GamepadAction::QuickControls => 8,
+                crate::api::input::GamepadAction::TabPrevious => 9,
+                crate::api::input::GamepadAction::TabNext => 10,
+                crate::api::input::GamepadAction::Close => 11,
                 _ => {
                     unimplemented!("");
                 }

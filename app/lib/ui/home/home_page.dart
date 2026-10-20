@@ -9,12 +9,10 @@ import 'package:gamer_launcher/ui/home/recents_panel.dart';
 import 'package:gamer_launcher/ui/home/system_panel.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
 
-const _favoritesFlex = 5;
-const _recentsFlex = 4;
-
-/// Tela inicial na disposição da arte: saudação e pesquisa no topo,
-/// cartões e controle rápido, depois favoritos, recentes e sistema. Painel
-/// oculto some e os vizinhos ocupam o espaço.
+/// Tela inicial: saudação e pesquisa no topo; à esquerda os cartões de
+/// destaque e os favoritos em blocos do mesmo tamanho (navegação de TV); à
+/// direita o controle rápido, o sistema e os recentes. Painel oculto some e
+/// os vizinhos ocupam o espaço.
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.state});
 
@@ -24,11 +22,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = [
-      _header(),
-      _topRow(),
-      _bottomRow(),
-    ].whereType<Widget>().toList();
+    final body = _body();
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         Dimens.focusInset,
@@ -39,10 +33,8 @@ class HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final (index, row) in rows.indexed) ...[
-            if (index > 0) const SizedBox(height: Dimens.gutter),
-            row,
-          ],
+          _header(),
+          if (body != null) ...[const SizedBox(height: Dimens.gutter), body],
         ],
       ),
     );
@@ -57,48 +49,39 @@ class HomePage extends StatelessWidget {
     ],
   );
 
-  Widget? _topRow() {
-    final cards = _shows(PanelKind.featuredCards);
-    final quick = _shows(PanelKind.quickControls);
-    if (!cards && !quick) return null;
+  Widget? _body() {
+    final left = _stack([
+      if (_shows(PanelKind.featuredCards)) FeaturedCards(state: state),
+      if (_shows(PanelKind.favorites))
+        FavoritesPanel(favorites: state.favoriteApps),
+    ]);
+    final right = _stack([
+      if (_shows(PanelKind.quickControls)) const QuickControlsPanel(),
+      if (_shows(PanelKind.system)) const SystemPanel(),
+      if (_shows(PanelKind.recents)) RecentsPanel(recents: state.recents),
+    ]);
+    if (left == null && right == null) return null;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: cards ? FeaturedCards(state: state) : const SizedBox()),
-        if (quick) ...[
+        Expanded(child: left ?? const SizedBox.shrink()),
+        if (right != null) ...[
           const SizedBox(width: Dimens.gutter),
-          const SizedBox(
-            width: Dimens.sidePanelWidth,
-            child: QuickControlsPanel(),
-          ),
+          SizedBox(width: Dimens.sidePanelWidth, child: right),
         ],
       ],
     );
   }
 
-  Widget? _bottomRow() {
-    final favorites = _shows(PanelKind.favorites);
-    final recents = _shows(PanelKind.recents);
-    final system = _shows(PanelKind.system);
-    if (!favorites && !recents && !system) return null;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  /// Painéis um embaixo do outro; nenhum visível, nada.
+  Widget? _stack(List<Widget> panels) {
+    if (panels.isEmpty) return null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (favorites)
-          Expanded(
-            flex: _favoritesFlex,
-            child: FavoritesPanel(favorites: state.favoriteApps),
-          ),
-        if (favorites && recents) const SizedBox(width: Dimens.gutter),
-        if (recents)
-          Expanded(
-            flex: _recentsFlex,
-            child: RecentsPanel(recents: state.recents),
-          ),
-        if (!favorites && !recents) const Spacer(),
-        if (system) ...[
-          const SizedBox(width: Dimens.gutter),
-          const SizedBox(width: Dimens.sidePanelWidth, child: SystemPanel()),
+        for (final (index, panel) in panels.indexed) ...[
+          if (index > 0) const SizedBox(height: Dimens.gutter),
+          panel,
         ],
       ],
     );

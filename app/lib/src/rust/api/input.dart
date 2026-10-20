@@ -41,6 +41,7 @@ enum GamepadAction {
   confirm,
   back,
   search,
+  secondary,
   quickControls,
   tabPrevious,
   tabNext,

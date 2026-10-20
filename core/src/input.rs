@@ -23,6 +23,9 @@ pub enum GamepadAction {
     Confirm,
     Back,
     Search,
+    /// Botão X (à esquerda no Xbox, em cima no Nintendo): ação secundária
+    /// do item focado, como mover um favorito.
+    Secondary,
     QuickControls,
     TabPrevious,
     TabNext,
@@ -127,6 +130,7 @@ pub fn action_for_button(button: PadButton) -> Option<GamepadAction> {
         PadButton::South => Some(A::Confirm),
         PadButton::East => Some(A::Back),
         PadButton::North => Some(A::Search),
+        PadButton::West => Some(A::Secondary),
         PadButton::Start => Some(A::QuickControls),
         PadButton::LeftBumper => Some(A::TabPrevious),
         PadButton::RightBumper => Some(A::TabNext),
@@ -135,7 +139,7 @@ pub fn action_for_button(button: PadButton) -> Option<GamepadAction> {
         PadButton::DPadDown => Some(A::Down),
         PadButton::DPadLeft => Some(A::Left),
         PadButton::DPadRight => Some(A::Right),
-        PadButton::West | PadButton::Select | PadButton::Other => None,
+        PadButton::Select | PadButton::Other => None,
     }
 }
 

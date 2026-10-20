@@ -26,8 +26,6 @@ abstract final class Dimens {
   static const focusInset = 12.0;
   static const topBarHeight = 64.0;
   static const featuredCardHeight = 210.0;
-  static const favoriteTile = 72.0;
-  static const favoriteIcon = 44.0;
   static const appGridExtent = 160.0;
   static const appGridIcon = 64.0;
   static const wallpaperThumbWidth = 240.0;

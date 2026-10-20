@@ -105,7 +105,8 @@
         "No menu lateral, desça e suba com o direcional. Confira se cada seção (Início, Aplicativos, Jogos, Arquivos, Configurações) abre sozinha só de passar o foco, sem apertar A, e se passar pelo Energia NÃO abre o menu de energia (só com A).",
         "Com o foco num item do menu, aperte A. Confira se o foco vai para o primeiro item da página aberta (na tela inicial, o cartão Continuar; em Aplicativos, o primeiro app; em Configurações, o tema Claro).",
         "Com o foco no menu, aperte para a direita. Confira se cai no mesmo primeiro item (na tela inicial, o Continuar, e não a pesquisa). A pesquisa continua acessível pelo Y e subindo a partir dos cartões.",
-        "Dentro de uma página, aperte B. Confira se o foco volta ao item da seção no menu, sem trocar de seção. Com um painel aberto (Start, Energia, pesquisa, favoritos), o B só fecha o painel."
+        "Dentro de uma página, aperte B. Confira se o foco volta ao item da seção no menu, sem trocar de seção. Com um painel aberto (Start, Energia, pesquisa, favoritos), o B só fecha o painel.",
+        "Confira o botão X: no Xbox é o da esquerda, no Nintendo o de cima. Ele só faz algo num favorito da tela inicial (mover); nos outros lugares não faz nada."
       ],
       "covers": [
         "core/src/input.rs",
@@ -122,14 +123,14 @@
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/content_focus.dart": "ca6674ce766b",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
-        "app/lib/input/input_router.dart": "42fd3b91403e",
+        "app/lib/input/input_router.dart": "b621bde977ba",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/ui/shell/side_nav.dart": "393919814867",
-        "app/rust/src/api/input.rs": "18c1d38b076f",
+        "app/rust/src/api/input.rs": "a36818a990cc",
         "core/src/gamepad.rs": "552cda4a685a",
-        "core/src/input.rs": "5c4ce90df3f5"
+        "core/src/input.rs": "defbb34c90f8"
       },
-      "itemsHash": "91c5c38fe058",
+      "itemsHash": "168d934c9291",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -174,7 +175,7 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/input_router.dart": "42fd3b91403e",
+        "app/lib/input/input_router.dart": "b621bde977ba",
         "app/lib/ui/shell/side_nav.dart": "393919814867"
       },
       "itemsHash": "94efe33a2d72",
@@ -194,6 +195,10 @@
         {
           "date": "2026-10-19",
           "reason": "side_nav.dart só reduziu a folga da direita; a navegação não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O InputRouter passou a entregar o Esc ao cancelamento do item focado antes de voltar ao menu; o teclado ao mover favoritos está na seção apps."
         }
       ]
     },
@@ -227,14 +232,14 @@
         "app/lib/main.dart"
       ],
       "reviewed": {
-        "app/lib/input/button_names.dart": "6b8f775c7f08",
-        "app/lib/input/input_router.dart": "42fd3b91403e",
+        "app/lib/input/button_names.dart": "c128ebbd0919",
+        "app/lib/input/input_router.dart": "b621bde977ba",
         "app/lib/main.dart": "0149ccf9c36f",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
         "app/lib/ui/settings/input_settings.dart": "e9e9a8f4b907",
         "app/lib/ui/widgets/button_hints.dart": "9b141eee9b88",
-        "app/rust/src/api/input.rs": "18c1d38b076f",
+        "app/rust/src/api/input.rs": "a36818a990cc",
         "app/rust/src/api/sound.rs": "63bf56a9b28a",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/sound.rs": "b3f4fbc249cf"
@@ -248,6 +253,10 @@
         {
           "date": "2026-10-19",
           "reason": "O InputRouter passou a mover o foco pelas Actions e a voltar ao menu com B e Esc; os sons das mesmas ações não mudam."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Entrou o botão X (ação secundária) nas dicas e na ponte; a dica X move está na seção apps."
         }
       ]
     },
@@ -342,17 +351,13 @@
         "app/rust/src/api/settings.rs"
       ],
       "reviewed": {
-        "app/lib/ui/home/home_page.dart": "faf3a2ace125",
+        "app/lib/ui/home/home_page.dart": "6847b319f561",
         "app/lib/ui/settings/settings_page.dart": "1b1716f77355",
         "app/rust/src/api/settings.rs": "2a6a73f25fa8",
         "core/src/settings.rs": "144b0e0a81e3"
       },
       "itemsHash": "13e6b977f59f",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "O settings.rs ganhou o campo button_layout, sem relação com a visibilidade dos painéis."
-        },
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
@@ -368,6 +373,10 @@
         {
           "date": "2026-10-19",
           "reason": "A tela inicial e Configurações só ganharam a folga de foco à esquerda e no alto; mostrar e ocultar painéis não muda (anel conferido na seção visual)."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A tela inicial mudou de disposição (seção inicio); mostrar e ocultar cada painel continua igual."
         }
       ]
     },
@@ -385,7 +394,9 @@
         "Confira se a saudação muda conforme a hora do dia (bom dia, boa tarde, boa noite).",
         "Confira se o botão Energia, no fim da navegação lateral, tem a mesma cara dos outros itens (sem fundo próprio, separado por um fio fino) e só ganha destaque quando focado.",
         "Na barra superior, confira se a bateria aparece deitada, do mesmo tamanho dos ícones de Wi-Fi e volume, com a porcentagem ao lado.",
-        "Saindo do menu para a direita na tela inicial, confira se o primeiro item focado é o cartão Continuar."
+        "Saindo do menu para a direita na tela inicial, confira se o primeiro item focado é o cartão Continuar.",
+        "Confira a nova disposição da tela inicial: à esquerda os quatro cartões e, embaixo, os favoritos em blocos grandes do mesmo tamanho dos cartões; à direita, um embaixo do outro, o controle rápido, Sistema e Recentes.",
+        "Repita no monitor ultrawide (2560×1080) e no de 1920×1080. Confira se os blocos de favoritos continuam do tamanho dos cartões e se nada fica cortado ou sobreposto."
       ],
       "covers": [
         "app/lib/launcher_app.dart",
@@ -406,14 +417,14 @@
         "app/lib/state/launcher_controller.dart": "634cf0b92925",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
-        "app/lib/ui/home/home_page.dart": "faf3a2ace125",
+        "app/lib/ui/home/home_page.dart": "6847b319f561",
         "app/lib/ui/shell/launcher_shell.dart": "83d5e3c467cd",
         "app/lib/ui/shell/side_nav.dart": "393919814867",
         "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
-      "itemsHash": "4f68560e4fc3",
+      "itemsHash": "16a0a14d9a8f",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -454,7 +465,13 @@
         "No seletor de favoritos, filtre por um nome que não existe. Confira se aparece \"Nenhum aplicativo com esse nome.\" e se, com o filtro, Enter (ou A no campo) marca ou desmarca o primeiro app da lista.",
         "Em Aplicativos, digite no campo \"Filtrar pelo nome\" (no alto, à direita) parte do nome de um app. Confira se a grade mostra só os que batem, sem diferença de acentos e maiúsculas, e por sigla (vsc). Apagar o texto traz todos de volta.",
         "Em Aplicativos, com um app selecionado pelo controle, digite uma letra no teclado. Confira se ela vai para o filtro. Com o filtro escrito, Enter (ou A no campo) abre o primeiro app da lista; B volta ao menu.",
-        "Saindo do menu para Aplicativos (A ou direita), confira se o foco cai no primeiro app, e não no campo de filtro."
+        "Saindo do menu para Aplicativos (A ou direita), confira se o foco cai no primeiro app, e não no campo de filtro.",
+        "Na tela inicial, navegue pelos favoritos com o direcional, entre fileiras também. Confira se o foco é bem visível e se A abre o app.",
+        "Com um favorito focado, confira a dica \"X move\" ao lado do título. Aperte X (no Xbox, o da esquerda; no Nintendo, o de cima): o bloco ganha o selo de mover e a dica muda para \"Direcional muda o lugar · A confirma · B cancela\".",
+        "Movendo, use o direcional: esquerda e direita trocam com o vizinho, cima e baixo mudam de fileira. Aperte A e confira se a nova ordem fica, inclusive depois de fechar e abrir o launcher.",
+        "Comece a mover e aperte B. Confira se volta à ordem anterior, sem gravar, e se o foco continua no favorito (o B não vai para o menu nesse caso).",
+        "No teclado, com um favorito focado: M começa a mover, as setas mudam o lugar, Enter confirma e Esc cancela.",
+        "Com o mouse, arraste um favorito para cima de outro. Confira se ele vai para aquele lugar e se a ordem fica gravada."
       ],
       "covers": [
         "core/src/apps.rs",
@@ -463,10 +480,18 @@
         "app/lib/ui/home/favorites_panel.dart",
         "app/lib/ui/home/favorites_picker.dart",
         "app/lib/ui/widgets/app_icon.dart",
-        "app/lib/ui/widgets/app_filter.dart"
+        "app/lib/ui/widgets/app_filter.dart",
+        "app/lib/input/item_intents.dart",
+        "app/lib/state/favorites_order.dart",
+        "app/lib/ui/home/favorite_tile.dart",
+        "app/lib/ui/home/favorites_hints.dart"
       ],
       "reviewed": {
-        "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
+        "app/lib/input/item_intents.dart": "85acd2b209aa",
+        "app/lib/state/favorites_order.dart": "921070e0f225",
+        "app/lib/ui/home/favorite_tile.dart": "a01f6bf021db",
+        "app/lib/ui/home/favorites_hints.dart": "af55c437e979",
+        "app/lib/ui/home/favorites_panel.dart": "bfab8b048c47",
         "app/lib/ui/home/favorites_picker.dart": "3d0f69b670d4",
         "app/lib/ui/pages/apps_page.dart": "790d991d5f50",
         "app/lib/ui/widgets/app_filter.dart": "87da121cc362",
@@ -474,7 +499,7 @@
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
-      "itemsHash": "ffef3326d140",
+      "itemsHash": "fae67b2a995d",
       "reviews": [
         {
           "date": "2026-10-19",

@@ -80,6 +80,17 @@ void main() {
       },
     );
 
+    test('X (secondary) is left on xbox and on top on nintendo', () {
+      expect(
+        buttonFor(PadRole.secondary, PadLayout.xbox),
+        const PadButtonName('X', FacePosition.left),
+      );
+      expect(
+        buttonFor(PadRole.secondary, PadLayout.nintendo),
+        const PadButtonName('X', FacePosition.top),
+      );
+    });
+
     test('each position has a spoken name', () {
       expect(FacePosition.bottom.spoken, 'botão de baixo');
       expect(FacePosition.right.spoken, 'botão da direita');

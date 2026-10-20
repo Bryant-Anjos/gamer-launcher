@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/src/rust/api/system.dart';
+import 'package:gamer_launcher/ui/home/favorites_panel.dart';
 
 import '../support/fake_backend.dart';
 import '../support/harness.dart';
@@ -56,6 +58,44 @@ void main() {
     await expectLater(
       find.byType(MaterialApp),
       matchesGoldenFile('home_light.png'),
+    );
+  });
+
+  testWidgets('home on an ultrawide screen (2560x1080)', (tester) async {
+    final backend = FakeBackend(
+      settings: sampleSettings(themeMode: LauncherThemeMode.dark),
+    );
+    await pumpLauncher(tester, backend: backend, size: const Size(2560, 1080));
+    await _feedStats(tester, backend);
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('home_ultrawide.png'),
+    );
+  });
+
+  testWidgets('home while moving a favorite', (tester) async {
+    final h = await pumpLauncher(tester);
+    Focus.of(
+      tester.element(
+        find
+            .descendant(
+              of: find.byWidgetPredicate(
+                (w) => w is FavoriteTile && w.label == 'VS Code',
+              ),
+              matching: find.byType(AnimatedScale),
+            )
+            .first,
+      ),
+    ).requestFocus();
+    await tester.pumpAndSettle();
+    await h.pressAndSettle(tester, GamepadAction.secondary);
+    await h.pressAndSettle(tester, GamepadAction.right);
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('home_moving.png'),
     );
   });
 }

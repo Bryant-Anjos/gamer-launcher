@@ -5,7 +5,7 @@ import 'package:gamer_launcher/src/rust/api/settings.dart';
 enum PadLayout { xbox, nintendo }
 
 /// Papel do botão na tela, independente de onde ele fica no controle.
-enum PadRole { confirm, back, search }
+enum PadRole { confirm, back, search, secondary }
 
 /// Onde o botão fica no losango de botões do controle.
 enum FacePosition {
@@ -82,5 +82,13 @@ PadButtonName buttonFor(PadRole role, PadLayout layout) =>
       (PadRole.search, PadLayout.nintendo) => const PadButtonName(
         'Y',
         FacePosition.left,
+      ),
+      (PadRole.secondary, PadLayout.xbox) => const PadButtonName(
+        'X',
+        FacePosition.left,
+      ),
+      (PadRole.secondary, PadLayout.nintendo) => const PadButtonName(
+        'X',
+        FacePosition.top,
       ),
     };

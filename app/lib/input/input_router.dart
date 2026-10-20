@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamer_launcher/input/adjust_intent.dart';
+import 'package:gamer_launcher/input/item_intents.dart';
 import 'package:gamer_launcher/input/typing.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 
@@ -116,6 +117,8 @@ class _InputRouterState extends State<InputRouter> {
         _back();
       case GamepadAction.search:
         widget.onSearch?.call();
+      case GamepadAction.secondary:
+        _invokeOnFocused(const SecondaryIntent());
       case GamepadAction.quickControls:
         widget.onQuickControls?.call();
       case GamepadAction.tabPrevious:
@@ -196,9 +199,21 @@ class _InputRouterState extends State<InputRouter> {
     }
   }
 
-  /// Fecha a camada de cima (diálogo, painel); sem nenhuma aberta, leva o
-  /// foco de volta à navegação.
+  /// Invoca [intent] no item focado se alguém ali aceitar; diz se aceitou.
+  bool _invokeOnFocused(Intent intent) {
+    final focusedContext = _focusedItem?.context;
+    if (focusedContext == null) return false;
+    final action = Actions.maybeFind<Intent>(focusedContext, intent: intent);
+    if (action == null || !action.isEnabled(intent)) return false;
+    Actions.invoke(focusedContext, intent);
+    return true;
+  }
+
+  /// O item focado pode cancelar o que está fazendo (mover um favorito);
+  /// senão fecha a camada de cima (diálogo, painel); sem nenhuma aberta,
+  /// leva o foco de volta à navegação.
   void _back() {
+    if (_invokeOnFocused(const CancelIntent())) return;
     final primaryContext = _primary?.context;
     final navigator = primaryContext == null
         ? null
@@ -222,7 +237,11 @@ class _InputRouterState extends State<InputRouter> {
     // num campo de texto as setas e o Enter editam, não navegam
     if (action == null || isTypingInField()) return KeyEventResult.ignored;
     widget.onFeedback?.call(action);
-    // Esc sem diálogo aberto volta à navegação, como o B
+    // Esc como o B: primeiro o cancelamento do item, depois a navegação
+    if (action == GamepadAction.back &&
+        _invokeOnFocused(const CancelIntent())) {
+      return KeyEventResult.handled;
+    }
     if (action == GamepadAction.back && !_hasOverlay) {
       widget.onBackToMenu?.call();
       return KeyEventResult.handled;
