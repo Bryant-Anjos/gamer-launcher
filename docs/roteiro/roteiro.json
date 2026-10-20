@@ -120,7 +120,7 @@
       ],
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
-        "app/lib/input/content_focus.dart": "e2b403f38eb1",
+        "app/lib/input/content_focus.dart": "ca6674ce766b",
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
         "app/lib/input/input_router.dart": "42fd3b91403e",
         "app/lib/state/gamepad_status.dart": "043915da5add",
@@ -131,10 +131,6 @@
       },
       "itemsHash": "91c5c38fe058",
       "reviews": [
-        {
-          "date": "2026-10-19",
-          "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
-        },
         {
           "date": "2026-10-19",
           "reason": "O leitor passou a guardar o fabricante do último controle usado para as dicas na tela; os testes de layout estão na seção botoes-sons."
@@ -150,6 +146,10 @@
         {
           "date": "2026-10-19",
           "reason": "side_nav.dart só reduziu a folga da direita (a página ganhou a folga do foco); a navegação não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O primeiro item da página deixou de contar campos de texto; o item novo da seção apps confere a entrada em Aplicativos."
         }
       ]
     },
@@ -451,7 +451,10 @@
         "Feche e abra o launcher. Confira se os favoritos continuam.",
         "Sem nenhum favorito, confira se a grade mostra só o botão \"Adicionar\" (hoje não há favoritos padrão).",
         "No seletor \"Escolha os favoritos\", digite parte do nome de um app (no campo \"Filtrar pelo nome\" ou direto, com um app selecionado). Confira se a grade mostra só os que batem, se a sigla funciona (vsc) e se apagar o texto traz todos de volta.",
-        "No seletor de favoritos, filtre por um nome que não existe. Confira se aparece \"Nenhum aplicativo com esse nome.\" e se, com o filtro, Enter (ou A no campo) marca ou desmarca o primeiro app da lista."
+        "No seletor de favoritos, filtre por um nome que não existe. Confira se aparece \"Nenhum aplicativo com esse nome.\" e se, com o filtro, Enter (ou A no campo) marca ou desmarca o primeiro app da lista.",
+        "Em Aplicativos, digite no campo \"Filtrar pelo nome\" (no alto, à direita) parte do nome de um app. Confira se a grade mostra só os que batem, sem diferença de acentos e maiúsculas, e por sigla (vsc). Apagar o texto traz todos de volta.",
+        "Em Aplicativos, com um app selecionado pelo controle, digite uma letra no teclado. Confira se ela vai para o filtro. Com o filtro escrito, Enter (ou A no campo) abre o primeiro app da lista; B volta ao menu.",
+        "Saindo do menu para Aplicativos (A ou direita), confira se o foco cai no primeiro app, e não no campo de filtro."
       ],
       "covers": [
         "core/src/apps.rs",
@@ -459,17 +462,19 @@
         "app/lib/ui/pages/apps_page.dart",
         "app/lib/ui/home/favorites_panel.dart",
         "app/lib/ui/home/favorites_picker.dart",
-        "app/lib/ui/widgets/app_icon.dart"
+        "app/lib/ui/widgets/app_icon.dart",
+        "app/lib/ui/widgets/app_filter.dart"
       ],
       "reviewed": {
         "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
-        "app/lib/ui/home/favorites_picker.dart": "3ffabc34d5fc",
-        "app/lib/ui/pages/apps_page.dart": "aefa1565b182",
+        "app/lib/ui/home/favorites_picker.dart": "3d0f69b670d4",
+        "app/lib/ui/pages/apps_page.dart": "790d991d5f50",
+        "app/lib/ui/widgets/app_filter.dart": "87da121cc362",
         "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
       },
-      "itemsHash": "12c116360686",
+      "itemsHash": "ffef3326d140",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -708,7 +713,7 @@
       "reviewed": {
         "app/lib/input/typing.dart": "fb176c939078",
         "app/lib/state/search_model.dart": "c419a2773a52",
-        "app/lib/ui/home/favorites_picker.dart": "3ffabc34d5fc",
+        "app/lib/ui/home/favorites_picker.dart": "3d0f69b670d4",
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
         "app/lib/ui/search/search_overlay.dart": "64a9dfe5f1db",
         "app/lib/ui/search/search_results.dart": "108f16ff46d6",
@@ -725,6 +730,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "O seletor de favoritos passou a usar o filtro comum (AppFilter), com o mesmo comportamento; conferido na seção apps."
         }
       ]
     },

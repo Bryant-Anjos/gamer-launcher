@@ -5,6 +5,7 @@ import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
 import 'package:gamer_launcher/ui/launcher_scope.dart';
 import 'package:gamer_launcher/ui/pages/page_header.dart';
+import 'package:gamer_launcher/ui/widgets/app_filter.dart';
 import 'package:gamer_launcher/ui/widgets/app_icon.dart';
 import 'package:gamer_launcher/ui/widgets/focus_tile.dart';
 
@@ -21,19 +22,27 @@ class AppsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = LauncherScope.of(context).controller;
     final apps = state.catalog.apps;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        PageHeader(title: 'Aplicativos', subtitle: '${apps.length} instalados'),
-        Expanded(
-          child: apps.isEmpty
-              ? const EmptyState(icon: Icons.apps_rounded, text: noAppsText)
-              : AppGrid(
-                  apps: apps,
-                  onActivate: (app) => controller.launchApp(app.id),
-                ),
-        ),
-      ],
+    void launch(AppInfo app) => controller.launchApp(app.id);
+    final header = PageHeader(
+      title: 'Aplicativos',
+      subtitle: '${apps.length} instalados',
+    );
+    if (apps.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          header,
+          const EmptyState(icon: Icons.apps_rounded, text: noAppsText),
+        ],
+      );
+    }
+    return AppFilter(
+      apps: apps,
+      leading: header,
+      fieldWidth: Dimens.searchWidth,
+      headerPadding: const EdgeInsets.only(right: Dimens.gutter),
+      onSubmit: launch,
+      builder: (context, visible) => AppGrid(apps: visible, onActivate: launch),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/ui/home/favorites_picker.dart';
+import 'package:gamer_launcher/ui/widgets/app_filter.dart';
 import 'package:gamer_launcher/ui/home/greeting_header.dart';
 import 'package:gamer_launcher/ui/search/search_overlay.dart';
 import 'package:gamer_launcher/ui/search/search_results.dart';

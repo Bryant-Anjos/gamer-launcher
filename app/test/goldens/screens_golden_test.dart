@@ -68,6 +68,14 @@ void main() {
     await expectScreen('search');
   });
 
+  testWidgets('apps with filter', (tester) async {
+    final h = await pumpLauncher(tester);
+    await h.pressAndSettle(tester, GamepadAction.tabNext);
+    await h.pressAndSettle(tester, GamepadAction.right);
+
+    await expectScreen('apps');
+  });
+
   testWidgets('settings', (tester) async {
     await pumpLauncher(tester);
     await tester.tap(find.text('Configurações'));
