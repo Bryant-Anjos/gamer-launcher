@@ -42,7 +42,8 @@
         "Confira se a primeira tela aparece sem mensagem de erro.",
         "Feche com o botão Guide do controle. Abra de novo e feche com Ctrl+Q. Confira se fecha por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
         "Abra o launcher duas vezes seguidas. Anote o que acontece (duas janelas? a segunda fecha? dá erro?).",
-        "Desinstale (sudo apt remove gamer-launcher). Confira se o atalho do menu some."
+        "Desinstale (sudo apt remove gamer-launcher). Confira se o atalho do menu some.",
+        "Depois de compilar com make app-release (ou instalar o pacote), confira se todos os ícones aparecem certos, inclusive em Configurações > Botões do controle e nos painéis novos; nenhum deve virar caractere estranho."
       ],
       "covers": [
         "packaging/linux/*.sh",
@@ -54,7 +55,7 @@
         "app/lib/main.dart"
       ],
       "reviewed": {
-        ".github/workflows/release.yml": "7d01b146f691",
+        ".github/workflows/release.yml": "beb1984006d7",
         "app/lib/main.dart": "0149ccf9c36f",
         "app/linux/CMakeLists.txt": "41cb78aea946",
         "app/linux/runner/CMakeLists.txt": "8cdcfd911e77",
@@ -68,7 +69,7 @@
         "packaging/linux/gamer-launcher.desktop": "88a91850f503",
         "packaging/linux/gamer-launcher.svg": "332eb1294f07"
       },
-      "itemsHash": "23da77b8d185",
+      "itemsHash": "02aa70f5a8b2",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -123,7 +124,7 @@
         "app/lib/input/gamepad_stream.dart": "d305e483091e",
         "app/lib/input/input_router.dart": "42fd3b91403e",
         "app/lib/state/gamepad_status.dart": "043915da5add",
-        "app/lib/ui/shell/side_nav.dart": "659577b91ad3",
+        "app/lib/ui/shell/side_nav.dart": "393919814867",
         "app/rust/src/api/input.rs": "18c1d38b076f",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/input.rs": "5c4ce90df3f5"
@@ -145,6 +146,10 @@
         {
           "date": "2026-10-19",
           "reason": "side_nav.dart só trocou o ícone do Energia; a navegação não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "side_nav.dart só reduziu a folga da direita (a página ganhou a folga do foco); a navegação não muda."
         }
       ]
     },
@@ -170,7 +175,7 @@
       "reviewed": {
         "app/lib/input/adjust_intent.dart": "36b6c0533c5e",
         "app/lib/input/input_router.dart": "42fd3b91403e",
-        "app/lib/ui/shell/side_nav.dart": "659577b91ad3"
+        "app/lib/ui/shell/side_nav.dart": "393919814867"
       },
       "itemsHash": "94efe33a2d72",
       "reviews": [
@@ -185,6 +190,10 @@
         {
           "date": "2026-10-19",
           "reason": "side_nav.dart só trocou o ícone do Energia; a navegação não muda."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "side_nav.dart só reduziu a folga da direita; a navegação não muda."
         }
       ]
     },
@@ -201,7 +210,8 @@
         "Ligue \"Sons\" em Configurações > \"Sons e animações\". Confira se mover o foco, confirmar e voltar tocam sons curtos, pelo controle e pelo teclado (setas, Enter e Esc). Desligue e confira se fica em silêncio.",
         "Com \"Sons\" ligado, se aparecer \"Não foi possível tocar os sons\", anote a mensagem. Ela deve aparecer uma vez só, não a cada movimento.",
         "Ligue \"Reduzir animações\". Confira se o destaque do foco, a rolagem e a abertura do controle rápido (Start) e do menu Energia passam a acontecer na hora, sem animação. Desligue e confira se as animações voltam.",
-        "Feche e abra o launcher. Confira se layout, sons e animações continuam como você deixou."
+        "Feche e abra o launcher. Confira se layout, sons e animações continuam como você deixou.",
+        "Em \"Botões do controle\", confira os ícones: setas em círculo em Automático, um controle em Xbox e um controle de duas metades em Nintendo. Nenhum deve aparecer como letra ou ideograma."
       ],
       "covers": [
         "app/lib/input/button_names.dart",
@@ -222,14 +232,14 @@
         "app/lib/main.dart": "0149ccf9c36f",
         "app/lib/state/gamepad_status.dart": "043915da5add",
         "app/lib/state/ui_sounds.dart": "a8f981adb0d2",
-        "app/lib/ui/settings/input_settings.dart": "2e5b8af5964d",
+        "app/lib/ui/settings/input_settings.dart": "e9e9a8f4b907",
         "app/lib/ui/widgets/button_hints.dart": "9b141eee9b88",
         "app/rust/src/api/input.rs": "18c1d38b076f",
         "app/rust/src/api/sound.rs": "63bf56a9b28a",
         "core/src/gamepad.rs": "552cda4a685a",
         "core/src/sound.rs": "b3f4fbc249cf"
       },
-      "itemsHash": "1d8861d63050",
+      "itemsHash": "60ed5074ce11",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -255,7 +265,8 @@
         "Confira se o destaque do foco é bem visível nos dois temas, com e sem papel de parede.",
         "Feche e abra o launcher. Confira se tema e papel de parede continuam como você deixou.",
         "Se a lista de imagens falhar, confira se aparece \"Não foi possível listar as imagens\" com o motivo.",
-        "Abra o menu Energia e o seletor de favoritos (Adicionar). Confira se os dois têm a mesma moldura (fundo do tema com borda fina), título e dica embaixo, e se as linhas do menu têm a mesma cara das linhas dos recentes e das chaves de Configurações, nos dois temas."
+        "Abra o menu Energia e o seletor de favoritos (Adicionar). Confira se os dois têm a mesma moldura (fundo do tema com borda fina), título e dica embaixo, e se as linhas do menu têm a mesma cara das linhas dos recentes e das chaves de Configurações, nos dois temas.",
+        "Percorra com o controle os itens de Configurações (chaves, temas, miniaturas de wallpaper, horários), de Aplicativos, Jogos, Arquivos e da tela inicial. Confira se o destaque do foco aparece inteiro, sem corte na borda esquerda, no alto, à direita nem embaixo, e se linhas largas (Arquivos) crescem só um pouco ao receber o foco."
       ],
       "covers": [
         "core/src/theme.rs",
@@ -270,24 +281,26 @@
         "app/lib/ui/widgets/panel_card.dart",
         "app/lib/state/settings_edit.dart",
         "app/lib/ui/widgets/menu_row.dart",
-        "app/lib/ui/widgets/overlay_card.dart"
+        "app/lib/ui/widgets/overlay_card.dart",
+        "app/lib/ui/widgets/svg_icon.dart"
       ],
       "reviewed": {
         "app/lib/state/settings_edit.dart": "862a5e4782ea",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
-        "app/lib/ui/settings/settings_controls.dart": "bfcd1edfc839",
-        "app/lib/ui/settings/settings_page.dart": "6c5815d0cc82",
+        "app/lib/ui/settings/settings_controls.dart": "8e8b03c156d6",
+        "app/lib/ui/settings/settings_page.dart": "1b1716f77355",
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
-        "app/lib/ui/widgets/focus_tile.dart": "ed78bfe07dfd",
+        "app/lib/ui/widgets/focus_tile.dart": "29cfe21c0999",
         "app/lib/ui/widgets/menu_row.dart": "8d09a3716fae",
         "app/lib/ui/widgets/overlay_card.dart": "14d31f6cbdbf",
         "app/lib/ui/widgets/panel_card.dart": "e1c36a4ab77a",
+        "app/lib/ui/widgets/svg_icon.dart": "6e376f9a9132",
         "core/src/theme.rs": "2dba34e92256",
         "core/src/time_of_day.rs": "3648a3ad3dd3",
         "core/src/wallpapers.rs": "0ea70ce54eac"
       },
-      "itemsHash": "c4a16b55f09b",
+      "itemsHash": "d91023218994",
       "reviews": [
         {
           "date": "2026-10-19",
@@ -329,8 +342,8 @@
         "app/rust/src/api/settings.rs"
       ],
       "reviewed": {
-        "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/settings/settings_page.dart": "6c5815d0cc82",
+        "app/lib/ui/home/home_page.dart": "faf3a2ace125",
+        "app/lib/ui/settings/settings_page.dart": "1b1716f77355",
         "app/rust/src/api/settings.rs": "2a6a73f25fa8",
         "core/src/settings.rs": "144b0e0a81e3"
       },
@@ -351,6 +364,10 @@
         {
           "date": "2026-10-19",
           "reason": "Configurações ganhou seções novas abaixo dos painéis (testadas em botoes-sons); mostrar e ocultar painéis não mudou."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A tela inicial e Configurações só ganharam a folga de foco à esquerda e no alto; mostrar e ocultar painéis não muda (anel conferido na seção visual)."
         }
       ]
     },
@@ -389,9 +406,9 @@
         "app/lib/state/launcher_controller.dart": "634cf0b92925",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9e0908b32808",
-        "app/lib/ui/home/home_page.dart": "6ed5c801706e",
+        "app/lib/ui/home/home_page.dart": "faf3a2ace125",
         "app/lib/ui/shell/launcher_shell.dart": "83d5e3c467cd",
-        "app/lib/ui/shell/side_nav.dart": "659577b91ad3",
+        "app/lib/ui/shell/side_nav.dart": "393919814867",
         "app/lib/ui/shell/top_bar.dart": "b7dabc73f202",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
@@ -413,6 +430,10 @@
         {
           "date": "2026-10-19",
           "reason": "O botão Energia da navegação só trocou o ícone pelo desenho próprio; conferido na seção energia."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A tela inicial e a navegação só trocaram folgas para o foco não ser cortado; conferido na seção visual."
         }
       ]
     },
@@ -443,7 +464,7 @@
       "reviewed": {
         "app/lib/ui/home/favorites_panel.dart": "3f549929cb37",
         "app/lib/ui/home/favorites_picker.dart": "3ffabc34d5fc",
-        "app/lib/ui/pages/apps_page.dart": "20850355065c",
+        "app/lib/ui/pages/apps_page.dart": "aefa1565b182",
         "app/lib/ui/widgets/app_icon.dart": "374e320eeab5",
         "core/src/apps.rs": "e1c1bc2ec028",
         "core/src/icons.rs": "fe7303cd015c"
@@ -457,6 +478,10 @@
         {
           "date": "2026-10-19",
           "reason": "O seletor de favoritos só trocou a dica de texto pela dica com o losango do botão; conferida na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "A grade de apps só ganhou a folga de foco; conferido na seção visual."
         }
       ]
     },
@@ -479,13 +504,18 @@
       ],
       "reviewed": {
         "app/lib/ui/home/recents_panel.dart": "e3cb008390bc",
-        "app/lib/ui/pages/files_page.dart": "5a80974480eb",
+        "app/lib/ui/pages/files_page.dart": "32a65ac88010",
         "app/lib/ui/widgets/recent_tile.dart": "78d2af4994e8",
         "app/rust/src/api/files.rs": "85313b83b7a4",
         "core/src/recents.rs": "45843026b6a8"
       },
       "itemsHash": "e8af3ffc1a70",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "A lista de Arquivos só ganhou a folga de foco; conferido na seção visual."
+        }
+      ]
     },
     {
       "id": "controle-rapido",
@@ -591,7 +621,7 @@
       ],
       "reviewed": {
         "app/lib/state/power_controller.dart": "d213e49debd5",
-        "app/lib/ui/power/power_icons.dart": "19df19b9c438",
+        "app/lib/ui/power/power_icons.dart": "24280a48373f",
         "app/lib/ui/power/power_menu.dart": "4101878db914"
       },
       "itemsHash": "4aa97cf0f2e4",
@@ -603,6 +633,10 @@
         {
           "date": "2026-10-19",
           "reason": "O menu Energia só trocou a dica de texto pela dica com o losango do botão; conferida na seção botoes-sons."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "power_icons.dart passou a usar o SvgIcon comum; os desenhos não mudaram."
         }
       ]
     },
@@ -846,7 +880,7 @@
         ".github/workflows/release.yml"
       ],
       "reviewed": {
-        ".github/workflows/release.yml": "7d01b146f691",
+        ".github/workflows/release.yml": "beb1984006d7",
         "packaging/linux/build-appdir.sh": "63d9b4ef2a89",
         "packaging/linux/build-appimage.sh": "674468b78320",
         "packaging/linux/build-deb.sh": "dc501dbecd11",
@@ -855,7 +889,12 @@
         "packaging/linux/gamer-launcher.svg": "332eb1294f07"
       },
       "itemsHash": "09be864b0810",
-      "reviews": []
+      "reviews": [
+        {
+          "date": "2026-10-19",
+          "reason": "A CI de release passou a compilar sem cortar a fonte de ícones (--no-tree-shake-icons); o item novo da seção instalar confere os ícones no pacote."
+        }
+      ]
     },
     {
       "id": "outros",

@@ -67,6 +67,7 @@ flutter:
   # Ícones próprios (energia), no traço dos ícones do sistema.
   assets:
     - assets/icons/power/
+    - assets/icons/pads/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

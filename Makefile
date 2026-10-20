@@ -1,4 +1,4 @@
-.PHONY: check core-check app-check packaging-check roteiro-test roteiro-check roteiro-build roteiro-ack roteiro-baseline
+.PHONY: app-release check core-check app-check packaging-check roteiro-test roteiro-check roteiro-build roteiro-ack roteiro-baseline
 
 # Tudo o que precisa estar verde antes de cada commit.
 check: core-check app-check packaging-check roteiro-test roteiro-check
@@ -35,3 +35,10 @@ roteiro-ack:
 # Só para criar a linha de base de um roteiro novo; no dia a dia use roteiro-ack.
 roteiro-baseline:
 	python3 tools/roteiro/roteiro.py baseline
+
+# Compila o release do zero. Sem cortar a fonte de ícones: um bundle
+# incremental chegou a ficar com a fonte cortada de um build antigo, e os
+# ícones novos viraram outros caracteres (ideogramas) na tela.
+app-release:
+	rm -rf app/build/linux/x64/release/bundle
+	cd app && mkdir -p build/native_assets/linux && flutter build linux --release --no-tree-shake-icons

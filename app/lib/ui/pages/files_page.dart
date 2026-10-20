@@ -38,7 +38,7 @@ class FilesPage extends StatelessWidget {
                     child: ValueListenableBuilder(
                       valueListenable: services.clock,
                       builder: (context, now, _) => ListView.separated(
-                        padding: const EdgeInsets.all(Dimens.smallGap),
+                        padding: const EdgeInsets.all(Dimens.focusInset),
                         itemCount: recents.length,
                         separatorBuilder: (_, _) =>
                             const SizedBox(height: Dimens.smallGap),

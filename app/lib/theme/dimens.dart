@@ -5,7 +5,10 @@ abstract final class Dimens {
   static const gutter = 24.0;
   static const gap = 16.0;
   static const smallGap = 8.0;
-  static const sideNavWidth = 220.0;
+
+  /// A navegação perde a mesma largura que as páginas ganham de recuo
+  /// ([focusInset]): o conteúdo continua começando no mesmo lugar.
+  static const sideNavWidth = 208.0;
   static const sidePanelWidth = 380.0;
   static const searchWidth = 440.0;
   static const searchPanelWidth = 760.0;
@@ -14,6 +17,13 @@ abstract final class Dimens {
   static const focusBorder = 3.0;
   static const focusScale = 1.04;
   static const focusGlow = 18.0;
+
+  /// O item focado cresce no máximo isso de cada lado (linhas largas, como
+  /// as de Arquivos, cresceriam ~30 px com a escala sozinha).
+  static const maxFocusGrowth = 8.0;
+
+  /// Folga dentro das áreas que rolam, para o anel de foco não ser cortado.
+  static const focusInset = 12.0;
   static const topBarHeight = 64.0;
   static const featuredCardHeight = 210.0;
   static const favoriteTile = 72.0;

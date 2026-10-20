@@ -59,10 +59,11 @@ class SideNav extends StatelessWidget {
     return SizedBox(
       width: Dimens.sideNavWidth,
       child: Padding(
+        // à direita, a folga de foco da página completa o espaço
         padding: const EdgeInsets.fromLTRB(
           Dimens.gap,
           Dimens.topBarHeight + Dimens.gap,
-          Dimens.gap,
+          Dimens.gap - Dimens.focusInset,
           Dimens.gap,
         ),
         child: Column(

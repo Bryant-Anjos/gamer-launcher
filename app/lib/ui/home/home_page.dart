@@ -30,7 +30,12 @@ class HomePage extends StatelessWidget {
       _bottomRow(),
     ].whereType<Widget>().toList();
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(0, 0, Dimens.gutter, Dimens.gutter),
+      padding: const EdgeInsets.fromLTRB(
+        Dimens.focusInset,
+        Dimens.focusInset,
+        Dimens.gutter,
+        Dimens.gutter,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

@@ -4,6 +4,7 @@ import 'package:gamer_launcher/state/settings_edit.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/ui/settings/settings_controls.dart';
 import 'package:gamer_launcher/ui/widgets/panel_card.dart';
+import 'package:gamer_launcher/ui/widgets/svg_icon.dart';
 
 typedef SettingsEdit = void Function(
   LauncherSettings Function(LauncherSettings current) change,
@@ -23,17 +24,14 @@ class ButtonLayoutChoices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChoiceTile choice(
-      LauncherButtonLayout layout,
-      String label,
-      IconData icon,
-    ) => ChoiceTile(
-      label: label,
-      icon: icon,
-      selected: settings.buttonLayout == layout,
-      onSelect: () =>
-          onEdit((current) => current.copyWith(buttonLayout: layout)),
-    );
+    ChoiceTile choice(LauncherButtonLayout layout, String label, Widget icon) =>
+        ChoiceTile(
+          label: label,
+          leading: icon,
+          selected: settings.buttonLayout == layout,
+          onSelect: () =>
+              onEdit((current) => current.copyWith(buttonLayout: layout)),
+        );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -44,18 +42,14 @@ class ButtonLayoutChoices extends StatelessWidget {
             choice(
               LauncherButtonLayout.auto,
               'Automático',
-              Icons.auto_awesome_rounded,
+              const Icon(Icons.autorenew_rounded),
             ),
             choice(
               LauncherButtonLayout.xbox,
               'Xbox',
-              Icons.sports_esports_rounded,
+              const Icon(Icons.sports_esports_rounded),
             ),
-            choice(
-              LauncherButtonLayout.nintendo,
-              'Nintendo',
-              Icons.videogame_asset_rounded,
-            ),
+            choice(LauncherButtonLayout.nintendo, 'Nintendo', const PadIcon()),
           ],
         ),
         const SizedBox(height: Dimens.smallGap),

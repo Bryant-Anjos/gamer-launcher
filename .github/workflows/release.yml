@@ -42,7 +42,8 @@ jobs:
         run: |
           flutter pub get
           mkdir -p build/native_assets/linux
-          flutter build linux --release
+          # a fonte de ícones inteira: veja o alvo app-release do Makefile
+          flutter build linux --release --no-tree-shake-icons
 
       - name: Gerar .deb
         run: packaging/linux/build-deb.sh app/build/linux/x64/release/bundle dist

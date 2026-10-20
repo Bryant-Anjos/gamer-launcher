@@ -16,13 +16,17 @@ class ChoiceTile extends StatelessWidget {
   const ChoiceTile({
     super.key,
     required this.label,
-    required this.icon,
     required this.selected,
     required this.onSelect,
+    this.icon,
+    this.leading,
   });
 
   final String label;
-  final IconData icon;
+
+  /// Ícone do Material; [leading] (um desenho próprio) tem prioridade.
+  final IconData? icon;
+  final Widget? leading;
   final bool selected;
   final VoidCallback onSelect;
 
@@ -40,7 +44,12 @@ class ChoiceTile extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: selected ? palette.onAccent : null),
+            IconTheme.merge(
+              data: IconThemeData(
+                color: selected ? palette.onAccent : palette.textPrimary,
+              ),
+              child: leading ?? Icon(icon),
+            ),
             const SizedBox(width: 10),
             Text(
               label,

@@ -40,11 +40,25 @@ class FocusTile extends StatefulWidget {
 class _FocusTileState extends State<FocusTile> {
   bool _focused = false;
   bool _hovered = false;
+  double _scale = Dimens.focusScale;
 
   bool get _focusable => widget.focusable ?? widget.onActivate != null;
 
+  /// A escala de foco, limitada para itens grandes não crescerem demais
+  /// (e não saírem da área visível).
+  double _scaleFor(Size? size) {
+    if (size == null) return Dimens.focusScale;
+    final longest = size.longestSide;
+    if (longest <= 0) return Dimens.focusScale;
+    final capped = 1 + 2 * Dimens.maxFocusGrowth / longest;
+    return capped < Dimens.focusScale ? capped : Dimens.focusScale;
+  }
+
   void _handleFocus(bool focused) {
-    setState(() => _focused = focused);
+    setState(() {
+      _focused = focused;
+      if (focused) _scale = _scaleFor(context.size);
+    });
     widget.onFocusChange?.call(focused);
     if (focused) {
       Scrollable.ensureVisible(
@@ -86,7 +100,7 @@ class _FocusTileState extends State<FocusTile> {
         child: GestureDetector(
           onTap: widget.onActivate,
           child: AnimatedScale(
-            scale: _focused ? Dimens.focusScale : 1,
+            scale: _focused ? _scale : 1,
             duration: motion,
             child: AnimatedContainer(
               duration: motion,

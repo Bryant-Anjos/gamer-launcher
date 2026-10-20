@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gamer_launcher/ui/widgets/svg_icon.dart';
 
 /// Desenhos próprios das ações de energia, no estilo dos sistemas (COSMIC,
 /// GNOME, Windows): traço de 2 px com pontas arredondadas, como os ícones
@@ -27,19 +27,6 @@ class PowerIcon extends StatelessWidget {
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = IconTheme.of(context);
-    final size = theme.size ?? 24;
-    return SvgPicture.asset(
-      glyph.asset,
-      width: size,
-      height: size,
-      semanticsLabel: semanticLabel,
-      excludeFromSemantics: semanticLabel == null,
-      colorFilter: ColorFilter.mode(
-        color ?? theme.color ?? Colors.white,
-        BlendMode.srcIn,
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      SvgIcon(glyph.asset, color: color, semanticLabel: semanticLabel);
 }

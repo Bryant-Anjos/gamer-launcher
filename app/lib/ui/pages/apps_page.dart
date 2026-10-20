@@ -47,8 +47,8 @@ class AppGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GridView.builder(
     padding: const EdgeInsets.fromLTRB(
-      Dimens.smallGap,
-      Dimens.smallGap,
+      Dimens.focusInset,
+      Dimens.focusInset,
       Dimens.gutter,
       Dimens.gutter,
     ),

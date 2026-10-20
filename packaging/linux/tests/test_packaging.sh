@@ -109,6 +109,8 @@ check "AppImage sem appimagetool dá erro explicativo" \
 check "o ícone SVG é um SVG bem formado" \
   bash -c 'python3 -c "import sys, xml.dom.minidom as m; m.parse(sys.argv[1])" "$1"' _ "$LINUX_DIR/gamer-launcher.svg"
 check "o .desktop de origem é válido" desktop-file-validate "$LINUX_DIR/gamer-launcher.desktop"
+check "o release da CI não corta a fonte de ícones" \
+  grep -q -- "flutter build linux --release --no-tree-shake-icons" "$LINUX_DIR/../../.github/workflows/release.yml"
 
 echo
 echo "$passed passaram, $failed falharam"

@@ -27,10 +27,13 @@ class SettingsPage extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.only(right: Dimens.gutter),
+          padding: const EdgeInsets.only(
+            left: Dimens.focusInset,
+            right: Dimens.gutter,
+          ),
           sliver: SliverMainAxisGroup(
             slivers: [
-              box(const PageHeader(title: 'Configurações')),
+              box(const PageHeader(title: 'Configurações', inset: 0)),
               box(const SectionTitle('Tema')),
               box(_ThemeChoices(settings: settings, onEdit: edit)),
               if (settings.themeMode == LauncherThemeMode.auto)
