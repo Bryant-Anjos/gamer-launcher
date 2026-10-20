@@ -19,7 +19,51 @@ IconData volumeIcon(LevelReading? volume) {
       : Icons.volume_up_rounded;
 }
 
-/// Barra superior: Wi-Fi, volume, controle conectado, hora e data.
+/// Abaixo disso o ícone avisa que a bateria está fraca.
+const lowBatteryPercent = 15;
+
+IconData batteryIcon(BatteryReading battery) {
+  if (battery.charging) return Icons.battery_charging_full_rounded;
+  return switch (battery.percent) {
+    < lowBatteryPercent => Icons.battery_alert_rounded,
+    < 30 => Icons.battery_2_bar_rounded,
+    < 50 => Icons.battery_3_bar_rounded,
+    < 70 => Icons.battery_4_bar_rounded,
+    < 90 => Icons.battery_5_bar_rounded,
+    _ => Icons.battery_full_rounded,
+  };
+}
+
+/// Ícone e porcentagem da bateria; o rótulo diz se carrega ou está fraca.
+class BatteryIndicator extends StatelessWidget {
+  const BatteryIndicator({super.key, required this.battery});
+
+  final BatteryReading battery;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLow = !battery.charging && battery.percent < lowBatteryPercent;
+    final label = battery.charging
+        ? 'Bateria carregando'
+        : isLow
+        ? 'Bateria fraca'
+        : 'Bateria';
+    return Row(
+      children: [
+        Icon(
+          batteryIcon(battery),
+          size: Dimens.statusIcon,
+          semanticLabel: label,
+          color: isLow ? Theme.of(context).colorScheme.error : null,
+        ),
+        const SizedBox(width: Dimens.smallGap / 2),
+        Text('${battery.percent}%'),
+      ],
+    );
+  }
+}
+
+/// Barra superior: Wi-Fi, volume, controle conectado, bateria, hora e data.
 class TopBar extends StatelessWidget {
   const TopBar({super.key});
 
@@ -28,7 +72,11 @@ class TopBar extends StatelessWidget {
     final services = LauncherScope.of(context);
     final palette = LauncherPalette.of(context);
     return PollerAttachment(
-      pollers: [services.quickControls.poller, services.gamepad.poller],
+      pollers: [
+        services.quickControls.poller,
+        services.gamepad.poller,
+        services.power.poller,
+      ],
       child: SizedBox(
         height: Dimens.topBarHeight,
         child: Padding(
@@ -66,6 +114,15 @@ class TopBar extends StatelessWidget {
                         ),
                       )
                     : const SizedBox.shrink(),
+              ),
+              ValueListenableBuilder(
+                valueListenable: services.power,
+                builder: (context, battery, _) => battery == null
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.only(left: Dimens.gap),
+                        child: BatteryIndicator(battery: battery),
+                      ),
               ),
               const SizedBox(width: Dimens.gutter),
               ValueListenableBuilder(

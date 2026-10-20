@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gamer_launcher/theme/dimens.dart';
 import 'package:gamer_launcher/ui/home/favorites_picker.dart';
+import 'package:gamer_launcher/ui/power/power_menu.dart';
 import 'package:gamer_launcher/ui/quick/quick_controls_panel.dart';
 
 const _barrierColor = Color(0x8C000000);
 const _overlayMotion = Duration(milliseconds: 160);
 const quickControlsRouteName = 'quick-controls';
 const favoritesRouteName = 'favorites-picker';
+const powerMenuRouteName = 'power-menu';
 
 Future<void> _showOverlay(
   NavigatorState navigator,
@@ -54,3 +56,6 @@ Future<void> showFavoritesPicker(NavigatorState navigator) => _showOverlay(
   favoritesRouteName,
   (context) => const FavoritesPicker(),
 );
+
+Future<void> showPowerMenu(NavigatorState navigator) =>
+    _showOverlay(navigator, powerMenuRouteName, (context) => const PowerMenu());

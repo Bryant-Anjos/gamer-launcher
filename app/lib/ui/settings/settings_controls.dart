@@ -60,15 +60,21 @@ class SwitchRow extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.onWord = 'exibido',
+    this.offWord = 'oculto',
   });
 
   final String label;
   final bool value;
   final ValueChanged<bool> onChanged;
 
+  /// Como a leitura em voz alta descreve cada estado.
+  final String onWord;
+  final String offWord;
+
   @override
   Widget build(BuildContext context) => FocusTile(
-    semanticLabel: '$label: ${value ? 'exibido' : 'oculto'}',
+    semanticLabel: '$label: ${value ? onWord : offWord}',
     borderRadius: Dimens.smallRadius,
     onActivate: () => onChanged(!value),
     child: Container(

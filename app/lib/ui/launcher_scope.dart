@@ -3,7 +3,9 @@ import 'package:gamer_launcher/backend/launcher_backend.dart';
 import 'package:gamer_launcher/state/clock.dart';
 import 'package:gamer_launcher/state/gamepad_status.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
+import 'package:gamer_launcher/state/autostart_controller.dart';
 import 'package:gamer_launcher/state/messages.dart';
+import 'package:gamer_launcher/state/power_controller.dart';
 import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
 
@@ -41,6 +43,10 @@ class LauncherServices {
     required this.messages,
     required this.coreVersion,
     required this.openFavoritesPicker,
+    required this.power,
+    required this.autostart,
+    required this.openPowerMenu,
+    required this.closeLauncher,
   });
 
   final LauncherBackend backend;
@@ -53,6 +59,10 @@ class LauncherServices {
   final LauncherMessages messages;
   final String coreVersion;
   final VoidCallback openFavoritesPicker;
+  final PowerController power;
+  final AutostartController autostart;
+  final VoidCallback openPowerMenu;
+  final VoidCallback closeLauncher;
 }
 
 class LauncherScope extends InheritedWidget {

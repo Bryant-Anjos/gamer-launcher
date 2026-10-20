@@ -9,7 +9,7 @@ use crate::api::meta::{core_version, user_first_name};
 use crate::api::settings::{
     default_settings, resolve_theme, LauncherSettings, LauncherThemeMode, ResolvedTheme,
 };
-use crate::api::system::sample_stats;
+use crate::api::system::{autostart_enabled, read_battery, sample_stats};
 
 const NOON: u16 = 12 * 60;
 const NIGHT: u16 = 22 * 60;
@@ -80,4 +80,16 @@ fn the_catalog_lists_apps_with_their_featured_ids_inside_it() {
     if let Some(id) = &catalog.music_player_id {
         assert!(ids.contains(&id.as_str()), "{id}");
     }
+}
+
+#[test]
+fn the_battery_reading_never_fails_and_stays_in_range() {
+    let reading = read_battery().expect("sem bateria é None, não erro");
+
+    assert!(reading.is_none_or(|battery| battery.percent <= 100));
+}
+
+#[test]
+fn reading_the_autostart_state_does_not_touch_it() {
+    assert_eq!(autostart_enabled(), autostart_enabled());
 }

@@ -33,6 +33,7 @@ class LauncherShell extends StatelessWidget {
                   selected: state.section,
                   onSelect: services.controller.selectSection,
                   focusNodes: services.focus.nav,
+                  onPower: services.openPowerMenu,
                 ),
                 Expanded(
                   child: Column(

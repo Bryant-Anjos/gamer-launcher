@@ -20,11 +20,13 @@ class SideNav extends StatelessWidget {
     required this.selected,
     required this.onSelect,
     required this.focusNodes,
+    required this.onPower,
   });
 
   final Section selected;
   final ValueChanged<Section> onSelect;
   final List<FocusNode> focusNodes;
+  final VoidCallback onPower;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,39 @@ class SideNav extends StatelessWidget {
                   onTap: () => onSelect(section),
                 ),
               ),
+            const Spacer(),
+            _PowerItem(onTap: onPower),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Energia e saída, separada das seções: abre o menu em vez de trocar de página.
+class _PowerItem extends StatelessWidget {
+  const _PowerItem({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = LauncherPalette.of(context);
+    return FocusTile(
+      onActivate: onTap,
+      borderRadius: Dimens.smallRadius,
+      semanticLabel: 'Energia',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        color: palette.panel,
+        child: Row(
+          children: [
+            const Icon(Icons.power_settings_new_rounded),
+            const SizedBox(width: 14),
+            Text(
+              'Energia',
+              style: TextStyle(color: palette.textPrimary, fontSize: 16),
+            ),
           ],
         ),
       ),

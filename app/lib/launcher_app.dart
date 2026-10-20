@@ -6,9 +6,11 @@ import 'package:gamer_launcher/input/input_router.dart';
 import 'package:gamer_launcher/src/rust/api/input.dart';
 import 'package:gamer_launcher/src/rust/api/settings.dart';
 import 'package:gamer_launcher/state/clock.dart';
+import 'package:gamer_launcher/state/autostart_controller.dart';
 import 'package:gamer_launcher/state/gamepad_status.dart';
 import 'package:gamer_launcher/state/launcher_controller.dart';
 import 'package:gamer_launcher/state/messages.dart';
+import 'package:gamer_launcher/state/power_controller.dart';
 import 'package:gamer_launcher/state/quick_controls_controller.dart';
 import 'package:gamer_launcher/state/system_monitor.dart';
 import 'package:gamer_launcher/theme/launcher_theme.dart';
@@ -68,10 +70,15 @@ class _LauncherAppState extends State<LauncherApp> {
       messages: messages,
       coreVersion: widget.coreVersion,
       openFavoritesPicker: _openFavoritesPicker,
+      power: PowerController(backend, messages),
+      autostart: AutostartController(backend, messages),
+      openPowerMenu: _openPowerMenu,
+      closeLauncher: widget.onClose,
     );
     _messageSubscription = messages.stream.listen(_showMessage);
     _lifecycle = AppLifecycleListener(onStateChange: _onLifecycle);
     unawaited(_services.controller.load());
+    unawaited(_services.autostart.load());
   }
 
   @override
@@ -80,6 +87,8 @@ class _LauncherAppState extends State<LauncherApp> {
     unawaited(_messageSubscription.cancel());
     _services.controller.dispose();
     _services.quickControls.dispose();
+    _services.power.dispose();
+    _services.autostart.dispose();
     _services.monitor.dispose();
     _services.gamepad.dispose();
     _services.clock.dispose();
@@ -94,6 +103,7 @@ class _LauncherAppState extends State<LauncherApp> {
     _services.quickControls.poller.visible = visible;
     _services.monitor.poller.visible = visible;
     _services.gamepad.poller.visible = visible;
+    _services.power.poller.visible = visible;
     if (visible) unawaited(_services.controller.refreshRecents());
   }
 
@@ -126,6 +136,12 @@ class _LauncherAppState extends State<LauncherApp> {
     final navigator = _navigator;
     if (navigator == null || _overlayOpen) return;
     unawaited(showFavoritesPicker(navigator));
+  }
+
+  void _openPowerMenu() {
+    final navigator = _navigator;
+    if (navigator == null || _overlayOpen) return;
+    unawaited(showPowerMenu(navigator));
   }
 
   /// LB/RB trocam de seção e levam o foco para o item dela na navegação.

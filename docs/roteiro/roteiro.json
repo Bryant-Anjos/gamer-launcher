@@ -179,8 +179,8 @@
       "reviewed": {
         "app/lib/state/settings_edit.dart": "862a5e4782ea",
         "app/lib/theme/launcher_theme.dart": "0ccdfd3a434c",
-        "app/lib/ui/settings/settings_controls.dart": "2bd55da8b33d",
-        "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
+        "app/lib/ui/settings/settings_controls.dart": "bfcd1edfc839",
+        "app/lib/ui/settings/settings_page.dart": "a58abfd6e327",
         "app/lib/ui/settings/wallpaper_picker.dart": "d504425be76c",
         "app/lib/ui/shell/launcher_background.dart": "d3535dcfb7ad",
         "app/lib/ui/widgets/focus_tile.dart": "2422fe86f6b5",
@@ -194,6 +194,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
         }
       ]
     },
@@ -215,7 +219,7 @@
       ],
       "reviewed": {
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/settings/settings_page.dart": "12033c21bd24",
+        "app/lib/ui/settings/settings_page.dart": "a58abfd6e327",
         "app/rust/src/api/settings.rs": "2a6a73f25fa8",
         "core/src/settings.rs": "144b0e0a81e3"
       },
@@ -228,6 +232,10 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só acrescentou a seção Ao ligar o computador no fim da página de Configurações (testada na seção iniciar-sistema); o resto da página não mudou."
         }
       ]
     },
@@ -236,7 +244,7 @@
       "title": "Início e cartões",
       "sub": "Continuar, Projetos, Jogos e Músicas",
       "items": [
-        "Abra a tela inicial. Confira se aparecem a saudação com o seu primeiro nome, a navegação lateral, a barra superior (Wi-Fi, volume, controle conectado, hora e data) e os quatro cartões: Continuar, Projetos, Jogos e Músicas.",
+        "Abra a tela inicial. Confira se aparecem a saudação com o seu primeiro nome, a navegação lateral, a barra superior (Wi-Fi, volume, controle conectado, bateria quando houver, hora e data), o botão Energia no fim da navegação e os quatro cartões: Continuar, Projetos, Jogos e Músicas.",
         "No cartão Continuar, confira se diz \"Nenhum app aberto ainda\" antes de abrir algo e se passa a mostrar o último aplicativo aberto pelo launcher depois.",
         "Abra o cartão Projetos. Hoje ele mostra quantos itens recentes existem e leva a Arquivos. Anote se é isso que você esperava dele.",
         "Confira o cartão Músicas: sem player instalado ele aparece apagado com \"Nenhum player encontrado\"; com um player instalado, \"Abrir player\" deve abri-lo. Anote qual player abriu se houver vários.",
@@ -258,19 +266,19 @@
         "core/src/user.rs"
       ],
       "reviewed": {
-        "app/lib/launcher_app.dart": "2c0887dd03db",
+        "app/lib/launcher_app.dart": "b7c3702fea80",
         "app/lib/state/clock.dart": "9f13cfa32f2a",
         "app/lib/state/launcher_controller.dart": "7751c85c8a24",
         "app/lib/ui/home/featured_cards.dart": "a185f648562e",
         "app/lib/ui/home/greeting_header.dart": "9fe871afadb7",
         "app/lib/ui/home/home_page.dart": "6ed5c801706e",
-        "app/lib/ui/shell/launcher_shell.dart": "67ae141dffbf",
-        "app/lib/ui/shell/side_nav.dart": "ffd313f39dbc",
-        "app/lib/ui/shell/top_bar.dart": "5ff7f662f98b",
+        "app/lib/ui/shell/launcher_shell.dart": "53be837c3ce4",
+        "app/lib/ui/shell/side_nav.dart": "58f0940eefae",
+        "app/lib/ui/shell/top_bar.dart": "68cbc8495cdf",
         "core/src/history.rs": "d02f2fd3e17f",
         "core/src/user.rs": "891e6dec580a"
       },
-      "itemsHash": "fc585849b599",
+      "itemsHash": "4cb51803049e",
       "reviews": []
     },
     {
@@ -367,7 +375,7 @@
       "reviewed": {
         "app/lib/state/quick_controls_controller.dart": "c6673ecd3ff6",
         "app/lib/state/quick_controls_edit.dart": "9f752b41b06a",
-        "app/lib/ui/quick/overlays.dart": "b3d4b72c68ba",
+        "app/lib/ui/quick/overlays.dart": "16cd7a2e9ab8",
         "app/lib/ui/quick/quick_controls_panel.dart": "9941ae119a34",
         "app/lib/ui/widgets/level_slider.dart": "2590b0862009",
         "app/rust/src/api/system.rs": "198436bcfac8",
@@ -387,8 +395,41 @@
         {
           "date": "2026-10-19",
           "reason": "Só a ponte e o núcleo mudaram (bateria, energia, sons, pesquisa, layout); a tela ainda não os mostra, então nada novo a testar."
+        },
+        {
+          "date": "2026-10-19",
+          "reason": "Só registrou a rota do menu Energia em overlays.dart (testado na seção energia); o controle rápido não mudou."
         }
       ]
+    },
+    {
+      "id": "energia",
+      "title": "Energia e bateria",
+      "sub": "Bateria na barra superior e menu Energia",
+      "priority": "Desliga, reinicia e encerra a sessão de verdade: salve o que estiver aberto",
+      "items": [
+        "Num notebook, confira se a barra superior mostra a bateria com a porcentagem e se ela bate com a do COSMIC. Ligue e desligue o carregador: o ícone com raio deve aparecer ou sumir em até 30 segundos.",
+        "Num computador sem bateria, confira se nada aparece no lugar dela e se o resto da barra continua certo.",
+        "Se puder, deixe a bateria abaixo de 15% sem carregar. Confira se o ícone muda de cor para avisar.",
+        "Com um controle de videogame conectado (que tem bateria própria), confira se a barra mostra a bateria do computador, não a do controle.",
+        "Abra o menu Energia pelo botão no fim da navegação lateral (com o controle: desça até ele e confirme com A). Confira as cinco opções: Suspender, Reiniciar, Desligar, Encerrar sessão e Fechar o launcher, o foco na primeira, e se B fecha o menu sem fazer nada.",
+        "Escolha Suspender. Confira se o computador suspende na hora e, ao acordar, se o launcher e o controle continuam funcionando.",
+        "Escolha Reiniciar. Confira se pergunta antes, com \"Cancelar\" já selecionado. Cancele (ou aperte B) e confira que nada acontece. Depois confirme e veja se reinicia.",
+        "Escolha Desligar e repita o teste da pergunta: Cancelar selecionado, B volta um passo, confirmar desliga.",
+        "Escolha Encerrar sessão. Confira se pergunta, se confirmar leva à tela de login e se, com \"Iniciar com o sistema\" ligado, o launcher abre ao entrar de novo.",
+        "Escolha Fechar o launcher. Confira se fecha na hora, sem perguntar, e por inteiro: o comando pgrep -x gamer_launcher não deve listar nada.",
+        "Se alguma ação for recusada pelo sistema, anote a mensagem que aparece na tela."
+      ],
+      "covers": [
+        "app/lib/ui/power/power_menu.dart",
+        "app/lib/state/power_controller.dart"
+      ],
+      "reviewed": {
+        "app/lib/state/power_controller.dart": "d213e49debd5",
+        "app/lib/ui/power/power_menu.dart": "7279a7015d5d"
+      },
+      "itemsHash": "10397ed097c6",
+      "reviews": []
     },
     {
       "id": "sistema",
@@ -547,24 +588,25 @@
       "id": "iniciar-sistema",
       "title": "Iniciar com o sistema",
       "sub": "Abrir o launcher ao entrar na sessão",
-      "priority": "Ainda em desenvolvimento",
-      "desc": "O núcleo já grava e apaga o arquivo de inicialização. A chave em Configurações ainda será ligada, então estes testes valem quando ela estiver pronta.",
       "items": [
-        "Em Configurações, ligue \"Iniciar com o sistema\". Confira se o ajuste continua ligado depois de fechar e abrir o launcher.",
+        "Em Configurações, na seção \"Ao ligar o computador\", ligue \"Iniciar com o sistema\". Confira se o ajuste continua ligado depois de fechar e abrir o launcher.",
         "Confira se o arquivo ~/.config/autostart/gamer-launcher.desktop foi criado e tem o comando certo.",
         "Saia da sessão e entre de novo (ou reinicie). Confira se o launcher abre sozinho, em tela cheia.",
         "Desligue o ajuste. Confira se o arquivo some e se o launcher não abre no próximo login.",
         "Desligue o launcher em Configurações do sistema > Aplicativos de inicialização e reabra o launcher. Confira se o ajuste aparece desligado.",
         "Instalado pelo .deb e pelo AppImage, confira se o comando gravado abre o launcher certo.",
-        "Anote se abrir com o sistema atrapalha o login (demora, janela por cima da tela de boas-vindas ou do desbloqueio)."
+        "Anote se abrir com o sistema atrapalha o login (demora, janela por cima da tela de boas-vindas ou do desbloqueio).",
+        "Com o ajuste ligado, apague o arquivo ~/.config/autostart/gamer-launcher.desktop e reabra o launcher. Confira se a chave aparece desligada (o arquivo é que manda)."
       ],
       "covers": [
-        "core/src/autostart.rs"
+        "core/src/autostart.rs",
+        "app/lib/state/autostart_controller.dart"
       ],
       "reviewed": {
+        "app/lib/state/autostart_controller.dart": "37a54373640d",
         "core/src/autostart.rs": "cc491ddf08bc"
       },
-      "itemsHash": "c7fd95321716",
+      "itemsHash": "6658948276c1",
       "reviews": []
     },
     {
