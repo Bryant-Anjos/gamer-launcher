@@ -421,6 +421,26 @@ pub(crate) fn spawn_detached(
     Ok(())
 }
 
+/// Abre um atalho `.lnk` como o Menu Iniciar faz (`start`). Passar o atalho
+/// ao `explorer.exe` só abre a pasta padrão em vez de iniciar o programa.
+#[cfg(windows)]
+fn launch_windows_shortcut(shortcut: &str) -> io::Result<()> {
+    let mut command = Command::new("cmd.exe");
+    command
+        .args(["/C", "start", ""])
+        .arg(shortcut)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    // sem janela de console piscando
+    std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0800_0000);
+    let mut child = command.spawn()?;
+    thread::spawn(move || {
+        let _ = child.wait();
+    });
+    Ok(())
+}
+
 /// Abre o app sem esperar por ele.
 pub fn launch(app: &AppEntry) -> io::Result<()> {
     if app.terminal {
@@ -429,8 +449,11 @@ pub fn launch(app: &AppEntry) -> io::Result<()> {
             "apps de terminal ainda não são suportados",
         ));
     }
-    if cfg!(windows) && app.exec.to_lowercase().ends_with(".lnk") {
-        return spawn_detached("explorer.exe", &[app.exec.clone()], None);
+    #[cfg(windows)]
+    {
+        if app.exec.to_lowercase().ends_with(".lnk") {
+            return launch_windows_shortcut(&app.exec);
+        }
     }
     let args = exec_args(&app.exec);
     let (program, rest) = args
