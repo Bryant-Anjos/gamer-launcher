@@ -17,8 +17,19 @@ fn absolute_env_dir(lookup: &impl Fn(&str) -> Option<OsString>, name: &str) -> O
         .filter(|path| path.is_absolute())
 }
 
+/// No Windows, `APPDATA` e `LOCALAPPDATA` fazem o papel dos diretórios XDG.
+fn windows_dir(lookup: &impl Fn(&str) -> Option<OsString>, name: &str) -> Option<PathBuf> {
+    if cfg!(windows) {
+        absolute_env_dir(lookup, name)
+    } else {
+        None
+    }
+}
+
 pub fn home_dir_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
-    absolute_env_dir(lookup, "HOME")
+    absolute_env_dir(lookup, "HOME").or_else(|| {
+        cfg!(windows).then(|| absolute_env_dir(lookup, "USERPROFILE")).flatten()
+    })
 }
 
 fn under_home(lookup: &impl Fn(&str) -> Option<OsString>, relative: &str) -> Option<PathBuf> {
@@ -26,11 +37,15 @@ fn under_home(lookup: &impl Fn(&str) -> Option<OsString>, relative: &str) -> Opt
 }
 
 pub fn data_home_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
-    absolute_env_dir(lookup, "XDG_DATA_HOME").or_else(|| under_home(lookup, ".local/share"))
+    absolute_env_dir(lookup, "XDG_DATA_HOME")
+        .or_else(|| windows_dir(lookup, "LOCALAPPDATA"))
+        .or_else(|| under_home(lookup, ".local/share"))
 }
 
 pub fn config_home_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
-    absolute_env_dir(lookup, "XDG_CONFIG_HOME").or_else(|| under_home(lookup, ".config"))
+    absolute_env_dir(lookup, "XDG_CONFIG_HOME")
+        .or_else(|| windows_dir(lookup, "APPDATA"))
+        .or_else(|| under_home(lookup, ".config"))
 }
 
 /// Diretórios de dados do sistema, do mais prioritário para o menos.
@@ -50,7 +65,9 @@ pub fn data_dirs_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Vec<PathBuf
 }
 
 pub fn state_home_with(lookup: &impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
-    absolute_env_dir(lookup, "XDG_STATE_HOME").or_else(|| under_home(lookup, ".local/state"))
+    absolute_env_dir(lookup, "XDG_STATE_HOME")
+        .or_else(|| windows_dir(lookup, "LOCALAPPDATA"))
+        .or_else(|| under_home(lookup, ".local/state"))
 }
 
 /// Estado do launcher (não são escolhas do usuário), como o último app aberto.

@@ -1,3 +1,4 @@
+#![cfg(unix)]
 use launcher_core::sound::{SoundPlayer, UiSound, find_program, synth_wav};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;

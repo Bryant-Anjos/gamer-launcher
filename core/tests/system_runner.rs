@@ -1,6 +1,7 @@
 use launcher_core::system::{CommandRunner, ProcessRunner, SystemError};
 use std::time::Duration;
 
+#[cfg(unix)]
 #[test]
 fn returns_standard_output() {
     let output = ProcessRunner::default().run("echo", &["oi"]).unwrap();
@@ -8,6 +9,7 @@ fn returns_standard_output() {
     assert_eq!(output, "oi\n");
 }
 
+#[cfg(unix)]
 #[test]
 fn a_failing_command_reports_its_error_text() {
     let error = ProcessRunner::default()
@@ -32,6 +34,7 @@ fn a_missing_program_is_a_command_failure() {
     assert!(matches!(error, SystemError::CommandFailed { .. }));
 }
 
+#[cfg(unix)]
 #[test]
 fn slow_commands_are_killed_after_the_timeout() {
     let runner = ProcessRunner::with_timeout(Duration::from_millis(200));
@@ -43,6 +46,7 @@ fn slow_commands_are_killed_after_the_timeout() {
     assert!(started.elapsed() < Duration::from_secs(3));
 }
 
+#[cfg(unix)]
 #[test]
 fn commands_run_with_the_c_locale() {
     let output = ProcessRunner::default()
@@ -52,6 +56,7 @@ fn commands_run_with_the_c_locale() {
     assert_eq!(output.trim(), "C");
 }
 
+#[cfg(unix)]
 #[test]
 fn shared_runners_work_through_arc() {
     let runner = std::sync::Arc::new(ProcessRunner::default());

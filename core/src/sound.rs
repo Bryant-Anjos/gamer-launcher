@@ -9,6 +9,7 @@ use crate::apps::spawn_detached;
 use crate::fs_util::write_atomic;
 use std::ffi::OsStr;
 use std::io;
+#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
@@ -20,6 +21,7 @@ const AMPLITUDE: f32 = 6_000.0;
 /// Subida e descida suaves (em ms) para o som não estalar.
 const FADE_MS: f32 = 6.0;
 const WAV_HEADER_LEN: u32 = 44;
+#[cfg(unix)]
 const EXECUTABLE_BITS: u32 = 0o111;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -96,6 +98,13 @@ pub fn synth_wav(sound: UiSound) -> Vec<u8> {
     wav
 }
 
+/// Sem player de linha de comando no Windows: os sons ficam indisponíveis.
+#[cfg(not(unix))]
+fn is_executable(_path: &Path) -> bool {
+    false
+}
+
+#[cfg(unix)]
 fn is_executable(path: &Path) -> bool {
     path.metadata()
         .is_ok_and(|meta| meta.is_file() && meta.permissions().mode() & EXECUTABLE_BITS != 0)

@@ -79,6 +79,7 @@ fn pictures_dir_comes_from_user_dirs() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn pictures_dir_accepts_absolute_values() {
     let text = "XDG_PICTURES_DIR=\"/data/fotos\"\n";

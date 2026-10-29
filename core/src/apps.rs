@@ -143,6 +143,182 @@ pub fn exec_args(exec: &str) -> Vec<String> {
 /// id vence, mesmo que esconda o app (é assim que o usuário oculta um app
 /// do sistema). Resultado ordenado por nome, sem diferenciar maiúsculas.
 pub fn discover_apps(dirs: &[PathBuf]) -> Vec<AppEntry> {
+    #[cfg(windows)]
+    return discover_start_menu(dirs);
+    #[cfg(not(windows))]
+    discover_desktop_files(dirs)
+}
+
+/// Atalhos `.lnk` do Menu Iniciar (usuário e todos os usuários), sem os
+/// desinstaladores. O `exec` guarda o caminho do atalho, aberto pelo Explorer.
+#[cfg(windows)]
+fn discover_start_menu(dirs: &[PathBuf]) -> Vec<AppEntry> {
+    fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
+        let Ok(read_dir) = fs::read_dir(dir) else {
+            return;
+        };
+        for entry in read_dir.filter_map(Result::ok) {
+            let path = entry.path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().is_some_and(|ext| ext.eq_ignore_ascii_case("lnk")) {
+                out.push(path);
+            }
+        }
+    }
+    let mut files = Vec::new();
+    for dir in dirs {
+        walk(dir, &mut files);
+    }
+    let mut seen = HashSet::new();
+    let mut apps: Vec<AppEntry> = files
+        .into_iter()
+        .filter_map(|path| {
+            let name = path.file_stem()?.to_string_lossy().into_owned();
+            let lower = name.to_lowercase();
+            let hidden = ["uninstall", "desinstal", "readme", "license"]
+                .iter()
+                .any(|word| lower.contains(word));
+            (!hidden && seen.insert(lower)).then(|| AppEntry {
+                id: format!("{name}.lnk"),
+                name,
+                exec: path.to_string_lossy().into_owned(),
+                icon: None,
+                categories: Vec::new(),
+                terminal: false,
+                working_dir: None,
+            })
+        })
+        .collect();
+    attach_windows_icons(&mut apps);
+    apps.sort_by_key(|app| app.name.to_lowercase());
+    apps
+}
+
+/// Script que extrai o ícone de cada atalho (uma linha `atalho|saida.png`)
+/// num único processo do PowerShell. Lê o atalho para achar o ícone dele (ou
+/// o do programa de destino) e extrai em 128 px, nítido para cartões grandes.
+#[cfg(windows)]
+const ICON_SCRIPT: &str = r#"Add-Type -AssemblyName System.Drawing
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class IconApi {
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+  public static extern uint PrivateExtractIcons(string file, int index, int cx, int cy, IntPtr[] icons, uint[] ids, uint count, uint flags);
+  [DllImport("user32.dll")]
+  public static extern bool DestroyIcon(IntPtr icon);
+}
+'@
+$shell = New-Object -ComObject WScript.Shell
+function Save-IconFrom($file, $index, $out) {
+  if (-not $file -or -not (Test-Path -LiteralPath $file)) { return $false }
+  $handles = New-Object IntPtr[] 1
+  $ids = New-Object uint32[] 1
+  $count = [IconApi]::PrivateExtractIcons($file, $index, 128, 128, $handles, $ids, 1, 0)
+  if ($count -lt 1 -or $handles[0] -eq [IntPtr]::Zero) { return $false }
+  $bitmap = [System.Drawing.Icon]::FromHandle($handles[0]).ToBitmap()
+  $bitmap.Save($out, [System.Drawing.Imaging.ImageFormat]::Png)
+  $bitmap.Dispose()
+  [IconApi]::DestroyIcon($handles[0]) | Out-Null
+  return $true
+}
+Get-Content -LiteralPath $args[0] -Encoding UTF8 | ForEach-Object {
+  $p = $_ -split '\|', 2
+  try {
+    $link = $shell.CreateShortcut($p[0])
+    $location = [Environment]::ExpandEnvironmentVariables($link.IconLocation)
+    $done = $false
+    if ($location) {
+      $cut = $location.LastIndexOf(',')
+      $file = if ($cut -ge 0) { $location.Substring(0, $cut) } else { $location }
+      $index = 0
+      if ($cut -ge 0) { [int]::TryParse($location.Substring($cut + 1), [ref]$index) | Out-Null }
+      $done = Save-IconFrom $file $index $p[1]
+    }
+    if (-not $done) { Save-IconFrom ([Environment]::ExpandEnvironmentVariables($link.TargetPath)) 0 $p[1] | Out-Null }
+  } catch {}
+}
+"#;
+
+/// Extrai os ícones que faltam sem travar a abertura: o PowerShell leva
+/// vários segundos para iniciar. Os apps aparecem já, com a inicial colorida,
+/// e os ícones novos entram na próxima leitura do catálogo.
+#[cfg(windows)]
+fn extract_icons_in_background(dir: PathBuf, missing: Vec<(String, PathBuf)>) {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static RUNNING: AtomicBool = AtomicBool::new(false);
+    if RUNNING.swap(true, Ordering::SeqCst) {
+        return;
+    }
+    thread::spawn(move || {
+        let list = dir.join("pending.txt");
+        let script = dir.join("extract.ps1");
+        let lines: Vec<String> = missing
+            .iter()
+            .map(|(exec, out)| format!("{exec}|{}", out.display()))
+            .collect();
+        if fs::write(&list, lines.join("\n")).is_ok() && fs::write(&script, ICON_SCRIPT).is_ok() {
+            let mut command = Command::new("powershell.exe");
+            command
+                .args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File"])
+                .arg(&script)
+                .arg(&list)
+                .stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(Stdio::null());
+            std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0800_0000);
+            if command.status().is_ok() {
+                for (_, out) in missing.iter().filter(|(_, out)| !out.is_file()) {
+                    let _ = fs::write(out.with_extension("none"), b"");
+                }
+            }
+        }
+        RUNNING.store(false, Ordering::SeqCst);
+    });
+}
+
+/// Ícones dos atalhos, guardados em `%LOCALAPPDATA%\gamer-launcher\icons`.
+/// Só os que faltam no cache são extraídos, em segundo plano.
+#[cfg(windows)]
+fn attach_windows_icons(apps: &mut [AppEntry]) {
+    let Some(dir) = paths::data_home().map(|dir| dir.join("gamer-launcher").join("icons")) else {
+        return;
+    };
+    if fs::create_dir_all(&dir).is_err() {
+        return;
+    }
+    let file_name = |app: &AppEntry| {
+        let safe: String = app
+            .name
+            .chars()
+            .map(|c| if c.is_alphanumeric() || c == ' ' { c } else { '_' })
+            .collect();
+        dir.join(format!("{safe}.png"))
+    };
+    // atalho sem ícone extraível ganha um marcador `.none`: não é tentado de novo
+    let missing: Vec<(String, PathBuf)> = apps
+        .iter()
+        .filter(|app| !file_name(app).is_file() && !file_name(app).with_extension("none").is_file())
+        .map(|app| (app.exec.clone(), file_name(app)))
+        .collect();
+    if !missing.is_empty() {
+        extract_icons_in_background(dir.clone(), missing);
+    }
+    for app in apps {
+        let file = file_name(app);
+        if file.is_file() {
+            app.icon = Some(file.to_string_lossy().into_owned());
+        }
+    }
+}
+
+#[cfg(not(windows))]
+#[allow(dead_code)]
+fn attach_windows_icons(_apps: &mut [AppEntry]) {}
+
+#[cfg_attr(windows, allow(dead_code))]
+fn discover_desktop_files(dirs: &[PathBuf]) -> Vec<AppEntry> {
     let mut seen = HashSet::new();
     let mut apps = Vec::new();
     for dir in dirs {
@@ -192,11 +368,29 @@ pub fn app_dirs_from(
         .collect()
 }
 
+#[cfg(windows)]
+pub fn default_app_dirs() -> Vec<PathBuf> {
+    let start_menu = |root: Option<String>| {
+        root.map(|root| PathBuf::from(root).join("Microsoft/Windows/Start Menu/Programs"))
+    };
+    [
+        start_menu(std::env::var("APPDATA").ok()),
+        start_menu(std::env::var("ProgramData").ok()),
+    ]
+    .into_iter()
+    .flatten()
+    .collect()
+}
+
+#[cfg(not(windows))]
 pub fn default_app_dirs() -> Vec<PathBuf> {
     app_dirs_from(paths::data_home(), paths::home_dir(), &paths::data_dirs())
 }
 
+#[cfg(not(windows))]
 const DEFAULT_OPENER: &str = "xdg-open";
+#[cfg(windows)]
+const DEFAULT_OPENER: &str = "explorer.exe";
 
 pub fn find_app<'a>(apps: &'a [AppEntry], id: &str) -> Option<&'a AppEntry> {
     apps.iter().find(|app| app.id == id)
@@ -234,6 +428,9 @@ pub fn launch(app: &AppEntry) -> io::Result<()> {
             io::ErrorKind::Unsupported,
             "apps de terminal ainda não são suportados",
         ));
+    }
+    if cfg!(windows) && app.exec.to_lowercase().ends_with(".lnk") {
+        return spawn_detached("explorer.exe", &[app.exec.clone()], None);
     }
     let args = exec_args(&app.exec);
     let (program, rest) = args

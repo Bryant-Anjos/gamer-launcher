@@ -87,6 +87,7 @@ fn exec_turns_double_percent_into_a_literal_percent() {
     assert_eq!(exec_args("echo 100%%"), vec!["echo", "100%"]);
 }
 
+#[cfg(unix)]
 #[test]
 fn discovery_merges_dirs_with_the_first_one_winning() {
     let first = tempdir().unwrap();
@@ -252,6 +253,7 @@ fn opening_an_existing_path_runs_the_opener() {
     assert!(open_path_with("true", dir.path()).is_ok());
 }
 
+#[cfg(unix)]
 #[test]
 fn opening_a_missing_path_fails_before_running_anything() {
     let error = open_path_with("true", std::path::Path::new("/no/such/file")).unwrap_err();

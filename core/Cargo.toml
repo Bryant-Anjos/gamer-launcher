@@ -11,5 +11,8 @@ serde_json = "1.0.154"
 sysinfo = "0.39.6"
 thiserror = "2.0.21"
 
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_System_Power", "Win32_Security_Authentication_Identity"] }
+
 [dev-dependencies]
 tempfile = "3.27.0"

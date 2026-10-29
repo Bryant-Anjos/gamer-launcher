@@ -188,6 +188,16 @@ pub fn read_active_sessions(root: &Path, is_alive: &dyn Fn(u32) -> bool) -> Vec<
 }
 
 /// Processo vivo no Linux: existe `/proc/<pid>`.
+#[cfg(not(windows))]
 pub fn pid_is_alive(pid: u32) -> bool {
     Path::new("/proc").join(pid.to_string()).exists()
+}
+
+/// Processo vivo no Windows: consulta a lista de processos.
+#[cfg(windows)]
+pub fn pid_is_alive(pid: u32) -> bool {
+    let pid = sysinfo::Pid::from_u32(pid);
+    let mut system = sysinfo::System::new();
+    system.refresh_processes(sysinfo::ProcessesToUpdate::Some(&[pid]), false);
+    system.process(pid).is_some()
 }

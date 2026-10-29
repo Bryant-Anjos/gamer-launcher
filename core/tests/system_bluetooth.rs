@@ -203,6 +203,7 @@ fn lowercase_addresses_are_accepted_and_normalized() {
     assert_eq!(runner.calls(), [format!("bluetoothctl connect {PAD}")]);
 }
 
+#[cfg(unix)]
 #[test]
 fn a_custom_timeout_is_honored_by_the_real_runner() {
     let runner = ProcessRunner::default();
@@ -214,6 +215,7 @@ fn a_custom_timeout_is_honored_by_the_real_runner() {
     assert!(matches!(error, SystemError::Timeout { .. }));
 }
 
+#[cfg(unix)]
 #[test]
 fn the_custom_timeout_does_not_cut_a_command_that_finishes_in_time() {
     let output = ProcessRunner::with_timeout(Duration::from_millis(50))

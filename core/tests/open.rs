@@ -26,6 +26,7 @@ fn app_running(id: &str, exec: &str) -> AppEntry {
     }
 }
 
+#[cfg(unix)]
 #[test]
 fn items_resolve_to_targets() {
     assert_eq!(
@@ -69,6 +70,7 @@ fn relative_file_paths_are_refused() {
     ));
 }
 
+#[cfg(unix)]
 #[test]
 fn opening_an_app_launches_it() {
     let apps = [app_running("ok.desktop", "true")];

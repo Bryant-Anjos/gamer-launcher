@@ -93,3 +93,49 @@ pub fn set_enabled(file: &Path, enabled: bool, exec: &str) -> io::Result<()> {
         _ => Ok(()),
     }
 }
+
+/// Iniciar com o Windows: um valor em `HKCU\...\Run`, que não exige
+/// administrador. A chave é a verdade, como o arquivo no Linux.
+#[cfg(windows)]
+pub mod windows {
+    use std::io;
+    use std::process::{Command, Stdio};
+
+    const RUN_KEY: &str = r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run";
+    const VALUE_NAME: &str = "GamerLauncher";
+    const NO_WINDOW: u32 = 0x0800_0000;
+
+    fn reg(args: &[&str]) -> io::Result<bool> {
+        let mut command = Command::new("reg");
+        command
+            .args(args)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+        std::os::windows::process::CommandExt::creation_flags(&mut command, NO_WINDOW);
+        command.status().map(|status| status.success())
+    }
+
+    pub fn is_enabled() -> bool {
+        reg(&["query", RUN_KEY, "/v", VALUE_NAME]).unwrap_or(false)
+    }
+
+    /// Liga com o caminho do programa que está rodando; desligar sem a
+    /// chave presente também é sucesso.
+    pub fn set_enabled(enabled: bool) -> io::Result<()> {
+        if enabled {
+            let exe = std::env::current_exe()?;
+            let command_line = format!("\"{}\"", exe.display());
+            let done = reg(&[
+                "add", RUN_KEY, "/v", VALUE_NAME, "/t", "REG_SZ", "/d", &command_line, "/f",
+            ])?;
+            return done
+                .then_some(())
+                .ok_or_else(|| io::Error::other("não foi possível gravar no registro"));
+        }
+        if is_enabled() {
+            reg(&["delete", RUN_KEY, "/v", VALUE_NAME, "/f"])?;
+        }
+        Ok(())
+    }
+}

@@ -14,6 +14,7 @@ fn env<'a>(pairs: &'a [(&'a str, &'a str)]) -> impl Fn(&str) -> Option<OsString>
     }
 }
 
+#[cfg(unix)]
 #[test]
 fn data_home_prefers_an_absolute_xdg_value() {
     let lookup = env(&[("XDG_DATA_HOME", "/data"), ("HOME", "/home/b")]);
@@ -21,6 +22,7 @@ fn data_home_prefers_an_absolute_xdg_value() {
     assert_eq!(data_home_with(&lookup), Some(PathBuf::from("/data")));
 }
 
+#[cfg(unix)]
 #[test]
 fn data_home_ignores_relative_xdg_values() {
     let lookup = env(&[("XDG_DATA_HOME", "relative/dir"), ("HOME", "/home/b")]);
@@ -36,6 +38,7 @@ fn data_home_needs_xdg_or_home() {
     assert_eq!(data_home_with(&env(&[])), None);
 }
 
+#[cfg(unix)]
 #[test]
 fn config_home_falls_back_to_dot_config() {
     let lookup = env(&[("HOME", "/home/b")]);
@@ -46,6 +49,7 @@ fn config_home_falls_back_to_dot_config() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn data_dirs_default_when_unset_or_empty() {
     let expected = vec![
@@ -57,6 +61,7 @@ fn data_dirs_default_when_unset_or_empty() {
     assert_eq!(data_dirs_with(&env(&[("XDG_DATA_DIRS", "")])), expected);
 }
 
+#[cfg(unix)]
 #[test]
 fn data_dirs_keep_order_and_drop_relative_entries() {
     let lookup = env(&[("XDG_DATA_DIRS", "/a:rel:/b")]);
@@ -67,6 +72,7 @@ fn data_dirs_keep_order_and_drop_relative_entries() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn settings_and_recents_live_under_the_xdg_homes() {
     let lookup = env(&[("XDG_CONFIG_HOME", "/cfg"), ("XDG_DATA_HOME", "/data")]);
@@ -89,6 +95,7 @@ fn empty_or_relative_home_is_not_a_home() {
     assert_eq!(config_home_with(&env(&[("HOME", "")])), None);
 }
 
+#[cfg(unix)]
 #[test]
 fn absolute_home_is_used() {
     assert_eq!(
@@ -97,6 +104,7 @@ fn absolute_home_is_used() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn state_home_prefers_xdg_and_falls_back_to_local_state() {
     assert_eq!(
@@ -109,6 +117,7 @@ fn state_home_prefers_xdg_and_falls_back_to_local_state() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn launch_history_lives_under_the_state_home() {
     assert_eq!(

@@ -16,6 +16,7 @@ fn env<'a>(pairs: &'a [(&'a str, &'a str)]) -> impl Fn(&str) -> Option<OsString>
     }
 }
 
+#[cfg(unix)]
 #[test]
 fn the_autostart_file_lives_in_the_xdg_autostart_folder() {
     let lookup = env(&[("XDG_CONFIG_HOME", "/cfg"), ("HOME", "/home/b")]);
@@ -26,6 +27,7 @@ fn the_autostart_file_lives_in_the_xdg_autostart_folder() {
     );
 }
 
+#[cfg(unix)]
 #[test]
 fn without_xdg_it_falls_back_to_dot_config() {
     let lookup = env(&[("HOME", "/home/b")]);

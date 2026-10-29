@@ -175,6 +175,7 @@ dependencies = [
  "sysinfo",
  "tempfile",
  "thiserror",
+ "windows-sys",
 ]
 
 [[package]]

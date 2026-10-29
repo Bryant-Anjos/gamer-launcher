@@ -8,10 +8,14 @@ mod linux;
 mod parse;
 mod power;
 mod runner;
+#[cfg(windows)]
+mod windows;
 
 pub use error::SystemError;
 pub use linux::LinuxSystem;
 pub use runner::{CommandRunner, ProcessRunner};
+#[cfg(windows)]
+pub use windows::WindowsSystem;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Volume {

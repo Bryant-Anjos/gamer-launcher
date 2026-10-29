@@ -94,13 +94,18 @@ impl ProcessRunner {
             program: program.to_string(),
             message,
         };
-        let mut child = Command::new(program)
+        let mut command = Command::new(program);
+        command
             .args(args)
             .env("LC_ALL", "C")
             .env("LANG", "C")
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
+            .stderr(Stdio::piped());
+        // sem janela de console piscando quando o app é gráfico
+        #[cfg(windows)]
+        std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0800_0000);
+        let mut child = command
             .spawn()
             .map_err(|error| failed(error.to_string()))?;
         let stdout = child.stdout.take().map(read_in_background);

@@ -6,8 +6,14 @@ use crate::search::SearchItem;
 use std::path::PathBuf;
 use thiserror::Error;
 
+#[cfg(not(windows))]
 const DEFAULT_FILE_OPENER: &str = "xdg-open";
+#[cfg(not(windows))]
 const DEFAULT_SETTINGS_APP: &str = "cosmic-settings";
+#[cfg(windows)]
+const DEFAULT_FILE_OPENER: &str = "explorer.exe";
+#[cfg(windows)]
+const DEFAULT_SETTINGS_APP: &str = "explorer.exe";
 
 #[derive(Debug, Error)]
 pub enum OpenError {
@@ -61,6 +67,25 @@ pub struct Opener {
     settings_app: String,
 }
 
+/// No Windows as configurações abrem pelo esquema `ms-settings:`.
+#[cfg(windows)]
+fn settings_argument(page: &str) -> String {
+    match page {
+        "bluetooth" => "ms-settings:bluetooth",
+        "network" | "wifi" => "ms-settings:network",
+        "sound" | "audio" => "ms-settings:sound",
+        "display" => "ms-settings:display",
+        "power" => "ms-settings:powersleep",
+        _ => "ms-settings:",
+    }
+    .to_string()
+}
+
+#[cfg(not(windows))]
+fn settings_argument(page: &str) -> String {
+    page.to_string()
+}
+
 impl Opener {
     pub fn system() -> Self {
         Self::with_programs(DEFAULT_FILE_OPENER, DEFAULT_SETTINGS_APP)
@@ -88,7 +113,7 @@ impl Opener {
                 }
                 self.spawn(&self.file_opener, path.display().to_string())
             }
-            OpenTarget::Settings(page) => self.spawn(&self.settings_app, page.clone()),
+            OpenTarget::Settings(page) => self.spawn(&self.settings_app, settings_argument(page)),
         }
     }
 

@@ -80,6 +80,7 @@ fn loading_a_missing_file_gives_an_empty_list() {
     assert!(items.is_empty());
 }
 
+#[cfg(unix)]
 #[test]
 fn loading_drops_files_that_no_longer_exist_before_applying_the_limit() {
     let dir = tempdir().unwrap();

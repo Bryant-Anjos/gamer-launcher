@@ -5,8 +5,12 @@ use launcher_core::stats::StatsSampler;
 pub use launcher_core::system::PowerAction;
 use launcher_core::system::{
     AudioControl, BatteryControl, BluetoothControl, BluetoothDevices, BrightnessControl,
-    DarkModeControl, LinuxSystem, PowerControl, ProcessRunner, WifiControl,
+    DarkModeControl, PowerControl, ProcessRunner, WifiControl,
 };
+#[cfg(not(windows))]
+use launcher_core::system::LinuxSystem as PlatformSystem;
+#[cfg(windows)]
+use launcher_core::system::WindowsSystem as PlatformSystem;
 use std::sync::{LazyLock, Mutex, PoisonError};
 
 /// Um controle liga/desliga lido do sistema; `enabled` vazio quando a
@@ -69,8 +73,8 @@ pub struct PairedDevice {
     pub connected: bool,
 }
 
-static SYSTEM: LazyLock<LinuxSystem<ProcessRunner>> =
-    LazyLock::new(|| LinuxSystem::new(ProcessRunner::default()));
+static SYSTEM: LazyLock<PlatformSystem<ProcessRunner>> =
+    LazyLock::new(|| PlatformSystem::new(ProcessRunner::default()));
 
 /// O uso de CPU depende da leitura anterior, por isso o amostrador é único.
 static SAMPLER: LazyLock<Mutex<StatsSampler>> = LazyLock::new(|| Mutex::new(StatsSampler::new()));
@@ -151,14 +155,26 @@ pub fn disconnect_bluetooth_device(address: String) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
+#[cfg(not(windows))]
 const NO_AUTOSTART_DIR: &str = "sem pasta de configuração (HOME ausente)";
 
 /// A existência do arquivo em `~/.config/autostart` é a verdade.
 pub fn autostart_enabled() -> bool {
+    #[cfg(windows)]
+    return autostart::windows::is_enabled();
+    #[cfg(not(windows))]
     autostart::autostart_file().is_some_and(|file| autostart::is_enabled(&file))
 }
 
 pub fn set_autostart(enabled: bool) -> Result<(), String> {
+    #[cfg(windows)]
+    return autostart::windows::set_enabled(enabled).map_err(|error| error.to_string());
+    #[cfg(not(windows))]
+    set_autostart_file(enabled)
+}
+
+#[cfg(not(windows))]
+fn set_autostart_file(enabled: bool) -> Result<(), String> {
     let file = autostart::autostart_file().ok_or_else(|| NO_AUTOSTART_DIR.to_string())?;
     let exec = if enabled {
         autostart::current_exec_line().map_err(|error| error.to_string())?
