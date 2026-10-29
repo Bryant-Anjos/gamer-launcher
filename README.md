@@ -146,3 +146,24 @@ Pro Controller da Nintendo por Bluetooth.
 ## Licença
 
 [MIT](LICENSE).
+
+## Windows (experimental)
+
+O launcher também compila e abre no Windows 11, em tela cheia. Compilar exige Flutter, Rust (MSVC), o
+Visual Studio Build Tools com a carga de trabalho C++ e o Modo de Desenvolvedor do Windows ligado (links
+simbólicos dos plugins). Mantenha o projeto num caminho curto (o MSBuild falha acima de 260 caracteres).
+
+```powershell
+cd app
+flutter build windows --release
+```
+
+O Smart App Control do Windows bloqueia os programas gerados pela compilação; é preciso desativá-lo para compilar.
+
+**Funciona:** aplicativos (atalhos do Menu Iniciar, com ícones), abrir arquivos, volume, brilho (só em tela
+interna), modo escuro do sistema, bateria, estado do Wi-Fi e Bluetooth, gráficos do sistema, energia e controles
+reconhecidos pelo Windows (Xbox; PlayStation e Nintendo não foram testados).
+
+**Ainda não no Windows:** ligar e desligar Wi-Fi e Bluetooth, lista de dispositivos Bluetooth, sons da interface,
+iniciar junto com o sistema e papéis de parede do sistema. Os testes de captura (`test/goldens`) foram gerados no
+Linux e não batem pixel a pixel no Windows.
