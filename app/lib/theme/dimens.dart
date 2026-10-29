@@ -11,6 +11,9 @@ abstract final class Dimens {
   static const sideNavWidth = 208.0;
   static const sidePanelWidth = 380.0;
   static const searchWidth = 440.0;
+
+  /// Escala da coluna da direita da tela inicial em telas estreitas.
+  static const compactPanelScale = 0.82;
   static const searchPanelWidth = 760.0;
   static const radius = 18.0;
   static const smallRadius = 12.0;

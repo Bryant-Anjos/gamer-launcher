@@ -20,7 +20,7 @@ const addFavoriteLabel = 'Adicionar';
 
 /// Colunas da grade de favoritos: as mesmas dos cartões de destaque, para os
 /// blocos terem o mesmo tamanho e ficarem alinhados com eles.
-const favoriteColumns = 4;
+const favoriteColumns = wideColumns;
 
 /// Favoritos em blocos grandes, do tamanho dos cartões de destaque (como numa
 /// TV), e o "Adicionar". X (ou M no teclado) num favorito começa a movê-lo:
@@ -73,7 +73,7 @@ class _FavoritesPanelState extends State<FavoritesPanel> {
     final to = moveTarget(
       from,
       direction,
-      columns: favoriteColumns,
+      columns: homeColumns(MediaQuery.sizeOf(context).width),
       length: draft.length,
     );
     setState(() => _draft = moveItem(draft, from, to));
@@ -173,8 +173,9 @@ class _FavoritesPanelState extends State<FavoritesPanel> {
     final height = featuredCardHeight(MediaQuery.sizeOf(context).height);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gaps = Dimens.gap * (favoriteColumns - 1);
-        final width = (constraints.maxWidth - gaps) / favoriteColumns;
+        final columns = homeColumns(MediaQuery.sizeOf(context).width);
+        final gaps = Dimens.gap * (columns - 1);
+        final width = (constraints.maxWidth - gaps) / columns;
         final size = Size(width, height);
         return Wrap(
           spacing: Dimens.gap,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamer_launcher/backend/rust_backend.dart';
@@ -17,6 +19,12 @@ Future<LauncherButtonLayout> _savedButtonLayout() async {
   }
 }
 
+/// `SystemNavigator.pop` não faz nada nos desktops Windows; lá o processo sai direto.
+void _closeLauncher() {
+  if (Platform.isWindows) exit(0);
+  SystemNavigator.pop();
+}
+
 Future<void> main() async {
   await RustLib.init();
   final layout = await _savedButtonLayout();
@@ -25,7 +33,7 @@ Future<void> main() async {
       backend: const RustBackend(),
       coreVersion: coreVersion(),
       actions: gamepadStream(layout: layout),
-      onClose: SystemNavigator.pop,
+      onClose: _closeLauncher,
     ),
   );
 }

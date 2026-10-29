@@ -43,30 +43,38 @@ class LauncherController extends ValueNotifier<LauncherState> {
   }
 
   Future<void> load() async {
-    final settings = await _attempt(
+    // As quatro leituras começam juntas: uma lenta não segura as outras.
+    final settingsLoad = _attempt(
       _backend.loadSettings,
       'Configurações inválidas, usando o padrão',
     );
-    final catalog = await _attempt(
+    final catalogLoad = _attempt(
       _backend.loadCatalog,
       'Não foi possível listar os apps',
     );
-    catalog?.warnings.forEach(_messages.show);
-    final recents = await _attempt(
+    final recentsLoad = _attempt(
       () => _backend.listRecents(recentsLimit),
       'Não foi possível ler os recentes',
     );
-    final userName = await _loadUserName();
+    final userNameLoad = _loadUserName();
+
+    // A tela aparece assim que configurações e apps chegam (o necessário
+    // para os favoritos); recentes e nome entram depois, sem segurá-la.
+    final settings = await settingsLoad;
+    final catalog = await catalogLoad;
+    catalog?.warnings.forEach(_messages.show);
     if (settings != null) _applyButtonLayout(settings.buttonLayout);
     // `value` lido só agora: uma troca de seção durante a carga é mantida
     value = value.copyWith(
       settings: settings,
       catalog: catalog,
-      recents: recents,
-      userName: userName,
       lastAppId: catalog?.lastAppId,
       isReady: true,
     );
+    final recents = await recentsLoad;
+    final userName = await userNameLoad;
+    if (_disposed) return;
+    value = value.copyWith(recents: recents, userName: userName);
   }
 
   /// Sem nome a saudação só fica genérica; não vale um aviso.

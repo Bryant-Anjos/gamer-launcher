@@ -25,7 +25,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasClaude = LauncherScope.of(context).claude != null;
-    final body = _body(hasClaude: hasClaude);
+    final compact =
+        homeColumns(MediaQuery.sizeOf(context).width) < wideColumns;
+    final body = _body(hasClaude: hasClaude, compact: compact);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         Dimens.focusInset,
@@ -52,7 +54,21 @@ class HomePage extends StatelessWidget {
     ],
   );
 
-  Widget? _body({required bool hasClaude}) {
+  /// Em telas estreitas a coluna da direita encolhe como um bloco só (mesmas
+  /// proporções, só menor), deixando mais espaço para os cartões.
+  Widget _sidePanel(Widget panels, {required bool compact}) {
+    if (!compact) return SizedBox(width: Dimens.sidePanelWidth, child: panels);
+    return SizedBox(
+      width: Dimens.sidePanelWidth * Dimens.compactPanelScale,
+      child: FittedBox(
+        fit: BoxFit.fitWidth,
+        alignment: Alignment.topLeft,
+        child: SizedBox(width: Dimens.sidePanelWidth, child: panels),
+      ),
+    );
+  }
+
+  Widget? _body({required bool hasClaude, required bool compact}) {
     final left = _stack([
       if (_shows(PanelKind.featuredCards)) FeaturedCards(state: state),
       if (_shows(PanelKind.favorites))
@@ -71,7 +87,7 @@ class HomePage extends StatelessWidget {
         Expanded(child: left ?? const SizedBox.shrink()),
         if (right != null) ...[
           const SizedBox(width: Dimens.gutter),
-          SizedBox(width: Dimens.sidePanelWidth, child: right),
+          _sidePanel(right, compact: compact),
         ],
       ],
     );

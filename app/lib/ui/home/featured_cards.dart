@@ -24,6 +24,15 @@ double featuredCardHeight(double screenHeight) =>
       _maxCardHeight,
     );
 
+/// Colunas da tela inicial (cartões de destaque e favoritos): em telas estreitas
+/// (notebook de 1366 px) cabem dois blocos por linha, grandes como nas telas
+/// largas, em vez de quatro pequenos ao lado de um painel lateral largo.
+const wideColumns = 4;
+const _narrowScreenWidth = 1500.0;
+
+int homeColumns(double screenWidth) =>
+    screenWidth < _narrowScreenWidth ? 2 : wideColumns;
+
 /// Os quatro cartões de destaque: Continuar, Projetos, Jogos e Músicas.
 class FeaturedCards extends StatelessWidget {
   const FeaturedCards({super.key, required this.state});
@@ -84,17 +93,29 @@ class FeaturedCards extends StatelessWidget {
         onActivate: music == null ? null : () => controller.launchApp(music.id),
       ),
     ];
-    return SizedBox(
-      height: featuredCardHeight(MediaQuery.sizeOf(context).height),
+    final screen = MediaQuery.sizeOf(context);
+    final height = featuredCardHeight(screen.height);
+    final columns = homeColumns(screen.width);
+    Widget row(List<Widget> items) => SizedBox(
+      height: height,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final (index, card) in cards.indexed) ...[
+          for (final (index, card) in items.indexed) ...[
             if (index > 0) const SizedBox(width: Dimens.gap),
             Expanded(child: card),
           ],
         ],
       ),
+    );
+    if (columns >= cards.length) return row(cards);
+    return Column(
+      children: [
+        for (var start = 0; start < cards.length; start += columns) ...[
+          if (start > 0) const SizedBox(height: Dimens.gap),
+          row(cards.sublist(start, (start + columns).clamp(0, cards.length))),
+        ],
+      ],
     );
   }
 }

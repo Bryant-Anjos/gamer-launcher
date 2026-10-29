@@ -25,6 +25,9 @@ import 'package:gamer_launcher/ui/shell/launcher_shell.dart';
 
 const _minutesPerHour = 60;
 
+/// Largura lógica (px) para a qual as medidas de `Dimens` foram pensadas.
+const _designWidth = 1280.0;
+
 /// Criados uma vez: o MaterialApp é reconstruído a cada minuto (relógio).
 final _lightTheme = buildLauncherTheme(Brightness.light);
 final _darkTheme = buildLauncherTheme(Brightness.dark);
@@ -254,6 +257,23 @@ class _LauncherAppState extends State<LauncherApp> {
     );
   }
 
+  /// O layout é desenhado para ~1280 px lógicos de largura. Em telas com zoom
+  /// do sistema (125% num notebook de 1366 px dá ~1090), tudo é ampliado de
+  /// uma vez, em vez de só os painéis fixos crescerem mais que o resto.
+  Widget _fitToDesign(BuildContext context, Widget child) {
+    final media = MediaQuery.of(context);
+    final size = media.size;
+    if (size.isEmpty || size.width >= _designWidth) return child;
+    final virtual = Size(_designWidth, size.height * _designWidth / size.width);
+    return FittedBox(
+      fit: BoxFit.fill,
+      child: SizedBox.fromSize(
+        size: virtual,
+        child: MediaQuery(data: media.copyWith(size: virtual), child: child),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -273,9 +293,11 @@ class _LauncherAppState extends State<LauncherApp> {
             _services.controller.value.settings.reduceAnimations
             ? Duration.zero
             : kThemeAnimationDuration,
-        builder: (context, child) => _withMotion(
+        builder: (context, child) => _fitToDesign(
           context,
-          LauncherScope(
+          _withMotion(
+            context,
+            LauncherScope(
             services: _services,
             child: InputRouter(
               actions: widget.actions,
@@ -289,6 +311,7 @@ class _LauncherAppState extends State<LauncherApp> {
               onBackToMenu: _backToMenu,
               child: child ?? const SizedBox.shrink(),
             ),
+          ),
           ),
         ),
         home: const LauncherShell(),
