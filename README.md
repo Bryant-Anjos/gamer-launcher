@@ -149,21 +149,27 @@ Pro Controller da Nintendo por Bluetooth.
 
 ## Windows (experimental)
 
-O launcher também compila e abre no Windows 11, em tela cheia. Compilar exige Flutter, Rust (MSVC), o
-Visual Studio Build Tools com a carga de trabalho C++ e o Modo de Desenvolvedor do Windows ligado (links
-simbólicos dos plugins). Mantenha o projeto num caminho curto (o MSBuild falha acima de 260 caracteres).
+O launcher também compila e abre no Windows 11, em tela cheia. Detalhes de como compilar, o que muda em relação
+ao Linux, medições e armadilhas estão em [docs/windows.md](docs/windows.md). O resumo:
 
 ```powershell
 cd app
 flutter build windows --release
 ```
 
-O Smart App Control do Windows bloqueia os programas gerados pela compilação; é preciso desativá-lo para compilar.
+Compilar exige Flutter, Rust (MSVC), o Visual Studio Build Tools com a carga de trabalho C++, o Modo de
+Desenvolvedor do Windows ligado e um caminho curto para o projeto. O Smart App Control bloqueia os programas gerados
+pela compilação; prefira compilar em outro computador a desativá-lo (desativar é permanente).
 
 **Funciona:** aplicativos (atalhos do Menu Iniciar, com ícones), abrir arquivos, volume, brilho (só em tela
-interna), modo escuro do sistema, bateria, estado do Wi-Fi e Bluetooth, gráficos do sistema, energia e controles
-reconhecidos pelo Windows (Xbox; PlayStation e Nintendo não foram testados).
+interna), modo escuro do sistema, bateria, estado do Wi-Fi e do Bluetooth, gráficos do sistema, energia, iniciar com
+o Windows, nome na saudação, tela cheia e controles reconhecidos pelo Windows (um controle foi testado; o de
+PlayStation não está confirmado).
 
-**Ainda não no Windows:** ligar e desligar Wi-Fi e Bluetooth, lista de dispositivos Bluetooth, sons da interface,
-iniciar junto com o sistema e papéis de parede do sistema. Os testes de captura (`test/goldens`) foram gerados no
-Linux e não batem pixel a pixel no Windows.
+**Ainda não no Windows:** ligar e desligar Wi-Fi e Bluetooth, lista de dispositivos Bluetooth, sons da interface e
+papéis de parede do sistema. Os testes de captura (`test/goldens`) foram gerados no Linux e não batem pixel a pixel
+no Windows.
+
+## Ideias para depois
+
+- [Controle remoto pelo celular](docs/ideias/controle-pelo-celular.md)

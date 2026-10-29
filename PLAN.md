@@ -271,3 +271,14 @@ Pedido do usuário: em máquinas com o Claude Code, acompanhar sessões, agentes
 
 O Home/Guide do controle fechava o app (mapeamento da Fase 4) e foi lido pelo usuário como um travamento. Agora ele **volta ao Início**: fecha o painel aberto, seleciona a seção Início e leva o foco ao item dela. `GamepadAction::Close` virou `Home`. Fechar o launcher fica no Ctrl+Q e no botão "Fechar o launcher" do menu de energia; o controle rápido (Bluetooth, Wi-Fi...) continua no Start (o "+" do Pro Controller). **Isso substitui** a decisão antiga de que o Guide alternaria esconder/mostrar o launcher.
 
+## Windows (out/2026)
+
+Primeira versão para Windows 11 na branch `windows-port`; o registro completo (como compilar, o que muda, medições e
+armadilhas) está em `docs/windows.md`. Decisões: o núcleo ganhou implementações por `cfg(windows)` sem mudar o Linux;
+os controles do sistema usam programas que já vêm com o Windows (PowerShell, `reg`, `shutdown`) e a API do Windows
+para bateria e nome de usuário; os ícones dos apps são extraídos em segundo plano e cacheados.
+
+**Pendências:** revisar no Linux os testes de captura e o roteiro (`docs/roteiro`) por causa das duas colunas em
+telas estreitas e da carga em paralelo; dicas de botão de PlayStation (✕ ○ □ △); ligar e desligar Wi-Fi e Bluetooth no
+Windows; sons da interface no Windows; medir onde vão os ~4 s até a janela aparecer; testar iniciar com o Windows
+pelo botão das configurações e pelo login; ideia de controle pelo celular em `docs/ideias/controle-pelo-celular.md`.
